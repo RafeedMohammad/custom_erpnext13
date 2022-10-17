@@ -87,9 +87,13 @@ app_license = "MIT"
 # ---------------
 # Override standard doctype classes
 
-# override_doctype_class = {
-#	"ToDo": "custom_app.overrides.CustomToDo"
-# }
+override_doctype_class = {
+#	"ToDo": "custom_app.overrides.CustomToDo",
+
+    "Shift Type": "custom_erpnext.shift_type.override_ShiftType",
+    "Attendance": "custom_erpnext.attendance.override_Attendance",
+    "Employee Checkin": "custom_erpnext.employee_checkin.override_EmployeeCheckin"
+}
 
 # Document Events
 # ---------------
