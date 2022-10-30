@@ -2,6 +2,7 @@
 # For license information, please see license.txt
 
 
+from math import ceil, floor
 import frappe
 from frappe import _
 from frappe.model.document import Document
@@ -16,8 +17,8 @@ from erpnext.hr.utils import validate_active_employee
 
 from datetime import datetime
 
-
 class override_EmployeeCheckin(Document):
+	
 	def validate(self):
 		validate_active_employee(self.employee)
 		self.validate_duplicate_log()
@@ -57,6 +58,7 @@ class override_EmployeeCheckin(Document):
 				self.shift_end = shift_actual_timings[2].end_datetime
 		else:
 			self.shift = None
+	
 
 
 @frappe.whitelist()
@@ -119,6 +121,8 @@ def mark_attendance_and_link_log(
 	in_time=None,
 	out_time=None,
 	shift=None,
+	overtime_hour=None,
+	late_entry_duration=None
 ):
 	"""Creates an attendance and links the attendance to the Employee Checkin.
 	Note: If attendance is already present for the given date, the logs are marked as skipped and no exception is thrown.
@@ -130,13 +134,41 @@ def mark_attendance_and_link_log(
 	"""
 	log_names = [x.name for x in logs]
 	employee = logs[0].employee
+	company = frappe.get_cached_value("Employee", employee, "company")
+	overtime = frappe.get_cached_value("Employee", employee, "overtime")
+
+	
+	if attendance_status in ("Weekly Off", "Holiday"):
+		overtime_hour=working_hours
+
+	if overtime=="No":
+		overtime_hour = 0
+	else:
+		rounding_ot = frappe.db.get_value("Company", company, "rounding_overtime") / 60
+		#overtime_hour=rounding_ot
+		overtime_hour_fraction  = overtime_hour % 1
+		if overtime_hour_fraction >= rounding_ot:
+			#ceil(overtime_hour)
+			#late_entry_duration="besi"
+			overtime_hour = ceil(overtime_hour)
+		else:
+			#floor(overtime_hour)
+			#late_entry_duration="kom"
+			overtime_hour = floor(overtime_hour)
+		if attendance_status in ("Weekly Off", "Holiday"):
+			overtime_hour=overtime_hour*2
+
+
+
+
 	
 	if attendance_status == "Skip":
 		skip_attendance_in_checkins(log_names)
 		return None
 
-	elif attendance_status in ("Present", "Absent", "Half Day","Weekly Off","Holiday","Late"):
+	elif attendance_status in ("Present", "Absent", "Half Day", "Weekly Off", "Holiday", "Late"):
 		company = frappe.get_cached_value("Employee", employee, "company")
+
 		duplicate = frappe.db.exists(
 			"Attendance",
 			{"employee": employee, "attendance_date": attendance_date, "docstatus": ("!=", "2")},
@@ -155,16 +187,18 @@ def mark_attendance_and_link_log(
 				"early_exit": early_exit,
 				"in_time": in_time,
 				"out_time": out_time,
+				"rounded_ot": overtime_hour,
+				"late_entry_duration":late_entry_duration
 			}
 			attendance = frappe.get_doc(doc_dict).insert()
-			#attendance.submit()
-			attendance.save()
+			attendance.submit()
 
 			if attendance_status == "Absent":
 				attendance.add_comment(
 					text=_("Employee was marked Absent for not meeting the working hours threshold.")
 				)
 
+			#Updated the Employee Checkin document for multi-attendance processing. The checkins which are given later, will be set with the attendance ID processed before
 			frappe.db.sql(
 				"""update `tabEmployee Checkin`
 				set attendance = %s
@@ -187,11 +221,15 @@ def mark_attendance_and_link_log(
                 "early_exit": early_exit,
                 "in_time": in_time,
                 "out_time": out_time,
-                
+				"rounded_ot":overtime_hour,
+				"late_entry_duration":late_entry_duration
+			
             }
 			attendance=frappe.db.set_value('Attendance', previous_attendance_name, {'out_time': doc_dict['out_time'],'working_hours': doc_dict['working_hours'],
-            'in_time': doc_dict['in_time'],'status': doc_dict['status'],'late_entry': doc_dict['late_entry'],'early_exit': doc_dict['early_exit']}, update_modified=True)
+            'in_time': doc_dict['in_time'],'status': doc_dict['status'],'late_entry': doc_dict['late_entry'],'early_exit': doc_dict['early_exit'], 'rounded_ot': doc_dict['rounded_ot'],'late_entry_duration':doc_dict['late_entry_duration']}, update_modified=True)
 			#Changed Code - End
+
+			#Attendance document with updated values will be saved
 			attendance = frappe.get_doc('Attendance',previous_attendance_name).save()
 
 			skip_attendance_in_checkins(log_names,previous_attendance_name)#added previous_attendance
@@ -203,7 +241,7 @@ def mark_attendance_and_link_log(
 	else:
 		frappe.throw(_("{} is an invalid Attendance Status.").format(attendance_status))
 
-def calculate_working_hours(logs, check_in_out_type, working_hours_calc_type,holiday=None,lunch_start=None,lunch_end=None):
+def calculate_working_hours(logs, check_in_out_type, working_hours_calc_type, holiday=None, lunch_start=None, lunch_end=None,shift_start=None,shift_end=None):
 	"""Given a set of logs in chronological order calculates the total working hours based on the parameters.
 	Zero is returned for all invalid cases.
 
@@ -213,21 +251,31 @@ def calculate_working_hours(logs, check_in_out_type, working_hours_calc_type,hol
 	"""
 	total_hours = 0
 	in_time = out_time = None
+	#lunch_start_datetime1=datetime.strptime(lunch_start,'%H:%M:%S')
+	#lunch_end_datetime1=datetime.strptime(lunch_end,'%H:%M:%S')
 	lunch_start_datetime=datetime.strptime(lunch_start,'%H:%M:%S')
 	lunch_end_datetime=datetime.strptime(lunch_end,'%H:%M:%S')
+	
+	shift_start_datetime=datetime.strptime(shift_start,'%H:%M:%S')
+	shift_end_datetime=datetime.strptime(shift_end,'%H:%M:%S')
+	overtime_hour = 0
+	#check_if_weekly_off = 0
 
 
 
 	if check_in_out_type == "Alternating entries as IN and OUT during the same shift":
 		in_time = logs[0].time
 		
-		in_date1 = datetime.strptime(str(logs[0].time).split(" ")[0], '%Y-%m-%d').date()#(logs[0])
+		in_date1 = logs[0].shift_start_date 
 		check_if_weekly_off = frappe.db.get_value('Holiday', {'parent': holiday, 'holiday_date': in_date1}, 'weekly_off')
-
 		if len(logs) >= 2:
 			#lunch_time = frappe.db.sql('''select lunch_start, lunch_end from `tabShift Type` where name=%s''', shift_name)
 
 			out_time = logs[-1].time
+			in_time_time=in_time.time()
+			out_time_time=out_time.time()
+
+			
 			#changed - start
 			# if not holiday_list_name:
 			# 	holiday_list_name = get_holiday_list_for_employee(employee, False)
@@ -242,11 +290,20 @@ def calculate_working_hours(logs, check_in_out_type, working_hours_calc_type,hol
 				# 	total_hours = time_diff_in_hours(in_time,out_time)-10
 				# else:
 				# 	total_hours = time_diff_in_hours(in_time,out_time)
-				# if lunch_start_datetime>in_time and lunch_end_datetime<out_time:
-				total_hours=time_diff_in_hours(in_time,out_time)-time_diff_in_hours(lunch_start_datetime,lunch_end_datetime)
+				if (lunch_start_datetime.time() > in_time_time) and (lunch_end_datetime.time() < out_time_time):
+					total_hours=time_diff_in_hours(in_time, out_time) - time_diff_in_hours(lunch_start_datetime, lunch_end_datetime)
+				else:
+					total_hours=time_diff_in_hours(in_time, out_time) 
+
+			elif out_time > shift_end_datetime:
+				total_hours = time_diff_in_hours(in_time, out_time)
+				# overtime_hour=time_diff_in_hours(shift_end_datetime, out_time) 
 
 			else:
-				total_hours = time_diff_in_hours(in_time,out_time)
+				total_hours = time_diff_in_hours(in_time, out_time)
+				#overtime_hour = 123
+
+
 		
 		# if len(logs) >= 2:
 		# 	out_time = logs[-1].time

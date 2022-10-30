@@ -2,19 +2,12 @@
 // For license information, please see license.txt
 /* eslint-disable */
 
-frappe.query_reports["Missing Entry Report"] = {
+frappe.query_reports["Daily Attendance Report"] = {
 	"filters": [
+  
         {
-            "fieldname":"from_date",
-            "label": __("From"),
-            "fieldtype": "Date",
-            "default": frappe.datetime.get_today(),
-            "reqd": 1,
-            "width": "100px"
-        },
-        {
-            "fieldname":"to_date",
-            "label": __("To"),
+            "fieldname":"date",
+            "label": __("Date"),
             "fieldtype": "Date",
             "default": frappe.datetime.get_today(),
             "reqd": 1,
@@ -24,12 +17,12 @@ frappe.query_reports["Missing Entry Report"] = {
             "fieldname": "company",
             "fieldtype": "Link",
             "label": "Company",
-            "default": frappe.defaults.get_user_default("Company"),
             "mandatory": 0,
+            "default": frappe.defaults.get_user_default("Company"),
             "options": "Company",
             "wildcard_filter": 0
         },
-
+    
         {
             "fieldname": "employee",
             "fieldtype": "Link",
@@ -38,8 +31,8 @@ frappe.query_reports["Missing Entry Report"] = {
             "options": "Employee",
             "wildcard_filter": 0
         },
-
-
+    
+    
         {
          "fieldname": "department",
          "fieldtype": "Link",
@@ -80,9 +73,9 @@ frappe.query_reports["Missing Entry Report"] = {
             "mandatory": 0,
             "options": "Facility or Line",
             "wildcard_filter": 0
-
+    
            },
-
+    
            {
             "fieldname": "floor",
             "fieldtype": "Link",
@@ -90,10 +83,10 @@ frappe.query_reports["Missing Entry Report"] = {
             "mandatory": 0,
             "options": "Floor",
             "wildcard_filter": 0
-
+    
            },
            
-
+    
         {
             "fieldname": "shift",
             "fieldtype": "Link",
@@ -101,6 +94,14 @@ frappe.query_reports["Missing Entry Report"] = {
             "mandatory": 0,
             "options": "Shift Type",
             "wildcard_filter": 0
-        }
-	]
+        },
+        {
+            "fieldname": "status",
+            "fieldtype": "Select",
+            "label": "Status",
+            "options": ["Present","Absent","Late","On Leave"]
+           
+        },
+    
+    ]
 };

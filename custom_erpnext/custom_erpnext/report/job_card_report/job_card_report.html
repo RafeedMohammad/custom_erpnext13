@@ -1,0 +1,145 @@
+{%
+	var report_columns = report.get_columns_for_print();
+	report_columns = report_columns.filter(col => !col.hidden);
+
+	if (report_columns.length > 10) {
+		frappe.throw(__("Too many columns. Export the report and print it using a spreadsheet application."));
+	}
+%}
+
+
+
+<style>
+	
+	.financial-statements-blank-row td {
+		height: 37px;
+	}
+
+    tr, td{
+        border: 1px solid black;
+    }
+
+</style>
+
+<h1>BOSS</h1>
+
+
+<h2 class="text-center">{%= __(report.report_name) %}</h2>
+<h3 class="text-center">{%= filters.company %}</h3>
+<h3 class="text-center">{%= filters.employee %}</h3>
+<h3 class="text-center">{%= filters.date %}</h3>
+<h3 class="text-center">{%= filters.status %}</h3>
+
+
+
+
+
+
+<table class="table table-bordered">
+	<thead>
+		<tr>
+			<th style="width: {%= 100 - (report_columns.length - 1) * 13 %}%"></th>
+			{% for (let i=0, l=report_columns.length; i<l; i++) { %}
+				<th class="text-center">{%= report_columns[i].label %}</th>
+			{% } %}
+		</tr>
+	</thead>
+	<tbody>
+		{% for(let j=0, k=data.length; j<k; j++) { %}
+			{%
+				var row = data[j];
+				var row_class = data[j].parent_account ? "" : "financial-statements-important";
+				row_class += data[j].account_name ? "" : " financial-statements-blank-row";
+			%}
+			<tr class="{%= row_class %}">
+				<td>
+					<span style="padding-left: {%= cint(data[j].indent) * 2 %}em">{%= row.account_name %}</span>
+				</td>
+				{% for(let i=0, l=report_columns.length; i<l; i++) { %}
+					<td class="text-center">
+						{% const fieldname = report_columns[i].fieldname; %}
+						{% if (!is_null(row[fieldname])) { %}
+							{%= frappe.format(row[fieldname], report_columns[i], {}, row) %}
+						{% } %}
+					</td>
+				{% } %}
+			</tr>
+		{% } %}
+	</tbody>
+</table>
+
+
+{% 
+    let count_present = 0;
+    let count_absent = 0; 
+    let count_onLeave = 0; 
+    let count_late = 0;
+	let count_weekly = 0;
+    let count_holiday= 0;
+
+
+%}
+
+{% for(let i=0; i<data.length; i++) { %}
+    {% if (data[i].status == 'P') { %}
+        {% count_present = count_present+1; %}
+    {% } %}
+
+    {% if (data[i].status == 'A') { %}
+        {% count_absent = count_absent+1; %}
+    {% } %}
+
+    {% if (data[i].status == 'L') { %}
+        {% count_late = count_late+1; %}
+    {% } %}
+
+    {% if (data[i].status == 'OL') { %}
+        {% count_onLeave = count_onLeave+1; %}
+    {% } %}
+
+	{% if (data[i].status == 'WO') { %}
+        {% count_weekly = count_weekly+1; %}
+    {% } %}
+
+	{% if (data[i].status == 'H') { %}
+        {% count_holidaay = count_holiday+1; %}
+    {% } %}
+
+
+{% } %}
+
+
+<p><b>Summary</b></p>
+<table style="width: 60%; border: 1px solid rgb(29, 187, 76); text-align: center;">
+    <tr>
+        <td>Present</td>
+        <td>{{count_present}}</td>
+    </tr>
+    <tr>
+        <td>Absent</td>
+        <td>{{count_absent}}</td>
+    </tr>
+
+    <tr>
+        <td>Late</td>
+        <td>{{count_late}}</td>
+    </tr>
+
+    <tr>
+        <td>On Leave</td>
+        <td>{{count_onLeave}}</td>
+    </tr>
+	<tr>
+        <td>Weekly Off</td>
+        <td>{{count_weekly}}</td>
+    </tr>
+	<tr>
+        <td>Holiday</td>
+        <td>{{count_holiday}}</td>
+    </tr>
+
+</table>
+
+<p class="text-right text-muted">
+	Printed On {%= frappe.datetime.str_to_user(frappe.datetime.get_datetime_as_string()) %}
+</p>

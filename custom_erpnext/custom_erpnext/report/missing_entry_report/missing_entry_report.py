@@ -28,8 +28,7 @@ def get_columns():
 def get_missing_entry(filters):
 	conditions, filters = get_conditions(filters)
 	result= frappe.db.sql("""select att.department,att.employee,att.employee_name, 
-		emp.designation,att.shift,
-		# emp.line,
+		emp.designation,att.shift,emp.facility_or_line,
 		 TIME(att.in_time),TIME(att.out_time)
 		FROM tabAttendance as att
 		LEFT JOIN tabEmployee as emp ON emp.name = att.employee 
