@@ -93,7 +93,10 @@ override_doctype_class = {
     "Shift Type": "custom_erpnext.shift_type.override_ShiftType",
     "Attendance": "custom_erpnext.attendance.override_Attendance",
     "Employee Checkin": "custom_erpnext.employee_checkin.override_EmployeeCheckin",
-	"Shift Assignment": "custom_erpnext.shift_assignment.override_ShiftAssignment"
+	"Shift Assignment": "custom_erpnext.shift_assignment.override_ShiftAssignment",
+	"Salary Slip": "custom_erpnext.salary_slip.override_SalarySlip",
+	
+	#"Asset": "custom_erpnext.asset.override_Asset",
 }
 
 # Document Events

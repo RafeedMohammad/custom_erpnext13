@@ -15,6 +15,8 @@ from erpnext.hr.doctype.shift_assignment.shift_assignment import (
 )
 from erpnext.hr.utils import validate_active_employee
 
+
+
 from datetime import datetime
 
 class override_EmployeeCheckin(Document):
@@ -122,7 +124,9 @@ def mark_attendance_and_link_log(
 	out_time=None,
 	shift=None,
 	overtime_hour=None,
-	late_entry_duration=None
+	late_entry_duration=None,
+	overtime=None
+	
 ):
 	"""Creates an attendance and links the attendance to the Employee Checkin.
 	Note: If attendance is already present for the given date, the logs are marked as skipped and no exception is thrown.
@@ -135,25 +139,30 @@ def mark_attendance_and_link_log(
 	log_names = [x.name for x in logs]
 	employee = logs[0].employee
 	company = frappe.get_cached_value("Employee", employee, "company")
-	overtime = frappe.get_cached_value("Employee", employee, "overtime")
+	allowed_for_overtime = frappe.get_cached_value("Employee", employee, "overtime")
+	shift_start = logs[0].shift_start
+	shift_end = logs[0].shift_end
 
-	
+  
+# Create and save the svg file naming "myqr.svg"
+# url.svg("myqr.svg", scale = 8)
+  
+# Create and save the png file naming "myqr.png"
 	if attendance_status in ("Weekly Off", "Holiday"):
 		overtime_hour=working_hours
 
-	if overtime=="No":
+	if allowed_for_overtime=="No":
 		overtime_hour = 0
+	
 	else:
 		rounding_ot = frappe.db.get_value("Company", company, "rounding_overtime") / 60
 		#overtime_hour=rounding_ot
 		overtime_hour_fraction  = overtime_hour % 1
 		if overtime_hour_fraction >= rounding_ot:
-			#ceil(overtime_hour)
-			#late_entry_duration="besi"
+			
 			overtime_hour = ceil(overtime_hour)
 		else:
-			#floor(overtime_hour)
-			#late_entry_duration="kom"
+			
 			overtime_hour = floor(overtime_hour)
 		if attendance_status in ("Weekly Off", "Holiday"):
 			overtime_hour=overtime_hour*2
@@ -188,7 +197,10 @@ def mark_attendance_and_link_log(
 				"in_time": in_time,
 				"out_time": out_time,
 				"rounded_ot": overtime_hour,
-				"late_entry_duration":late_entry_duration
+				"late_entry_duration":late_entry_duration,
+				"shift_start": shift_start,
+				"shift_end":shift_end,
+				"overtime":overtime
 			}
 			attendance = frappe.get_doc(doc_dict).insert()
 			attendance.submit()
@@ -208,6 +220,9 @@ def mark_attendance_and_link_log(
 			return attendance
 		else:
 			#change_start
+  
+# Generate QR code
+			
 			previous_attendance_name=frappe.db.get_value("Attendance",{"attendance_date":attendance_date,"employee":employee},'name')
 			doc_dict = {
                 "doctype": "Attendance",
@@ -222,11 +237,15 @@ def mark_attendance_and_link_log(
                 "in_time": in_time,
                 "out_time": out_time,
 				"rounded_ot":overtime_hour,
-				"late_entry_duration":late_entry_duration
-			
+				"late_entry_duration":late_entry_duration,
+				"shift_start": shift_start,
+				"shift_end":shift_end,
+				"overtime":overtime	
             }
 			attendance=frappe.db.set_value('Attendance', previous_attendance_name, {'out_time': doc_dict['out_time'],'working_hours': doc_dict['working_hours'],
-            'in_time': doc_dict['in_time'],'status': doc_dict['status'],'late_entry': doc_dict['late_entry'],'early_exit': doc_dict['early_exit'], 'rounded_ot': doc_dict['rounded_ot'],'late_entry_duration':doc_dict['late_entry_duration']}, update_modified=True)
+            'in_time': doc_dict['in_time'],'status': doc_dict['status'],'late_entry': doc_dict['late_entry'],'early_exit': doc_dict['early_exit'], 
+			'rounded_ot': doc_dict['rounded_ot'],'late_entry_duration':doc_dict['late_entry_duration'], 'shift_start':doc_dict['shift_start'], 
+			'shift_end':doc_dict['shift_end'], "overtime":doc_dict['overtime']}, update_modified=True)
 			#Changed Code - End
 
 			#Attendance document with updated values will be saved
@@ -241,7 +260,7 @@ def mark_attendance_and_link_log(
 	else:
 		frappe.throw(_("{} is an invalid Attendance Status.").format(attendance_status))
 
-def calculate_working_hours(logs, check_in_out_type, working_hours_calc_type, holiday=None, lunch_start=None, lunch_end=None,shift_start=None,shift_end=None):
+def calculate_working_hours(logs, check_in_out_type, working_hours_calc_type, holiday=None, lunch_start=None, lunch_end=None, shift_start=None, shift_end=None):
 	"""Given a set of logs in chronological order calculates the total working hours based on the parameters.
 	Zero is returned for all invalid cases.
 
@@ -266,7 +285,7 @@ def calculate_working_hours(logs, check_in_out_type, working_hours_calc_type, ho
 	if check_in_out_type == "Alternating entries as IN and OUT during the same shift":
 		in_time = logs[0].time
 		
-		in_date1 = logs[0].shift_start_date 
+		in_date1 = str(logs[0].shift_start).split(" ")[0]
 		check_if_weekly_off = frappe.db.get_value('Holiday', {'parent': holiday, 'holiday_date': in_date1}, 'weekly_off')
 		if len(logs) >= 2:
 			#lunch_time = frappe.db.sql('''select lunch_start, lunch_end from `tabShift Type` where name=%s''', shift_name)

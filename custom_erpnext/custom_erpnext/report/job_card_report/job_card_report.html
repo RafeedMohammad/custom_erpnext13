@@ -21,7 +21,6 @@
 
 </style>
 
-<h1>BOSS</h1>
 
 
 <h2 class="text-center">{%= __(report.report_name) %}</h2>
@@ -32,6 +31,13 @@
 
 
 
+<!-- {% let emp_name =  data[0].first_name  %}  
+<h1>{{ emp_name }}</h1> -->
+
+
+
+
+        
 
 
 
@@ -67,6 +73,7 @@
 		{% } %}
 	</tbody>
 </table>
+
 
 
 {% 
@@ -139,6 +146,9 @@
     </tr>
 
 </table>
+<footer>
+    <p>Present-P,Absent=A,Weekly Off=WO,Holiday=H,Late=L,Sick Leave=SL,Casual Leave=CL</p>
+  </footer> 
 
 <p class="text-right text-muted">
 	Printed On {%= frappe.datetime.str_to_user(frappe.datetime.get_datetime_as_string()) %}

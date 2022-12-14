@@ -16,20 +16,30 @@ from frappe.model.document import Document
 from frappe.utils import cint, get_datetime, getdate
 from erpnext.hr.doctype.employee.employee import get_holiday_list_for_employee
 
+from erpnext.hr.doctype.shift_type.shift_type import ShiftType
+
+
 from erpnext.hr.doctype.attendance.attendance import mark_attendance
 
 # from erpnext.hr.doctype.employee_checkin.employee_checkin import (
 # 	calculate_working_hours,
 # 	mark_attendance_and_link_log,
 # )
-from erpnext.hr.doctype.shift_assignment.shift_assignment import (
-	get_actual_start_end_datetime_of_shift,
-	get_employee_shift,
-)
+# from erpnext.hr.doctype.shift_assignment.shift_assignment import (
+# 	get_actual_start_end_datetime_of_shift,
+# 	get_employee_shift,
+# )
 from custom_erpnext.employee_checkin import (
 	calculate_working_hours,
 	mark_attendance_and_link_log,
 )
+
+from custom_erpnext.shift_assignment import (
+	get_employee_shift,
+	get_actual_start_end_datetime_of_shift,
+)
+
+
 
 
 class override_ShiftType(Document):
@@ -63,7 +73,8 @@ class override_ShiftType(Document):
 				in_time,
 				out_time,
 				overtime_hour,
-				late_entry_duration
+				late_entry_duration,
+				overtime,
 			) = self.get_attendance(single_shift_logs)
 			mark_attendance_and_link_log(
 				single_shift_logs,
@@ -77,6 +88,7 @@ class override_ShiftType(Document):
 				self.name,
 				overtime_hour,	
 				late_entry_duration,
+				overtime,
 			)
 		for employee in self.get_assigned_employee(self.process_attendance_after, True):
 			self.mark_absent_for_dates_with_no_attendance(employee)
@@ -94,18 +106,21 @@ class override_ShiftType(Document):
 		# )
 
 		total_working_hours, in_time, out_time, weekly_off_check = calculate_working_hours(
-			logs, self.determine_check_in_and_check_out, self.working_hours_calculation_based_on,self.holiday_list,self.lunch_start,self.lunch_end,self.start_time,self.end_time##Change - Added parameter: self.holiday_list
+			logs, self.determine_check_in_and_check_out, self.working_hours_calculation_based_on, self.holiday_list, self.lunch_start, self.lunch_end, self.start_time, self.end_time##Change - Added parameter: self.holiday_list
 		)
 		overtime_hour=0
-		late_entry_duration=None
+		late_entry_duration=0
+		overtime=0
 		if (
 			cint(self.enable_entry_grace_period)
 			and in_time
 			and in_time > logs[0].shift_start + timedelta(minutes=cint(self.late_entry_grace_period))
 		):
 			late_entry = True
-			late_entry_time=round((in_time-logs[0].shift_start-timedelta(minutes=cint(self.late_entry_grace_period))).total_seconds() / 60)
-			late_entry_duration=str(int(late_entry_time/60)).zfill(2)+":"+str(late_entry_time%60).zfill(2)
+			# late_entry_time=round((in_time-logs[0].shift_start-timedelta(minutes=cint(self.late_entry_grace_period))).total_seconds() / 60)
+			# late_entry_duration=str(int(late_entry_time/60)).zfill(2)+":"+str(late_entry_time%60).zfill(2)
+			late_entry_duration=in_time-logs[0].shift_start-timedelta(minutes=cint(self.late_entry_grace_period))
+			#late_entry_duration=str(int(late_entry_time/60)).zfill(2)+":"+str(late_entry_time%60).zfill(2)
 
 
 		if (
@@ -120,17 +135,18 @@ class override_ShiftType(Document):
 			and out_time > logs[0].shift_end #- timedelta(minutes=cint(self.early_exit_grace_period))
 		):
 			overtime_hour=round((out_time - logs[0].shift_end).total_seconds() / 3600, 1)
+			overtime=out_time-logs[0].shift_end
 
 
 		#change start
 		if(weekly_off_check == 1):
-			return "Weekly Off", total_working_hours, late_entry, early_exit, in_time, out_time, overtime_hour,None
+			return "Weekly Off", total_working_hours, late_entry, early_exit, in_time, out_time, overtime_hour,None,overtime
 		
 		if(weekly_off_check==0):
-			return "Holiday", total_working_hours, late_entry, early_exit, in_time, out_time, overtime_hour,None
+			return "Holiday", total_working_hours, late_entry, early_exit, in_time, out_time, overtime_hour,None,overtime
 		
 		if(late_entry):
-			return "Late", total_working_hours, late_entry, early_exit, in_time, out_time, overtime_hour, late_entry_duration
+			return "Late", total_working_hours, late_entry, early_exit, in_time, out_time, overtime_hour, late_entry_duration,overtime
 
 		#change end
 
@@ -138,13 +154,13 @@ class override_ShiftType(Document):
 			self.working_hours_threshold_for_absent
 			and total_working_hours < self.working_hours_threshold_for_absent
 		): 
-			return "Absent", total_working_hours, late_entry, early_exit, in_time, out_time,overtime_hour
+			return "Absent", total_working_hours, late_entry, early_exit, in_time, out_time,overtime_hour,overtime
 		if (
 			self.working_hours_threshold_for_half_day
 			and total_working_hours < self.working_hours_threshold_for_half_day
 		):
-			return "Half Day", total_working_hours, late_entry, early_exit, in_time, out_time
-		return "Present", total_working_hours, late_entry, early_exit, in_time, out_time, overtime_hour, late_entry_duration
+			return "Half Day", total_working_hours, late_entry, early_exit, in_time, out_time,overtime
+		return "Present", total_working_hours, late_entry, early_exit, in_time, out_time, overtime_hour, late_entry_duration,overtime
 
 	def mark_absent_for_dates_with_no_attendance(self, employee):
 		"""Marks Absents for the given employee on working days in this shift which have no attendance marked.

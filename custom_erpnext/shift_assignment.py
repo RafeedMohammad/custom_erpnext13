@@ -9,6 +9,8 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import cstr, getdate, now_datetime, nowdate
 
+from erpnext.hr.doctype.shift_assignment.shift_assignment import ShiftAssignment
+
 from erpnext.hr.doctype.employee.employee import get_holiday_list_for_employee
 from erpnext.hr.doctype.holiday_list.holiday_list import is_holiday
 from erpnext.hr.utils import validate_active_employee
@@ -187,13 +189,13 @@ def get_employee_shift(
 	if not shift_type_name and consider_default_shift:
 		shift_type_name = default_shift
 	#Change -- Start
-	# if shift_type_name:
-	# 	holiday_list_name = frappe.get_cached_value("Shift Type", shift_type_name, "holiday_list")
-	# 	if not holiday_list_name:
-	# 		holiday_list_name = get_holiday_list_for_employee(employee, False)
-	# 	if holiday_list_name and is_holiday(holiday_list_name, for_date):
-	# 		shift_type_name = None
-	#Change -- End
+	if shift_type_name:
+		holiday_list_name = frappe.get_cached_value("Shift Type", shift_type_name, "holiday_list")
+		if not holiday_list_name:
+			holiday_list_name = get_holiday_list_for_employee(employee, False)
+		if holiday_list_name and is_holiday(holiday_list_name, for_date):
+			shift_type_name = default_shift
+	# #Change -- End
 	if not shift_type_name and next_shift_direction:
 		MAX_DAYS = 366
 		if consider_default_shift and default_shift:

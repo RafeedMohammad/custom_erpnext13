@@ -7,6 +7,8 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import cint, cstr, formatdate, get_datetime, getdate, nowdate
 from erpnext.hr.doctype.attendance.attendance import Attendance
+import qrcode
+
 
 from erpnext.hr.utils import get_holiday_dates_for_employee, validate_active_employee
 
@@ -190,6 +192,7 @@ def mark_attendance(
 				"company": company,
 				"shift": shift,
 				"leave_type": leave_type,
+				"image":image
 			}
 		)
 		attendance.flags.ignore_validate = ignore_validate

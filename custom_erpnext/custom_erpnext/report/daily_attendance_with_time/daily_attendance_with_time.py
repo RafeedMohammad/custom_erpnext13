@@ -1,12 +1,14 @@
-# Copyright (c) 2022, Frappe Technologies Pvt. Ltd. and contributors
+# Copyright (c) 2022, Lithe-Tech Limited and contributors
 # For license information, please see license.txt
+
+# import frappe
 
 import frappe
 #import datetime
 from datetime import datetime, timedelta
 from frappe import _
 
-max_allowed_hour=2
+max_allowed_hour=14
 max_allowed_minute=30
 
 def execute(filters= None):
@@ -54,7 +56,7 @@ def get_attendance(filters):
 	conditions, filters = get_conditions(filters)
 	result= frappe.db.sql("""select DISTINCT tabEmployee.attendance_device_id,  tabAttendance.employee, tabEmployee.designation,tabAttendance.shift,
 	tabAttendance.in_time, tabAttendance.late_entry_duration, tabAttendance.out_time, tabAttendance.rounded_ot, tabAttendance.status,
-	`tabEmployee Checkin`.shift_start,`tabEmployee Checkin`.shift_end,`tabAttendance`.leave_type
+	tabAttendance.overtime,`tabAttendance`.leave_type
 	FROM tabAttendance
 	LEFT JOIN tabEmployee ON tabEmployee.name = tabAttendance.employee 
 	LEFT OUTER JOIN `tabEmployee Checkin`
@@ -76,11 +78,10 @@ def get_attendance(filters):
 
 		elif result[i][6] is None:
 			pass
-		elif result[i][10] is None:
-			pass
+		
 		else:
 			if (max_allowed_hour>10): 
-				pass
+				continue
 			elif(max_allowed_minute>10):
 				if(result[i][6]>result[i][10]):
 					overtime=result[i][6]-result[i][10]

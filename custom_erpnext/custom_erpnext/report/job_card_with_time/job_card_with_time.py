@@ -4,6 +4,12 @@
 # import frappe
 
 
+# Copyright (c) 2022, Lithe-Tech Limited and contributors
+# For license information, please see license.txt
+
+# import frappe
+
+
 
 from datetime import datetime, timedelta
 import frappe
@@ -45,10 +51,7 @@ def get_columns():
 		_("Late") + ":Data/Attendance:120",
 		_("Out Time") + ":Data/Attendance:120",
 		_("O.T.") + ":Data/Attendance:120",
-		_("Status") + ":Data/:120",
-		_("overtime") + ":Data/:120",
-
-
+		_("Status") + ":Data/:120"
 	]
 
 def get_attendance(filters):
@@ -75,22 +78,14 @@ def get_attendance(filters):
 	# ORDER BY att.attendance_date""" 
 	# % conditions, as_list=1)
 
-	# result= frappe.db.sql("""select DISTINCT att.attendance_date, att.employee, att.shift,
-	# att.in_time, att.late_entry_duration, att.out_time, att.rounded_ot, att.status, att.shift_start, att.shift_end, att.leave_type, emp.first_name
-	# FROM tabAttendance as att
-	# INNER JOIN tabEmployee as emp ON emp.name = att.employee  	
-	# where %s
-	# ORDER BY att.attendance_date""" 
-	# % conditions, as_list=1) for testing
-	
-
 	result= frappe.db.sql("""select DISTINCT att.attendance_date, att.employee, att.shift,
-	att.in_time, att.late_entry_duration, att.out_time, att.rounded_ot, att.status, att.shift_start, att.shift_end, att.leave_type, emp.first_name, att.overtime
+	att.in_time, att.late_entry_duration, att.out_time, att.rounded_ot, att.status, att.overtime, att.leave_type, emp.first_name
 	FROM tabAttendance as att
 	INNER JOIN tabEmployee as emp ON emp.name = att.employee  	
-	where %s
+	where %s and att.docstatus!=2
 	ORDER BY att.attendance_date""" 
 	% conditions, as_list=1)
+	
 
 
 
@@ -101,54 +96,53 @@ def get_attendance(filters):
 		
 		elif result[i][7]=='On Leave' :
 			result[i][3]=result[i][4]=result[i][5]="00:00"
-			result[i][7]= result[i][10]
+			result[i][7]= result[i][9]
 		
 		elif result[i][5] is None:
-			continue
-		elif result[i][9] is None:
 			continue
 		
 		else:
 			if (max_allowed_hour>10): 
 				pass
 			elif(max_allowed_minute>10):
-				if(result[i][5]>result[i][9]):
-					ot_difference=result[i][5]-result[i][9]
-					minute1=int(str(ot_difference).split(":")[1])
+				shift_end_time=result[i][5]-result[i][8]
+				if(result[i][5]>shift_end_time):
+					minute1=int(str(result[i][8]).split(":")[1])
 
-					if(ot_difference>timedelta(hours=max_allowed_hour,minutes=max_allowed_minute+10)):
-						result[i][5]=result[i][9]+timedelta(hours=max_allowed_hour,minutes=max_allowed_minute+(minute1%10))
+					if(result[i][8]>timedelta(hours=max_allowed_hour,minutes=max_allowed_minute+10)):
+						result[i][5]=shift_end_time+timedelta(hours=max_allowed_hour,minutes=max_allowed_minute+(minute1%10))
 						result[i][6]=max_allowed_hour+(max_allowed_minute/60)
 
-					elif(ot_difference<timedelta(hours=max_allowed_hour,minutes=max_allowed_minute-rounded_over_time2)):#rounding_time2
+					elif(result[i][8]<timedelta(hours=max_allowed_hour,minutes=max_allowed_minute-rounded_over_time2)):#rounding_time2
 						result[i][6]=max_allowed_hour+(max_allowed_minute/60)
-					elif(ot_difference<timedelta(hours=result[i][6],minutes=rounded_over_time1)):#rounding_time1
+
+					elif(result[i][8]<timedelta(hours=result[i][6],minutes=rounded_over_time1)):#rounding_time1
 						pass
-					elif(ot_difference<timedelta(hours=result[i][6],minutes=rounded_over_time1)):#rounding_time1
-						result[i][5]=result[i][9]+timedelta(hours=max_allowed_hour,minutes=(minute1%10))
+					
+					elif(result[i][8]<timedelta(hours=result[i][6],minutes=rounded_over_time1)):#rounding_time1
+						result[i][5]=shift_end_time+timedelta(hours=max_allowed_hour,minutes=(minute1%10))
 
 
 
 
 			elif(max_allowed_minute<10):
-				if(result[i][5]>result[i][9]):
-					ot_difference=result[i][5]-result[i][9]
-					minute1=int(str(ot_difference).split(":")[1])
+				if(result[i][5]>shift_end_time):
+					result[i][8]=result[i][5]-shift_end_time
+					minute1=int(str(result[i][8]).split(":")[1])
 
-					if(ot_difference>timedelta(hours=max_allowed_hour,minutes=max_allowed_minute)):
-						result[i][5]=result[i][9]+timedelta(hours=max_allowed_hour,minutes=(minute1%10))
+					if(result[i][8]>timedelta(hours=max_allowed_hour,minutes=max_allowed_minute)):
+						result[i][5]=shift_end_time+timedelta(hours=max_allowed_hour,minutes=(minute1%10))
 						result[i][6]=max_allowed_hour#+(max_allowed_minute/60)
 
 					elif(minute1>rounded_over_time1):	#rounding_time
-						result[i][5]=result[i][9]+timedelta(hours=result[i][6],minutes=(minute1%10))
+						result[i][5]=shift_end_time+timedelta(hours=result[i][6],minutes=(minute1%10))
 			result[i][5]=datetime.strftime(result[i][5],'%H:%M')
 
 			#for late
-			if(result[i][3]<result[i][8] and max_allowed_hour<10):
-				early_entry_diff_min=int(str(result[i][8]-result[i][3]).split(":")[1])%10
-				result[i][3]=result[i][8]-timedelta(minutes=early_entry_diff_min)
-			result[i][3]=datetime.strftime(result[i][3],'%H:%M')	
-			result[i][8]=result[i][12]			
+			if result[i][4]>timedelta(minutes=0):
+				result[i][4]=9
+
+			result[i][3]=datetime.strftime(result[i][3],'%H:%M')				
 				
 	return result
 
@@ -177,15 +171,13 @@ def get_report_summary(data,a):
 	if not data:
 		return None
 
-	total_present=total_absent=total_leave=total_late=work_from_home=total_weekly_off=total_holiday=total_null=0
-	for i in range(len(data)):
-		total_null=total_null+1
-
+	total_present=total_absent=total_leave=total_late=work_from_home=total_weekly_off=total_holiday=0
+	for i in range(len(data)-1):
 		if data[i][a] == 'Present':
 			total_present = total_present+1 
 		elif data[i][a] == 'Absent':
 			total_absent = total_absent+1
-		elif data[i][a] in ['On Leave' , 'SL','CL','EL','OL','RL']:
+		elif data[i][a] in ['On Leave' , 'SL','CL','EL','OL']:
 			total_leave = total_leave+1
 		elif data[i][a] == 'Late':
 			total_late = total_late+1 
@@ -228,11 +220,6 @@ def get_report_summary(data,a):
 		{
 			"value": total_holiday,
 			"label": _("Total Holiday"),
-			"datatype": "Int",
-		},
-		{
-			"value": total_null,
-			"label": _("Total Null"),
 			"datatype": "Int",
 		},
 		
