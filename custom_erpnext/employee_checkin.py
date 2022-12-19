@@ -144,10 +144,7 @@ def mark_attendance_and_link_log(
 	shift_end = logs[0].shift_end
 
   
-# Create and save the svg file naming "myqr.svg"
-# url.svg("myqr.svg", scale = 8)
-  
-# Create and save the png file naming "myqr.png"
+
 	if attendance_status in ("Weekly Off", "Holiday"):
 		overtime_hour=working_hours
 
@@ -155,7 +152,7 @@ def mark_attendance_and_link_log(
 		overtime_hour = 0
 	
 	else:
-		rounding_ot = frappe.db.get_value("Company", company, "rounding_overtime") / 60
+		rounding_ot = frappe.db.get_value("Company", company, "rounding_overtime") / 100
 		#overtime_hour=rounding_ot
 		overtime_hour_fraction  = overtime_hour % 1
 		if overtime_hour_fraction >= rounding_ot:

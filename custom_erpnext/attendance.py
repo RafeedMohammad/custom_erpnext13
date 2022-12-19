@@ -192,7 +192,8 @@ def mark_attendance(
 				"company": company,
 				"shift": shift,
 				"leave_type": leave_type,
-				"image":image
+				"late_entry_duration":0,
+				"overtime":0
 			}
 		)
 		attendance.flags.ignore_validate = ignore_validate

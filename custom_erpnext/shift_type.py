@@ -19,7 +19,9 @@ from erpnext.hr.doctype.employee.employee import get_holiday_list_for_employee
 from erpnext.hr.doctype.shift_type.shift_type import ShiftType
 
 
-from erpnext.hr.doctype.attendance.attendance import mark_attendance
+#from erpnext.hr.doctype.attendance.attendance import mark_attendance
+
+from custom_erpnext.attendance import mark_attendance
 
 # from erpnext.hr.doctype.employee_checkin.employee_checkin import (
 # 	calculate_working_hours,
@@ -134,7 +136,7 @@ class override_ShiftType(Document):
 			and out_time
 			and out_time > logs[0].shift_end #- timedelta(minutes=cint(self.early_exit_grace_period))
 		):
-			overtime_hour=round((out_time - logs[0].shift_end).total_seconds() / 3600, 1)
+			overtime_hour=round((out_time - logs[0].shift_end).total_seconds() / 3600, 2)
 			overtime=out_time-logs[0].shift_end
 
 

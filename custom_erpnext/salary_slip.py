@@ -8,6 +8,7 @@ import math
 import frappe
 from frappe import _, msgprint
 from frappe.model.naming import make_autoname
+from datetime import date
 from frappe.utils import (
 	add_days,
 	cint,
@@ -71,20 +72,38 @@ class override_SalarySlip(TransactionBase):
 		overtime_hours = frappe.db.sql("""SELECT SEC_TO_TIME(SUM(TIME_TO_SEC(overtime))) FROM `tabAttendance` WHERE employee = %s AND attendance_date between %s and %s""",
 		(self.employee, self.start_date, self.end_date)
 		)
-		# if(overtime_hours[0][0] and self.overtime_rate):
-		# 	total_pay = overtime_hours[0][0] 
-		# 	return total_pay, overtime_hours[0][0]
-		# else:
-		# 	return 0, '20:00:00'
-		return 0, overtime_hours
+		if(overtime_hours[0][0] and self.overtime_rate):
+			#total_pay = round((float(str(overtime_hours[0][0]).split(":")[0]) + float(str(overtime_hours[0][0]).split(":")[1])/60 ) * int(self.overtime_rate))
+			total_pay = 0
+			return total_pay, overtime_hours[0][0]
+		else:
+			total_pay = 0
+			return total_pay, overtime_hours[0][0]
+		
+	def calculate_total_late_entry_duration(self):
+
+		#overtime_hours will return a tuple. Which will be accessible using overtime_hours[0][0]
+		tolal_late_entry_duration = frappe.db.sql("""SELECT SEC_TO_TIME(SUM(TIME_TO_SEC(late_entry_duration))) FROM `tabAttendance` WHERE employee = %s AND attendance_date between %s and %s""",
+		(self.employee, self.start_date, self.end_date)
+		)
+		if(tolal_late_entry_duration[0][0]):
+			#return tolal_late_entry_duration[0][0]
+			# return str(tolal_late_entry_duration[0][0]).split(":")[0]*60+str(tolal_late_entry_duration[0][0]).split(":")[1]
+			return float(str(tolal_late_entry_duration[0][0]).split(":")[0])*60 + float(str(tolal_late_entry_duration[0][0]).split(":")[1]) 
+
+		else:
+			return 0
+
+
+
+
 
 		#set the filter according to the name of the field
 	def calculate_late_count(self):
 		late_count = frappe.db.sql("""SELECT COUNT(*) FROM `tabAttendance` WHERE late_entry = 1 AND employee = %s AND attendance_date between %s and %s""",
 		(self.employee, self.start_date, self.end_date)
 		)
-
-		return late_count
+		return late_count[0][0]
 
 	def autoname(self):
 		self.name = make_autoname(self.series)
@@ -93,7 +112,36 @@ class override_SalarySlip(TransactionBase):
 		self.status = self.get_status()
 		validate_active_employee(self.employee)
 		self.late = self.calculate_late_count()
-		self.total_overtime_pay, self.overtime_hours = self.calculate_overtime_amount()
+		#Assiging total overtime_pay and overtime_hours of the month
+		if (self.overtime_rate == None and self.overtime_hours == None):
+			self.total_overtime_pay, self.overtime_hours = self.calculate_overtime_amount()
+		#Assigning to total_late_entry_duration of the month
+		else:
+			self.total_overtime_pay = float(self.overtime_hours) * float(self.overtime_rate)
+
+		self.total_late_entry_duration = self.calculate_total_late_entry_duration()
+
+
+		#Below methods present_days and present_nights should be refactored into one method 
+
+		# if(self.calculate_day_days() is not None and self.calculate_night_days() is None):
+		# 	self.present_days = self.calculate_day_days() + self.calculate_night_days() 
+		# elif(self.calculate_night_days() is None):
+		# 	self.present_days = self.calculate_day_days()
+		# else:
+		# 	self.present_days = self.calculate_day_days()
+
+		self.present_days = self.calculate_day_days() + self.calculate_night_days()
+		
+		self.night_days = self.calculate_night_days()
+		self.day_days = self.calculate_day_days()
+
+
+		self.base_pay = self.fetch_base_pay()
+		#self.total_late_minutes = (date(int(self.end_date.split('-')[0]), int(self.end_date.split('-')[1]), int(self.end_date.split('-')[2])) - date(int(self.start_date.split('-')[0]), int(self.start_date.split('-')[1]), int(self.start_date.split('-')[2]))).days * 8 * 60 #fetch regular_working_hour from shift_type
+		self.overtime_rate = round(((self.base_pay - 1450) * 2/3 ) / 104)
+
+
 		self.validate_dates()
 		self.check_existing()
 		if not self.salary_slip_based_on_timesheet:
@@ -122,6 +170,11 @@ class override_SalarySlip(TransactionBase):
 					),
 					alert=True,
 				)
+		
+	def fetch_base_pay(self):
+		b_pay = frappe.db.get_value('Salary Structure Assignment', {'employee': self.employee}, ['base'])
+		return b_pay
+
 
 	def set_net_total_in_words(self):
 		doc_currency = self.currency
@@ -512,6 +565,8 @@ class override_SalarySlip(TransactionBase):
 
 		return lwp
 
+		
+
 	def calculate_lwp_ppl_and_absent_days_based_on_attendance(self, holidays):
 		lwp = 0
 		absent = 0
@@ -584,6 +639,57 @@ class override_SalarySlip(TransactionBase):
 				absent += 1
 		return lwp, absent
 
+
+	def calculate_day_days(self):
+		day_days = 0
+
+		#lwp, absent = calculate_lwp_ppl_and_absent_days_based_on_attendance(self, holidays)
+		day_days = frappe.db.sql(
+			"""
+			SELECT COUNT(status)
+			FROM `tabAttendance`
+			WHERE
+				status in ("Present","Late")
+				AND employee = %s
+				# AND is_night = "No"
+				AND attendance_date between %s and %s
+		""",
+			values=(self.employee, self.start_date, self.end_date)
+		)
+
+		if(day_days[0][0]):
+			return day_days[0][0]
+		else:
+			return 0
+
+
+	def calculate_night_days(self):
+		night_days = 0
+
+		#lwp, absent = calculate_lwp_ppl_and_absent_days_based_on_attendance(self, holidays)
+		night_days = frappe.db.sql(
+			"""
+			SELECT COUNT(*)
+			FROM `tabAttendance`
+			WHERE
+				status in ("Present","Late") 
+				AND is_night = "Yes"
+				AND employee = %s
+				AND attendance_date between %s and %s
+		""",
+			values=(self.employee, self.start_date, self.end_date)
+		)
+
+		if(night_days[0][0] is not None):
+			return night_days[0][0]
+		else:
+			return 0
+
+
+
+
+	
+
 	def add_earning_for_hourly_wages(self, doc, salary_component, amount):
 		row_exists = False
 		for row in doc.earnings:
@@ -605,7 +711,7 @@ class override_SalarySlip(TransactionBase):
 	def calculate_net_pay(self):
 		if self.salary_structure:
 			self.calculate_component_amounts("earnings")
-		self.gross_pay = self.get_component_totals("earnings", depends_on_payment_days=1)
+		self.gross_pay = self.get_component_totals("earnings", depends_on_payment_days=1) + self.arear
 		self.base_gross_pay = flt(
 			flt(self.gross_pay) * flt(self.exchange_rate), self.precision("base_gross_pay")
 		)
@@ -667,6 +773,7 @@ class override_SalarySlip(TransactionBase):
 					default_data[struct_row.abbr] = amount
 					data[struct_row.abbr] = flt(
 						(flt(amount) * flt(self.payment_days) / cint(self.total_working_days)),
+						#(flt(amount) * flt(self.payment_days) / 30),
 						struct_row.precision("amount"),
 					)
 
