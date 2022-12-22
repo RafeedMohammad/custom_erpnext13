@@ -3,6 +3,8 @@
 
 
 import datetime
+from datetime import datetime
+
 import math
 
 import frappe
@@ -112,6 +114,7 @@ class override_SalarySlip(TransactionBase):
 		self.status = self.get_status()
 		validate_active_employee(self.employee)
 		self.late = self.calculate_late_count()
+		self.late_days = int(self.calculate_late_count())
 		#Assiging total overtime_pay and overtime_hours of the month
 		if (self.overtime_rate == None and self.overtime_hours == None):
 			self.total_overtime_pay, self.overtime_hours = self.calculate_overtime_amount()
@@ -135,6 +138,12 @@ class override_SalarySlip(TransactionBase):
 		
 		self.night_days = self.calculate_night_days()
 		self.day_days = self.calculate_day_days()
+		to_date = datetime.strptime(self.end_date, "%Y-%m-%d").date()
+		from_date = datetime.strptime(self.start_date, "%Y-%m-%d").date()
+		if(to_date!= from_date):
+			self.total_month_minutes=(to_date-from_date).days*24*60
+		else:
+			self.total_month_minutes=24*60
 
 
 		self.base_pay = self.fetch_base_pay()
@@ -607,13 +616,13 @@ class override_SalarySlip(TransactionBase):
 			):
 				continue
 
-			if formatdate(d.attendance_date, "yyyy-mm-dd") in holidays:
-				if d.status == "Absent" or (
-					d.leave_type
-					and d.leave_type in leave_type_map.keys()
-					and not leave_type_map[d.leave_type]["include_holiday"]
-				):
-					continue
+			# if formatdate(d.attendance_date, "yyyy-mm-dd") in holidays:
+			# 	if d.status == "Absent" or (
+			# 		d.leave_type
+			# 		and d.leave_type in leave_type_map.keys()
+			# 		and not leave_type_map[d.leave_type]["include_holiday"]
+			# 	):
+			# 		continue
 
 			if d.leave_type:
 				fraction_of_daily_salary_per_leave = leave_type_map[d.leave_type][
@@ -651,7 +660,6 @@ class override_SalarySlip(TransactionBase):
 			WHERE
 				status in ("Present","Late")
 				AND employee = %s
-				# AND is_night = "No"
 				AND attendance_date between %s and %s
 		""",
 			values=(self.employee, self.start_date, self.end_date)

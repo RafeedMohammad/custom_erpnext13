@@ -136,7 +136,7 @@ class override_ShiftType(Document):
 			and out_time
 			and out_time > logs[0].shift_end #- timedelta(minutes=cint(self.early_exit_grace_period))
 		):
-			overtime_hour=round((out_time - logs[0].shift_end).total_seconds() / 3600, 2)
+			overtime_hour=round((out_time - logs[0].shift_end).total_seconds() / 3600, 4)
 			overtime=out_time-logs[0].shift_end
 
 

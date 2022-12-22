@@ -152,14 +152,12 @@ def mark_attendance_and_link_log(
 		overtime_hour = 0
 	
 	else:
-		rounding_ot = frappe.db.get_value("Company", company, "rounding_overtime") / 100
+		rounding_ot = frappe.db.get_value("Company", company, "rounding_overtime") / 60
 		#overtime_hour=rounding_ot
 		overtime_hour_fraction  = overtime_hour % 1
-		if overtime_hour_fraction >= rounding_ot:
-			
+		if overtime_hour_fraction >= rounding_ot:			
 			overtime_hour = ceil(overtime_hour)
-		else:
-			
+		else:		
 			overtime_hour = floor(overtime_hour)
 		if attendance_status in ("Weekly Off", "Holiday"):
 			overtime_hour=overtime_hour*2
@@ -218,7 +216,6 @@ def mark_attendance_and_link_log(
 		else:
 			#change_start
   
-# Generate QR code
 			
 			previous_attendance_name=frappe.db.get_value("Attendance",{"attendance_date":attendance_date,"employee":employee},'name')
 			doc_dict = {
