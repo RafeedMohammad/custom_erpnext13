@@ -3,8 +3,6 @@
 
 
 import datetime
-from datetime import datetime
-
 import math
 
 import frappe
@@ -38,6 +36,8 @@ from erpnext.loan_management.doctype.process_loan_interest_accrual.process_loan_
 	process_loan_interest_accrual_for_term_loans,
 )
 from erpnext.payroll.doctype.additional_salary.additional_salary import get_additional_salaries
+from erpnext.payroll.doctype.salary_structure.salary_structure import make_salary_slip
+
 from erpnext.payroll.doctype.employee_benefit_application.employee_benefit_application import (
 	get_benefit_component_amount,
 )
@@ -138,16 +138,10 @@ class override_SalarySlip(TransactionBase):
 		
 		self.night_days = self.calculate_night_days()
 		self.day_days = self.calculate_day_days()
-		to_date = datetime.strptime(self.end_date, "%Y-%m-%d").date()
-		from_date = datetime.strptime(self.start_date, "%Y-%m-%d").date()
-		if(to_date!= from_date):
-			self.total_month_minutes=(to_date-from_date).days*24*60
-		else:
-			self.total_month_minutes=24*60
 
 
 		self.base_pay = self.fetch_base_pay()
-		#self.total_late_minutes = (date(int(self.end_date.split('-')[0]), int(self.end_date.split('-')[1]), int(self.end_date.split('-')[2])) - date(int(self.start_date.split('-')[0]), int(self.start_date.split('-')[1]), int(self.start_date.split('-')[2]))).days * 8 * 60 #fetch regular_working_hour from shift_type
+		#self.total_month_minutes = ((date(int(self.end_date.split('-')[0]), int(self.end_date.split('-')[1]), int(self.end_date.split('-')[2])) - date(int(self.start_date.split('-')[0]), int(self.start_date.split('-')[1]), int(self.start_date.split('-')[2]))).days) * 8 * 60 #fetch regular_working_hour from shift_type
 		self.overtime_rate = round(((self.base_pay - 1450) * 2/3 ) / 104)
 
 
@@ -380,7 +374,6 @@ class override_SalarySlip(TransactionBase):
 			)
 
 	def pull_sal_struct(self):
-		from erpnext.payroll.doctype.salary_structure.salary_structure import make_salary_slip
 
 		if self.salary_slip_based_on_timesheet:
 			self.salary_structure = self._salary_structure_doc.name
