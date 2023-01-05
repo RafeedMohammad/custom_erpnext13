@@ -6,7 +6,7 @@ import frappe
 from datetime import datetime, timedelta
 from frappe import _
 
-max_allowed_hour=2
+max_allowed_hour=14
 max_allowed_minute=30
 
 def execute(filters= None):

@@ -103,16 +103,31 @@ class override_ShiftType(Document):
 		        2. Logs are in chronological order
 		"""
 		late_entry = early_exit = False
-		# total_working_hours, in_time, out_time, = calculate_working_hours(
-		# 	logs, self.determine_check_in_and_check_out, self.working_hours_calculation_based_on
+		total_working_hours, in_time, out_time, = calculate_working_hours(
+			logs, self.determine_check_in_and_check_out, self.working_hours_calculation_based_on
+		)
+
+		# total_working_hours, in_time, out_time, weekly_off_check = calculate_working_hours(
+		# 	logs, self.determine_check_in_and_check_out, self.working_hours_calculation_based_on, self.holiday_list, self.lunch_start, self.lunch_end, self.start_time, self.end_time##Change - Added parameter: self.holiday_list
 		# )
 
-		total_working_hours, in_time, out_time, weekly_off_check = calculate_working_hours(
-			logs, self.determine_check_in_and_check_out, self.working_hours_calculation_based_on, self.holiday_list, self.lunch_start, self.lunch_end, self.start_time, self.end_time##Change - Added parameter: self.holiday_list
-		)
 		overtime_hour=0
 		late_entry_duration=0
-		overtime=0
+		overtime=timedelta(0)
+
+		in_date1 = str(logs[0].shift_start).split(" ")[0]
+		weekly_off_check = frappe.db.get_value('Holiday', {'parent': self.holiday_list, 'holiday_date': in_date1}, 'weekly_off')
+
+		if (datetime.strptime(self.lunch_start, "%H:%M:%S") < datetime.strptime(self.start_time, "%H:%M:%S")):
+			start_time_to_lunch_duration=datetime.strptime(self.lunch_start, "%H:%M:%S")-datetime.strptime(self.start_time, "%H:%M:%S")+timedelta(days=1)
+		else:
+			start_time_to_lunch_duration=datetime.strptime(self.lunch_start, "%H:%M:%S")-datetime.strptime(self.start_time, "%H:%M:%S")
+
+		if(datetime.strptime(self.lunch_end, "%H:%M:%S") < datetime.strptime(self.lunch_start, "%H:%M:%S")):
+			lunch_duration	=datetime.strptime(self.lunch_end, "%H:%M:%S")-datetime.strptime(self.lunch_start, "%H:%M:%S")+timedelta(days=1)
+		else:
+			lunch_duration	=datetime.strptime(self.lunch_end, "%H:%M:%S")-datetime.strptime(self.lunch_start, "%H:%M:%S")
+
 		if (
 			cint(self.enable_entry_grace_period)
 			and in_time
@@ -138,14 +153,24 @@ class override_ShiftType(Document):
 		):
 			overtime_hour=round((out_time - logs[0].shift_end).total_seconds() / 3600, 4)
 			overtime=out_time-logs[0].shift_end
+		if (out_time):		
+			if(weekly_off_check==0 or weekly_off_check==1):
+				if(in_time<= (logs[0].shift_start+start_time_to_lunch_duration) and (logs[0].shift_start+start_time_to_lunch_duration+lunch_duration) <= out_time):
+					overtime=out_time-in_time-lunch_duration
+				else:
+					overtime=out_time-in_time
+				# if(overtime>=timedelta(days=1)):
+				# 	overtime=timedelta(days=1)-timedelta(minutes=1)
 
+
+#if (lunch_start_datetime.time() > in_time_time) and (lunch_end_datetime.time() < out_time_time):
 
 		#change start
 		if(weekly_off_check == 1):
-			return "Weekly Off", total_working_hours, late_entry, early_exit, in_time, out_time, overtime_hour,None,overtime
+			return "Weekly Off", total_working_hours, 0, early_exit, in_time, out_time, overtime_hour,0,overtime
 		
 		if(weekly_off_check==0):
-			return "Holiday", total_working_hours, late_entry, early_exit, in_time, out_time, overtime_hour,None,overtime
+			return "Holiday", total_working_hours, 0, early_exit, in_time, out_time, overtime_hour,0,overtime
 		
 		if(late_entry):
 			return "Late", total_working_hours, late_entry, early_exit, in_time, out_time, overtime_hour, late_entry_duration,overtime
@@ -215,8 +240,8 @@ class override_ShiftType(Document):
 		
 		# dates = get_filtered_date_list(employee, start_date, end_date, holiday_list=holiday_list_name)
 		# for date in dates:
-			timestamp = datetime.combine(date, start_time)
-			shift_details = get_employee_shift(employee, timestamp, True)
+			#timestamp = datetime.combine(date, start_time)
+			shift_details = get_employee_shift(employee, date, True)
 			if shift_details and shift_details.shift_type.name == self.name:
 				attendance = mark_attendance(employee, date, "Absent", self.name)
 				if attendance:

@@ -71,12 +71,24 @@ class override_SalarySlip(TransactionBase):
 	def calculate_overtime_amount(self):
 
 		#overtime_hours will return a tuple. Which will be accessible using overtime_hours[0][0]
-		overtime_hours = frappe.db.sql("""SELECT SEC_TO_TIME(SUM(TIME_TO_SEC(overtime))) FROM `tabAttendance` WHERE employee = %s AND attendance_date between %s and %s""",
+
+		# total overtime calculation for acctual overtime
+		# overtime_hours = frappe.db.sql("""SELECT SUM(TIME_TO_SEC(overtime)) FROM `tabAttendance` WHERE employee = %s AND attendance_date between %s and %s""",
+		# (self.employee, self.start_date, self.end_date)
+		# )
+		# if(overtime_hours[0][0] and self.overtime_rate):
+		# 	total_pay = 0
+		# 	return total_pay, overtime_hours[0][0]/3600
+		# else:
+		# 	total_pay = 0
+		# 	return total_pay, overtime_hours[0][0]/3600
+
+		# total overtime calculation for rounded overtime
+		overtime_hours = frappe.db.sql("""SELECT SUM(rounded_ot) FROM `tabAttendance` WHERE employee = %s AND attendance_date between %s and %s""",
 		(self.employee, self.start_date, self.end_date)
 		)
 		if(overtime_hours[0][0] and self.overtime_rate):
-			#total_pay = round((float(str(overtime_hours[0][0]).split(":")[0]) + float(str(overtime_hours[0][0]).split(":")[1])/60 ) * int(self.overtime_rate))
-			total_pay = 0
+			total_pay = self.overtime_rate*overtime_hours[0][0]
 			return total_pay, overtime_hours[0][0]
 		else:
 			total_pay = 0
@@ -85,13 +97,13 @@ class override_SalarySlip(TransactionBase):
 	def calculate_total_late_entry_duration(self):
 
 		#overtime_hours will return a tuple. Which will be accessible using overtime_hours[0][0]
-		tolal_late_entry_duration = frappe.db.sql("""SELECT SEC_TO_TIME(SUM(TIME_TO_SEC(late_entry_duration))) FROM `tabAttendance` WHERE employee = %s AND attendance_date between %s and %s""",
+		tolal_late_entry_duration = frappe.db.sql("""SELECT SUM(TIME_TO_SEC(late_entry_duration)) FROM `tabAttendance` WHERE employee = %s AND attendance_date between %s and %s""",
 		(self.employee, self.start_date, self.end_date)
 		)
 		if(tolal_late_entry_duration[0][0]):
-			#return tolal_late_entry_duration[0][0]
+			return tolal_late_entry_duration[0][0]/3600
 			# return str(tolal_late_entry_duration[0][0]).split(":")[0]*60+str(tolal_late_entry_duration[0][0]).split(":")[1]
-			return float(str(tolal_late_entry_duration[0][0]).split(":")[0])*60 + float(str(tolal_late_entry_duration[0][0]).split(":")[1]) 
+			#return float(str(tolal_late_entry_duration[0][0]).split(":")[0])*60 + float(str(tolal_late_entry_duration[0][0]).split(":")[1]) 
 
 		else:
 			return 0
@@ -122,8 +134,8 @@ class override_SalarySlip(TransactionBase):
 		else:
 			self.total_overtime_pay = float(self.overtime_hours) * float(self.overtime_rate)
 
-		self.total_late_entry_duration = self.calculate_total_late_entry_duration()
-
+		self.total_late_entry_duration = round(self.calculate_total_late_entry_duration(), 2)
+		#if()
 
 		#Below methods present_days and present_nights should be refactored into one method 
 
@@ -141,6 +153,7 @@ class override_SalarySlip(TransactionBase):
 
 
 		self.base_pay = self.fetch_base_pay()
+		self.total_month_minutes=(date_diff(self.end_date,self.start_date)+1)*8*60
 		#self.total_month_minutes = ((date(int(self.end_date.split('-')[0]), int(self.end_date.split('-')[1]), int(self.end_date.split('-')[2])) - date(int(self.start_date.split('-')[0]), int(self.start_date.split('-')[1]), int(self.start_date.split('-')[2]))).days) * 8 * 60 #fetch regular_working_hour from shift_type
 		self.overtime_rate = round(((self.base_pay - 1450) * 2/3 ) / 104)
 
@@ -756,6 +769,7 @@ class override_SalarySlip(TransactionBase):
 
 	def add_structure_components(self, component_type):
 		data, default_data = self.get_data_for_eval()
+
 		timesheet_component = frappe.db.get_value(
 			"Salary Structure", self.salary_structure, "salary_component"
 		)
@@ -765,7 +779,8 @@ class override_SalarySlip(TransactionBase):
 				continue
 
 			amount = self.eval_condition_and_formula(struct_row, data)
-
+			# if struct_row.salary_component =="Basic":
+			# 	self.payment_days_check=amount
 			if struct_row.statistical_component:
 				# update statitical component amount in reference data based on payment days
 				# since row for statistical component is not added to salary slip
@@ -780,9 +795,14 @@ class override_SalarySlip(TransactionBase):
 
 			elif amount or struct_row.amount_based_on_formula and amount is not None:
 				default_amount = self.eval_condition_and_formula(struct_row, default_data)
+				#default_amount = 200
 				self.update_component_row(
 					struct_row, amount, component_type, data=data, default_amount=default_amount
 				)
+			# if struct_row.salary_component =="Basic":
+			# 	self.payment_days_check=amount
+
+
 
 	def get_data_for_eval(self):
 		"""Returns data for evaluating formula"""
@@ -833,7 +853,9 @@ class override_SalarySlip(TransactionBase):
 			for d in self.get(key):
 				default_data[d.abbr] = d.default_amount or 0
 				data[d.abbr] = d.amount or 0
-
+				if data[d.abbr] =="Hrent":
+					self.payment_days_check=d.default_amount
+	
 		return data, default_data
 
 	def eval_condition_and_formula(self, d, data):
@@ -1025,6 +1047,8 @@ class override_SalarySlip(TransactionBase):
 		component_row.amount = self.get_amount_based_on_payment_days(
 			component_row, joining_date, relieving_date
 		)[0]
+
+
 
 		# remove 0 valued components that have been updated later
 		if component_row.amount == 0:
@@ -1338,6 +1362,8 @@ class override_SalarySlip(TransactionBase):
 				(flt(row.additional_amount) * flt(self.payment_days) / cint(self.total_working_days)),
 				row.precision("additional_amount"),
 			)
+			
+
 			amount = (
 				flt(
 					(flt(row.default_amount) * flt(self.payment_days) / cint(self.total_working_days)),
@@ -1345,6 +1371,7 @@ class override_SalarySlip(TransactionBase):
 				)
 				+ additional_amount
 			)
+			#self.payment_days_check = row.default_amount
 
 		elif (
 			not self.payment_days

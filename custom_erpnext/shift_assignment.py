@@ -183,18 +183,20 @@ def get_employee_shift(
 		shift_type_name = shift_assignment_details[0]
 
 		# if end_date present means that shift is over after end_date else it is a ongoing shift.
-		if shift_assignment_details[1] and for_date >= shift_assignment_details[1]:
+		#if shift_assignment_details[1] and for_date >= shift_assignment_details[1]:
+		#removed "=" for getting checkin on shift_assignments end date
+		if shift_assignment_details[1] and for_date > shift_assignment_details[1]:
 			shift_type_name = None
 
 	if not shift_type_name and consider_default_shift:
 		shift_type_name = default_shift
 	#Change -- Start
-	if shift_type_name:
-		holiday_list_name = frappe.get_cached_value("Shift Type", shift_type_name, "holiday_list")
-		if not holiday_list_name:
-			holiday_list_name = get_holiday_list_for_employee(employee, False)
-		if holiday_list_name and is_holiday(holiday_list_name, for_date):
-			shift_type_name = default_shift
+	# if shift_type_name:
+	# 	holiday_list_name = frappe.get_cached_value("Shift Type", shift_type_name, "holiday_list")
+	# 	if not holiday_list_name:
+	# 		holiday_list_name = get_holiday_list_for_employee(employee, False)
+	# 	if holiday_list_name and is_holiday(holiday_list_name, for_date):
+	# 		shift_type_name = None
 	# #Change -- End
 	if not shift_type_name and next_shift_direction:
 		MAX_DAYS = 366

@@ -1,0 +1,232 @@
+// Copyright (c) 2022, Frappe Technologies Pvt. Ltd. and contributors
+// For license information, please see license.txt
+
+frappe.ui.form.on('Shift Assignment Tool', {
+	refresh: function(frm) {
+		frm.disable_save();
+	},
+	
+
+	onload: function(frm) {
+		frm.set_value("date", frappe.datetime.get_today());
+		erpnext.shift_assignment_tool.load_employees(frm);
+	},
+
+	select_shift: function(frm){
+		erpnext.shift_assignment_tool.load_employees(frm);
+
+	},
+
+	department: function(frm) {
+		erpnext.shift_assignment_tool.load_employees(frm);
+	},
+
+	designation: function(frm) {
+		erpnext.shift_assignment_tool.load_employees(frm);
+	},
+
+	floor: function(frm) {
+		erpnext.shift_assignment_tool.load_employees(frm);
+	},
+
+	facility_or_line: function(frm) {
+		erpnext.shift_assignment_tool.load_employees(frm);
+	},
+
+	section: function(frm) {
+		erpnext.shift_assignment_tool.load_employees(frm);
+	},
+
+	group: function(frm) {
+		erpnext.shift_assignment_tool.load_employees(frm);
+	},
+
+	company: function(frm) {
+		erpnext.shift_assignment_tool.load_employees(frm);
+	},
+
+	employee_id: function(frm) {
+		erpnext.shift_assignment_tool.load_employees(frm)
+	},	
+
+});
+
+
+erpnext.shift_assignment_tool = {
+	load_employees: function(frm) {
+		if(frm.doc.date) {
+			frappe.call({
+				method: "erpnext.hr.doctype.shift_assignment_tool.shift_assignment_tool.get_employees",
+				args: {
+					date: frm.doc.date,
+					shift: frm.doc.select_shift,
+					department: frm.doc.department,
+					designation: frm.doc.designation,
+					floor: frm.doc.floor,
+					facility_or_line: frm.doc.facility_or_line,
+					section: frm.doc.section,
+					group: frm.doc.group,
+					company: frm.doc.company,
+					employee_id: frm.doc.employee_id
+				},
+				callback: function(r) {
+					if(r.message['unmarked'].length > 0) {
+						unhide_field('unmarked_attendance_section')
+						if(!frm.employee_area) {
+							frm.employee_area = $('<div>')
+							.appendTo(frm.fields_dict.employees_html.wrapper);
+						}
+						frm.EmployeeSelector = new erpnext.EmployeeSelector(frm, frm.employee_area, r.message['unmarked'])
+					}
+					else{
+						hide_field('unmarked_attendance_section')
+					}
+
+					if(r.message['marked'].length > 0) {
+						unhide_field('marked_attendance_section')
+						if(!frm.marked_employee_area) {
+							frm.marked_employee_area = $('<div>')
+								.appendTo(frm.fields_dict.marked_attendance_html.wrapper);
+						}
+						frm.marked_employee = new erpnext.MarkedEmployee(frm, frm.marked_employee_area, r.message['marked'])
+					}
+					else{
+						hide_field('marked_attendance_section')
+					}
+				}
+			});
+		} //load_employees ends here
+
+	}
+}
+
+
+
+
+
+
+erpnext.MarkedEmployee = class MarkedEmployee {
+	constructor(frm, wrapper, employee) {
+		this.wrapper = wrapper;
+		this.frm = frm;
+		this.make(frm, employee);
+	}
+	make(frm, employee) {
+		var me = this;
+		$(this.wrapper).empty();
+
+		var row;
+		$.each(employee, function(i, m) {
+			var attendance_icon = "fa fa-check";
+			var color_class = "";
+			if(m.status == "Absent") {
+				attendance_icon = "fa fa-check-empty"
+				color_class = "text-muted";
+			}
+			else if(m.status == "Half Day") {
+				attendance_icon = "fa fa-check-minus"
+			}
+
+			if (i===0 || i % 4===0) {
+				row = $('<div class="row"></div>').appendTo(me.wrapper);
+			}
+
+			$(repl('<div class="col-sm-3 %(color_class)s">\
+				<label class="marked-employee-label"><span class="%(icon)s"></span>\
+				%(employee)s</label>\
+				</div>', {
+					employee: m.employee_name, //employee_name
+					icon: attendance_icon,
+					color_class: color_class
+				})).appendTo(row);
+		});
+	}
+};
+
+
+erpnext.EmployeeSelector = class EmployeeSelector {
+	constructor(frm, wrapper, employee) {
+		this.wrapper = wrapper;
+		this.frm = frm;
+		this.make(frm, employee);
+	}
+	make(frm, employee) {
+		var me = this;
+
+		$(this.wrapper).empty();
+		var employee_toolbar = $('<div class="col-sm-12 top-toolbar">\
+			<button class="btn btn-default btn-add btn-xs"></button>\
+			<button class="btn btn-xs btn-default btn-remove"></button>\
+			</div>').appendTo($(this.wrapper));
+
+		var mark_employee_toolbar = $('<div class="col-sm-12 bottom-toolbar">\
+			<button class="btn btn-primary btn-assign btn-xs"></button>\
+			');
+
+		employee_toolbar.find(".btn-add")
+			.html(__('Check all'))
+			.on("click", function() {
+				$(me.wrapper).find('input[type="checkbox"]').each(function(i, check) {
+					if(!$(check).is(":checked")) {
+						check.checked = true;
+					}
+				});
+			});
+
+		employee_toolbar.find(".btn-remove")
+			.html(__('Uncheck all'))
+			.on("click", function() {
+				$(me.wrapper).find('input[type="checkbox"]').each(function(i, check) {
+					if($(check).is(":checked")) {
+						check.checked = false;
+					}
+				});
+			});
+
+
+		//This methods are used to set the marked employees' status to the selected one! We can take status from a dropdown or link, instead of a button 
+
+		mark_employee_toolbar.find(".btn-assign")
+			.html(__('Assign'))
+			.on("click", function() {
+				var employees_to_shift = [];
+				$(me.wrapper).find('input[type="checkbox"]').each(function(i, check) {
+					if($(check).is(":checked")) {
+						employees_to_shift.push(employee[i]);
+					}
+				});
+				frappe.call({
+					method: "erpnext.hr.doctype.shift_assignment_tool.shift_assignment_tool.mark_employee_attendance1",
+					args:{
+						"employee_list":employees_to_shift,
+						"shift": frm.doc.change_shift_to,
+						"from_date":frm.doc.from_date,
+						"to_date": frm.doc.to_date,
+						"company":frm.doc.company
+					},
+
+					callback: function(r) {
+						alert("Shift Assigned successfully !");
+						erpnext.shift_assignment_tool.load_employees(frm);
+
+					}
+				});
+			});
+
+		
+		var row;
+		$.each(employee, function(i, m) {
+			if (i===0 || (i % 2) === 0) {
+				row = $('<div class="row"></div>').appendTo(me.wrapper);
+			}
+
+			$(repl('<div class="col-sm-6 unmarked-employee-checkbox">\
+				<div class="checkbox">\
+				<label><input type="checkbox" class="employee-check" employee="%(employee)s"/>\
+				%(employee)s</label>\
+				</div></div>', {employee: m.employee + ": " + m.employee_name})).appendTo(row); //was: m.employee_name
+		});
+
+		mark_employee_toolbar.appendTo($(this.wrapper));
+	}
+};

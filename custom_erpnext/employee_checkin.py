@@ -10,7 +10,10 @@ from frappe.utils import cint, get_datetime, get_link_to_form
 from erpnext.hr.doctype.employee_checkin.employee_checkin import EmployeeCheckin
 
 from erpnext.hr.doctype.holiday_list.holiday_list import is_holiday
-from erpnext.hr.doctype.shift_assignment.shift_assignment import (
+# from erpnext.hr.doctype.shift_assignment.shift_assignment import (
+# 	get_actual_start_end_datetime_of_shift,
+# )
+from custom_erpnext.shift_assignment import (
 	get_actual_start_end_datetime_of_shift,
 )
 from erpnext.hr.utils import validate_active_employee
@@ -145,20 +148,20 @@ def mark_attendance_and_link_log(
 
   
 
-	if attendance_status in ("Weekly Off", "Holiday"):
-		overtime_hour=working_hours
+	# if attendance_status in ("Weekly Off", "Holiday"):
+	# 	overtime_hour=working_hours
 
 	if allowed_for_overtime=="No":
 		overtime_hour = 0
 	
 	else:
-		rounding_ot = frappe.db.get_value("Company", company, "rounding_overtime") / 60
+		rounding_ot = frappe.db.get_value("Company", company, "rounding_overtime") 
 		#overtime_hour=rounding_ot
-		overtime_hour_fraction  = overtime_hour % 1
+		overtime_hour_fraction  = ((overtime.total_seconds())%3600)//60
 		if overtime_hour_fraction >= rounding_ot:			
-			overtime_hour = ceil(overtime_hour)
+			overtime_hour = (overtime.total_seconds()//3600)+1
 		else:		
-			overtime_hour = floor(overtime_hour)
+			overtime_hour = (overtime.total_seconds()//3600)
 		if attendance_status in ("Weekly Off", "Holiday"):
 			overtime_hour=overtime_hour*2
 
@@ -254,7 +257,7 @@ def mark_attendance_and_link_log(
 	else:
 		frappe.throw(_("{} is an invalid Attendance Status.").format(attendance_status))
 
-def calculate_working_hours(logs, check_in_out_type, working_hours_calc_type, holiday=None, lunch_start=None, lunch_end=None, shift_start=None, shift_end=None):
+def calculate_working_hours(logs, check_in_out_type, working_hours_calc_type):
 	"""Given a set of logs in chronological order calculates the total working hours based on the parameters.
 	Zero is returned for all invalid cases.
 
@@ -264,70 +267,18 @@ def calculate_working_hours(logs, check_in_out_type, working_hours_calc_type, ho
 	"""
 	total_hours = 0
 	in_time = out_time = None
-	#lunch_start_datetime1=datetime.strptime(lunch_start,'%H:%M:%S')
-	#lunch_end_datetime1=datetime.strptime(lunch_end,'%H:%M:%S')
-	lunch_start_datetime=datetime.strptime(lunch_start,'%H:%M:%S')
-	lunch_end_datetime=datetime.strptime(lunch_end,'%H:%M:%S')
-	
-	shift_start_datetime=datetime.strptime(shift_start,'%H:%M:%S')
-	shift_end_datetime=datetime.strptime(shift_end,'%H:%M:%S')
-	overtime_hour = 0
-	#check_if_weekly_off = 0
-
-
-
 	if check_in_out_type == "Alternating entries as IN and OUT during the same shift":
 		in_time = logs[0].time
-		
-		in_date1 = str(logs[0].shift_start).split(" ")[0]
-		check_if_weekly_off = frappe.db.get_value('Holiday', {'parent': holiday, 'holiday_date': in_date1}, 'weekly_off')
 		if len(logs) >= 2:
-			#lunch_time = frappe.db.sql('''select lunch_start, lunch_end from `tabShift Type` where name=%s''', shift_name)
-
 			out_time = logs[-1].time
-			in_time_time=in_time.time()
-			out_time_time=out_time.time()
-
-			
-			#changed - start
-			# if not holiday_list_name:
-			# 	holiday_list_name = get_holiday_list_for_employee(employee, False)
-
-			#start_time = get_time(in_date)
-			#check_if_weekly_off = frappe.db.sql("""select weekly_off from tabHoliday where holiday_date = '2022-02-04' and parent = 'Holiday List 2022' """)
-			
-			if is_holiday(holiday, in_date1):
-					# skip marking absent on a holiday
-					#Dev: Can be changed because if it's a weekly holiday, the status is shown as 'W'
-				# if check_if_weekly_off == 1:
-				# 	total_hours = time_diff_in_hours(in_time,out_time)-10
-				# else:
-				# 	total_hours = time_diff_in_hours(in_time,out_time)
-				if (lunch_start_datetime.time() > in_time_time) and (lunch_end_datetime.time() < out_time_time):
-					total_hours=time_diff_in_hours(in_time, out_time) - time_diff_in_hours(lunch_start_datetime, lunch_end_datetime)
-				else:
-					total_hours=time_diff_in_hours(in_time, out_time) 
-
-			elif out_time > shift_end_datetime:
-				total_hours = time_diff_in_hours(in_time, out_time)
-				# overtime_hour=time_diff_in_hours(shift_end_datetime, out_time) 
-
-			else:
-				total_hours = time_diff_in_hours(in_time, out_time)
-				#overtime_hour = 123
-
-
-		
-		# if len(logs) >= 2:
-		# 	out_time = logs[-1].time
-		# if working_hours_calc_type == "First Check-in and Last Check-out":
-		# 	# assumption in this case: First log always taken as IN, Last log always taken as OUT
-		# 	total_hours = time_diff_in_hours(in_time, logs[-1].time)
-		# elif working_hours_calc_type == "Every Valid Check-in and Check-out":
-		# 	logs = logs[:]
-		# 	while len(logs) >= 2:
-		# 		total_hours += time_diff_in_hours(logs[0].time, logs[1].time)
-		# 		del logs[:2]
+		if working_hours_calc_type == "First Check-in and Last Check-out":
+			# assumption in this case: First log always taken as IN, Last log always taken as OUT
+			total_hours = time_diff_in_hours(in_time, logs[-1].time)
+		elif working_hours_calc_type == "Every Valid Check-in and Check-out":
+			logs = logs[:]
+			while len(logs) >= 2:
+				total_hours += time_diff_in_hours(logs[0].time, logs[1].time)
+				del logs[:2]
 
 	elif check_in_out_type == "Strictly based on Log Type in Employee Checkin":
 		if working_hours_calc_type == "First Check-in and Last Check-out":
@@ -364,7 +315,7 @@ def calculate_working_hours(logs, check_in_out_type, working_hours_calc_type, ho
 				out_time = out_log.time
 				total_hours += time_diff_in_hours(in_log.time, out_log.time)
 
-	return total_hours, in_time, out_time, check_if_weekly_off
+	return total_hours, in_time, out_time
 
 def time_diff_in_hours(start, end):
 	return round((end - start).total_seconds() / 3600, 1)

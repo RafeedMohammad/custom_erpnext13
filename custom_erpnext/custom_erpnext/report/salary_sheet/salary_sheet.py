@@ -133,6 +133,7 @@ def get_columns(salary_slips):
 		_("W/H") + ":Float:120",
 
 		_("CL") + ":Float:80",
+		
 		_("SL") + ":Float:80",
 		_("PL") + ":Float:80",
 		_("AD") + ":Float:80",
@@ -148,6 +149,10 @@ def get_columns(salary_slips):
 	]
 
 	salary_components = {_("Earning"): [], _("Deduction"): []}
+
+	leaves = {_("Leaves"): []}
+
+	for leave in frappe.db.sql()
 
 	for component in frappe.db.sql(
 		"""select distinct sd.salary_component, sc.type
