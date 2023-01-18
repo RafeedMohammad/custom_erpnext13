@@ -126,7 +126,7 @@ class override_SalarySlip(TransactionBase):
 		self.status = self.get_status()
 		validate_active_employee(self.employee)
 		self.late = self.calculate_late_count()
-		self.late_days = int(self.calculate_late_count())
+		self.late_days = 0#int(self.calculate_late_count())
 		#Assiging total overtime_pay and overtime_hours of the month
 		if (self.overtime_rate == None and self.overtime_hours == None):
 			self.total_overtime_pay, self.overtime_hours = self.calculate_overtime_amount()
@@ -154,8 +154,9 @@ class override_SalarySlip(TransactionBase):
 
 		self.base_pay = self.fetch_base_pay()
 		self.total_month_minutes=(date_diff(self.end_date,self.start_date)+1)*8*60
-		#self.total_month_minutes = ((date(int(self.end_date.split('-')[0]), int(self.end_date.split('-')[1]), int(self.end_date.split('-')[2])) - date(int(self.start_date.split('-')[0]), int(self.start_date.split('-')[1]), int(self.start_date.split('-')[2]))).days) * 8 * 60 #fetch regular_working_hour from shift_type
-		self.overtime_rate = round(((self.base_pay - 1450) * 2/3 ) / 104)
+		#self.total_month_minutes = ((date(int(self.end_date.split('-')[0]), int(self.end_date.split('-')[1]), int(self.end_date.split('-')[2])) - date(int(self.start_date.split('-')[0]), int(self.start_date.split('-')[1]), int(self.start_date.split('-')[2]))).days) * 8 * 60 #fetch regular_working_hour from shift_type		
+		if (self.overtime_rate == None):
+			self.overtime_rate = round(((self.base_pay - 1450) * 2/3 ) / 104)
 
 
 		self.validate_dates()
@@ -665,6 +666,7 @@ class override_SalarySlip(TransactionBase):
 			FROM `tabAttendance`
 			WHERE
 				status in ("Present","Late")
+				AND is_night = "No"
 				AND employee = %s
 				AND attendance_date between %s and %s
 		""",
@@ -725,7 +727,7 @@ class override_SalarySlip(TransactionBase):
 	def calculate_net_pay(self):
 		if self.salary_structure:
 			self.calculate_component_amounts("earnings")
-		self.gross_pay = self.get_component_totals("earnings", depends_on_payment_days=1) + self.arear
+		self.gross_pay = self.get_component_totals("earnings", depends_on_payment_days=1) + self.arear + flt(self.total_overtime_pay)
 		self.base_gross_pay = flt(
 			flt(self.gross_pay) * flt(self.exchange_rate), self.precision("base_gross_pay")
 		)

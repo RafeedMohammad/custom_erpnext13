@@ -4,13 +4,6 @@
 # import frappe
 
 
-# Copyright (c) 2022, Lithe-Tech Limited and contributors
-# For license information, please see license.txt
-
-# import frappe
-
-
-
 from datetime import datetime, timedelta
 import frappe
 from frappe import _
@@ -79,7 +72,7 @@ def get_attendance(filters):
 	# % conditions, as_list=1)
 
 	result= frappe.db.sql("""select DISTINCT att.attendance_date, att.employee, att.shift,
-	att.in_time, att.late_entry_duration, att.out_time, att.rounded_ot, att.status, att.overtime, att.leave_type, emp.first_name
+	att.in_time, att.late_entry_duration, att.out_time, att.overtime, att.status, emp.first_name, att.leave_type
 	FROM tabAttendance as att
 	INNER JOIN tabEmployee as emp ON emp.name = att.employee  	
 	where %s and att.docstatus!=2
@@ -101,48 +94,50 @@ def get_attendance(filters):
 		elif result[i][5] is None:
 			continue
 		
-		else:
-			if (max_allowed_hour>10): 
-				pass
-			elif(max_allowed_minute>10):
-				shift_end_time=result[i][5]-result[i][8]
-				if(result[i][5]>shift_end_time):
-					minute1=int(str(result[i][8]).split(":")[1])
+	# 	else:
+	# 		if (max_allowed_hour>10): 
+	# 			pass
+	# 		elif(max_allowed_minute>10):
+	# 			shift_end_time=result[i][5]-result[i][8]
+	# 			if(result[i][5]>shift_end_time):
+	# 				minute1=int(str(result[i][8]).split(":")[1])
 
-					if(result[i][8]>timedelta(hours=max_allowed_hour,minutes=max_allowed_minute+10)):
-						result[i][5]=shift_end_time+timedelta(hours=max_allowed_hour,minutes=max_allowed_minute+(minute1%10))
-						result[i][6]=max_allowed_hour+(max_allowed_minute/60)
+	# 				if(result[i][8]>timedelta(hours=max_allowed_hour,minutes=max_allowed_minute+10)):
+	# 					result[i][5]=shift_end_time+timedelta(hours=max_allowed_hour,minutes=max_allowed_minute+(minute1%10))
+	# 					result[i][6]=max_allowed_hour+(max_allowed_minute/60)
 
-					elif(result[i][8]<timedelta(hours=max_allowed_hour,minutes=max_allowed_minute-rounded_over_time2)):#rounding_time2
-						result[i][6]=max_allowed_hour+(max_allowed_minute/60)
+	# 				elif(result[i][8]<timedelta(hours=max_allowed_hour,minutes=max_allowed_minute-rounded_over_time2)):#rounding_time2
+	# 					result[i][6]=max_allowed_hour+(max_allowed_minute/60)
 
-					elif(result[i][8]<timedelta(hours=result[i][6],minutes=rounded_over_time1)):#rounding_time1
-						pass
+	# 				elif(result[i][8]<timedelta(hours=result[i][6],minutes=rounded_over_time1)):#rounding_time1
+	# 					pass
 					
-					elif(result[i][8]<timedelta(hours=result[i][6],minutes=rounded_over_time1)):#rounding_time1
-						result[i][5]=shift_end_time+timedelta(hours=max_allowed_hour,minutes=(minute1%10))
+	# 				elif(result[i][8]<timedelta(hours=result[i][6],minutes=rounded_over_time1)):#rounding_time1
+	# 					result[i][5]=shift_end_time+timedelta(hours=max_allowed_hour,minutes=(minute1%10))
 
 
 
 
-			elif(max_allowed_minute<10):
-				if(result[i][5]>shift_end_time):
-					result[i][8]=result[i][5]-shift_end_time
-					minute1=int(str(result[i][8]).split(":")[1])
+	# 		elif(max_allowed_minute<10):
+	# 			if(result[i][5]>shift_end_time):
+	# 				result[i][8]=result[i][5]-shift_end_time
+	# 				minute1=int(str(result[i][8]).split(":")[1])
 
-					if(result[i][8]>timedelta(hours=max_allowed_hour,minutes=max_allowed_minute)):
-						result[i][5]=shift_end_time+timedelta(hours=max_allowed_hour,minutes=(minute1%10))
-						result[i][6]=max_allowed_hour#+(max_allowed_minute/60)
+	# 				if(result[i][8]>timedelta(hours=max_allowed_hour,minutes=max_allowed_minute)):
+	# 					result[i][5]=shift_end_time+timedelta(hours=max_allowed_hour,minutes=(minute1%10))
+	# 					result[i][6]=max_allowed_hour#+(max_allowed_minute/60)
 
-					elif(minute1>rounded_over_time1):	#rounding_time
-						result[i][5]=shift_end_time+timedelta(hours=result[i][6],minutes=(minute1%10))
-			result[i][5]=datetime.strftime(result[i][5],'%H:%M')
+	# 				elif(minute1>rounded_over_time1):	#rounding_time
+	# 					result[i][5]=shift_end_time+timedelta(hours=result[i][6],minutes=(minute1%10))
+	# 		result[i][5]=datetime.strftime(result[i][5],'%H:%M')
 
-			#for late
-			if result[i][4]>timedelta(minutes=0):
-				result[i][4]=9
-
-			result[i][3]=datetime.strftime(result[i][3],'%H:%M')				
+	# 		#for late
+	# 		if result[i][4]>timedelta(minutes=0):
+	# 			result[i][4]=9
+		if result[i][3] !="00:00":
+			result[i][3]=frappe.session.user#datetime.strftime(result[i][3],'%H:%M')
+		if result[i][5] !="00:00":
+			result[i][5]=datetime.strftime(result[i][5],'%H:%M')				
 				
 	return result
 

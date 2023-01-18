@@ -8,9 +8,12 @@
 from datetime import datetime, timedelta
 import frappe
 from frappe import _
-
-max_allowed_hour=14
-max_allowed_minute=30
+#if frappe.session.user=="Administrator":
+max_allowed_hour=13
+max_allowed_minute=00
+# else:
+# 	max_allowed_hour=2
+# 	max_allowed_minute=00
 
 def execute(filters= None):
 	if not filters:
@@ -46,7 +49,6 @@ def get_columns():
 		_("Out Time") + ":Data/Attendance:120",
 		_("O.T.") + ":Data/Attendance:120",
 		_("Status") + ":Data/:120",
-		_("overtime") + ":Data/:120",
 
 
 	]
@@ -85,7 +87,7 @@ def get_attendance(filters):
 	
 
 	result= frappe.db.sql("""select DISTINCT att.attendance_date, att.employee, att.shift,
-	att.in_time, att.late_entry_duration, att.out_time, att.rounded_ot, att.status, att.shift_start, att.shift_end, att.leave_type, emp.first_name, att.overtime
+	att.in_time, att.late_entry_duration, att.out_time, att.rounded_ot, att.status, att.shift_start, att.shift_end, att.leave_type, emp.first_name
 	FROM tabAttendance as att
 	INNER JOIN tabEmployee as emp ON emp.name = att.employee  	
 	where %s
@@ -104,6 +106,11 @@ def get_attendance(filters):
 			result[i][7]= result[i][10]
 		
 		elif result[i][5] is None:
+			if result[i][3] !=None:
+				result[i][3]=datetime.strftime(result[i][3],'%H:%M')
+			if ((result[i][7]=="Weekly Off" or result[i][7]=="Holiday" )and max_allowed_hour<10):
+				result[i][3]=result[i][5]=None
+				result[i][6]=0
 			continue
 		elif result[i][9] is None:
 			continue
@@ -120,7 +127,7 @@ def get_attendance(filters):
 						result[i][5]=result[i][9]+timedelta(hours=max_allowed_hour,minutes=max_allowed_minute+(minute1%10))
 						result[i][6]=max_allowed_hour+(max_allowed_minute/60)
 
-					elif(ot_difference<timedelta(hours=max_allowed_hour,minutes=max_allowed_minute-rounded_over_time2)):#rounding_time2
+					elif(ot_difference>=timedelta(hours=max_allowed_hour,minutes=max_allowed_minute-rounded_over_time2)):#rounding_time2
 						result[i][6]=max_allowed_hour+(max_allowed_minute/60)
 					elif(ot_difference<timedelta(hours=result[i][6],minutes=rounded_over_time1)):#rounding_time1
 						pass
@@ -147,8 +154,11 @@ def get_attendance(filters):
 			if(result[i][3]<result[i][8] and max_allowed_hour<10):
 				early_entry_diff_min=int(str(result[i][8]-result[i][3]).split(":")[1])%10
 				result[i][3]=result[i][8]-timedelta(minutes=early_entry_diff_min)
-			result[i][3]=datetime.strftime(result[i][3],'%H:%M')	
-			result[i][8]=result[i][12]			
+			result[i][3]=datetime.strftime(result[i][3],'%H:%M')
+			
+			if ((result[i][7]=="Weekly Off" or result[i][7]=="Holiday" )and max_allowed_hour<10):
+					result[i][3]=result[i][5]=None
+					result[i][6]=0
 				
 	return result
 
@@ -229,11 +239,5 @@ def get_report_summary(data,a):
 			"value": total_holiday,
 			"label": _("Total Holiday"),
 			"datatype": "Int",
-		},
-		{
-			"value": total_null,
-			"label": _("Total Null"),
-			"datatype": "Int",
-		},
-		
+		},	
 	]

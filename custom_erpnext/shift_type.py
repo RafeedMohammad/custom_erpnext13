@@ -74,7 +74,6 @@ class override_ShiftType(Document):
 				early_exit,
 				in_time,
 				out_time,
-				overtime_hour,
 				late_entry_duration,
 				overtime,
 			) = self.get_attendance(single_shift_logs)
@@ -88,7 +87,6 @@ class override_ShiftType(Document):
 				in_time,
 				out_time,
 				self.name,
-				overtime_hour,	
 				late_entry_duration,
 				overtime,
 			)
@@ -111,7 +109,6 @@ class override_ShiftType(Document):
 		# 	logs, self.determine_check_in_and_check_out, self.working_hours_calculation_based_on, self.holiday_list, self.lunch_start, self.lunch_end, self.start_time, self.end_time##Change - Added parameter: self.holiday_list
 		# )
 
-		overtime_hour=0
 		late_entry_duration=0
 		overtime=timedelta(0)
 
@@ -151,7 +148,6 @@ class override_ShiftType(Document):
 			and out_time
 			and out_time > logs[0].shift_end #- timedelta(minutes=cint(self.early_exit_grace_period))
 		):
-			overtime_hour=round((out_time - logs[0].shift_end).total_seconds() / 3600, 4)
 			overtime=out_time-logs[0].shift_end
 		if (out_time):		
 			if(weekly_off_check==0 or weekly_off_check==1):
@@ -167,13 +163,13 @@ class override_ShiftType(Document):
 
 		#change start
 		if(weekly_off_check == 1):
-			return "Weekly Off", total_working_hours, 0, early_exit, in_time, out_time, overtime_hour,0,overtime
+			return "Weekly Off", total_working_hours, 0, early_exit, in_time, out_time,0,overtime
 		
 		if(weekly_off_check==0):
-			return "Holiday", total_working_hours, 0, early_exit, in_time, out_time, overtime_hour,0,overtime
+			return "Holiday", total_working_hours, 0, early_exit, in_time, out_time, 0,overtime
 		
 		if(late_entry):
-			return "Late", total_working_hours, late_entry, early_exit, in_time, out_time, overtime_hour, late_entry_duration,overtime
+			return "Late", total_working_hours, late_entry, early_exit, in_time, out_time, late_entry_duration,overtime
 
 		#change end
 
@@ -181,13 +177,13 @@ class override_ShiftType(Document):
 			self.working_hours_threshold_for_absent
 			and total_working_hours < self.working_hours_threshold_for_absent
 		): 
-			return "Absent", total_working_hours, late_entry, early_exit, in_time, out_time,overtime_hour,overtime
+			return "Absent", total_working_hours, late_entry, early_exit, in_time, out_time,0,0
 		if (
 			self.working_hours_threshold_for_half_day
 			and total_working_hours < self.working_hours_threshold_for_half_day
 		):
 			return "Half Day", total_working_hours, late_entry, early_exit, in_time, out_time,overtime
-		return "Present", total_working_hours, late_entry, early_exit, in_time, out_time, overtime_hour, late_entry_duration,overtime
+		return "Present", total_working_hours, late_entry, early_exit, in_time, out_time, late_entry_duration,overtime
 
 	def mark_absent_for_dates_with_no_attendance(self, employee):
 		"""Marks Absents for the given employee on working days in this shift which have no attendance marked.

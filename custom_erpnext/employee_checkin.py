@@ -126,7 +126,6 @@ def mark_attendance_and_link_log(
 	in_time=None,
 	out_time=None,
 	shift=None,
-	overtime_hour=None,
 	late_entry_duration=None,
 	overtime=None
 	
@@ -142,17 +141,23 @@ def mark_attendance_and_link_log(
 	log_names = [x.name for x in logs]
 	employee = logs[0].employee
 	company = frappe.get_cached_value("Employee", employee, "company")
-	allowed_for_overtime = frappe.get_cached_value("Employee", employee, "overtime")
+	#allowed_for_overtime = frappe.get_cached_value("Employee", employee, "eligible_for_overtime")
+	allowed_for_overtime = frappe.get_cached_value("Employee", employee, "ot_enable")
+
+	allowed_for_late = frappe.get_cached_value("Employee", employee, "late_allow")
 	shift_start = logs[0].shift_start
 	shift_end = logs[0].shift_end
 
-  
+	if allowed_for_late=="Y" and attendance_status=="Late":
+		late_entry_duration=0
+		attendance_status="Present"
 
 	# if attendance_status in ("Weekly Off", "Holiday"):
 	# 	overtime_hour=working_hours
+	overtime_hour = 0
 
 	if allowed_for_overtime=="No":
-		overtime_hour = 0
+		overtime=0
 	
 	else:
 		rounding_ot = frappe.db.get_value("Company", company, "rounding_overtime") 
@@ -196,8 +201,8 @@ def mark_attendance_and_link_log(
 				"out_time": out_time,
 				"rounded_ot": overtime_hour,
 				"late_entry_duration":late_entry_duration,
-				"shift_start": shift_start,
-				"shift_end":shift_end,
+				# "shift_start": shift_start,
+				# "shift_end":shift_end,
 				"overtime":overtime
 			}
 			attendance = frappe.get_doc(doc_dict).insert()
@@ -235,14 +240,13 @@ def mark_attendance_and_link_log(
                 "out_time": out_time,
 				"rounded_ot":overtime_hour,
 				"late_entry_duration":late_entry_duration,
-				"shift_start": shift_start,
-				"shift_end":shift_end,
+				# "shift_start": shift_start,
+				# "shift_end":shift_end,
 				"overtime":overtime	
             }
 			attendance=frappe.db.set_value('Attendance', previous_attendance_name, {'out_time': doc_dict['out_time'],'working_hours': doc_dict['working_hours'],
             'in_time': doc_dict['in_time'],'status': doc_dict['status'],'late_entry': doc_dict['late_entry'],'early_exit': doc_dict['early_exit'], 
-			'rounded_ot': doc_dict['rounded_ot'],'late_entry_duration':doc_dict['late_entry_duration'], 'shift_start':doc_dict['shift_start'], 
-			'shift_end':doc_dict['shift_end'], "overtime":doc_dict['overtime']}, update_modified=True)
+			'rounded_ot': doc_dict['rounded_ot'],'late_entry_duration':doc_dict['late_entry_duration'], "overtime":doc_dict['overtime']}, update_modified=True)
 			#Changed Code - End
 
 			#Attendance document with updated values will be saved
