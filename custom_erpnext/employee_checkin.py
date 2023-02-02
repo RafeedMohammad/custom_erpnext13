@@ -141,7 +141,7 @@ def mark_attendance_and_link_log(
 	log_names = [x.name for x in logs]
 	employee = logs[0].employee
 	company = frappe.get_cached_value("Employee", employee, "company")
-	#allowed_for_overtime = frappe.get_cached_value("Employee", employee, "eligible_for_overtime")
+
 	allowed_for_overtime = frappe.get_cached_value("Employee", employee, "ot_enable")
 
 	allowed_for_late = frappe.get_cached_value("Employee", employee, "late_allow")
@@ -167,8 +167,7 @@ def mark_attendance_and_link_log(
 			overtime_hour = (overtime.total_seconds()//3600)+1
 		else:		
 			overtime_hour = (overtime.total_seconds()//3600)
-		if attendance_status in ("Weekly Off", "Holiday"):
-			overtime_hour=overtime_hour*2
+
 
 
 
@@ -201,8 +200,8 @@ def mark_attendance_and_link_log(
 				"out_time": out_time,
 				"rounded_ot": overtime_hour,
 				"late_entry_duration":late_entry_duration,
-				# "shift_start": shift_start,
-				# "shift_end":shift_end,
+				"shift_start": shift_start,
+				"shift_end":shift_end,
 				"overtime":overtime
 			}
 			attendance = frappe.get_doc(doc_dict).insert()
@@ -240,13 +239,14 @@ def mark_attendance_and_link_log(
                 "out_time": out_time,
 				"rounded_ot":overtime_hour,
 				"late_entry_duration":late_entry_duration,
-				# "shift_start": shift_start,
-				# "shift_end":shift_end,
+				"shift_start": shift_start,
+				"shift_end":shift_end,
 				"overtime":overtime	
             }
 			attendance=frappe.db.set_value('Attendance', previous_attendance_name, {'out_time': doc_dict['out_time'],'working_hours': doc_dict['working_hours'],
             'in_time': doc_dict['in_time'],'status': doc_dict['status'],'late_entry': doc_dict['late_entry'],'early_exit': doc_dict['early_exit'], 
-			'rounded_ot': doc_dict['rounded_ot'],'late_entry_duration':doc_dict['late_entry_duration'], "overtime":doc_dict['overtime']}, update_modified=True)
+			'rounded_ot': doc_dict['rounded_ot'],'late_entry_duration':doc_dict['late_entry_duration'], 'shift_start':doc_dict['shift_start'],
+			'shift_end':doc_dict['shift_end'], "overtime":doc_dict['overtime']}, update_modified=True)
 			#Changed Code - End
 
 			#Attendance document with updated values will be saved

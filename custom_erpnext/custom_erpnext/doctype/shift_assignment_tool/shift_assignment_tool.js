@@ -56,7 +56,7 @@ erpnext.shift_assignment_tool = {
 	load_employees: function(frm) {
 		if(frm.doc.date) {
 			frappe.call({
-				method: "erpnext.hr.doctype.shift_assignment_tool.shift_assignment_tool.get_employees",
+				method: "custom_erpnext.custom_erpnext.doctype.shift_assignment_tool.shift_assignment_tool.get_employees",
 				args: {
 					date: frm.doc.date,
 					shift: frm.doc.select_shift,

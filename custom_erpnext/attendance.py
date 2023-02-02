@@ -19,7 +19,7 @@ class override_Attendance(Document):
 		validate_status(self.status, ["Present", "Absent", "On Leave", "Half Day", "Work From Home","Late","Weekly Off","Holiday"])
 		validate_active_employee(self.employee)
 		self.validate_attendance_date()
-		#self.validate_duplicate_record()
+		self.validate_duplicate_record()
 		self.validate_employee_status()
 		self.check_leave_record()
 
@@ -39,23 +39,23 @@ class override_Attendance(Document):
 		elif date_of_joining and getdate(self.attendance_date) < getdate(date_of_joining):
 			frappe.throw(_("Attendance date can not be less than employee's joining date"))
 
-	# def validate_duplicate_record(self):
-	# 	res = frappe.db.sql(
-	# 		"""
-	# 		select name from `tabAttendance`
-	# 		where employee = %s
-	# 			and attendance_date = %s
-	# 			and name != %s
-	# 			and docstatus != 2
-	# 	""",
-	# 		(self.employee, getdate(self.attendance_date), self.name),
-	# 	)
-	# 	if res:
-	# 		frappe.throw(
-	# 			_("Attendance for employee {0} is already marked for the date {1}").format(
-	# 				frappe.bold(self.employee), frappe.bold(self.attendance_date)
-	# 			)
-	# 		)
+	def validate_duplicate_record(self):
+		res = frappe.db.sql(
+			"""
+			select name from `tabAttendance`
+			where employee = %s
+				and attendance_date = %s
+				and name != %s
+				and docstatus != 2
+		""",
+			(self.employee, getdate(self.attendance_date), self.name),
+		)
+		if res:
+			frappe.throw(
+				_("Attendance for employee {0} is already marked for the date {1}").format(
+					frappe.bold(self.employee), frappe.bold(self.attendance_date)
+				)
+			)
 
 	def validate_employee_status(self):
 		if frappe.db.get_value("Employee", self.employee, "status") == "Inactive":
