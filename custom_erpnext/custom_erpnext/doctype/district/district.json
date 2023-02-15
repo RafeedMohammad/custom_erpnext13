@@ -9,6 +9,7 @@
  "engine": "InnoDB",
  "field_order": [
   "district",
+  "district_name_in_bangla",
   "lft",
   "rgt",
   "is_group",
@@ -54,12 +55,17 @@
    "fieldtype": "Link",
    "label": "Parent District",
    "options": "District"
+  },
+  {
+   "fieldname": "district_name_in_bangla",
+   "fieldtype": "Data",
+   "label": "District Name In Bangla"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_tree": 1,
  "links": [],
- "modified": "2022-10-26 10:04:05.328687",
+ "modified": "2023-02-07 14:04:40.139996",
  "modified_by": "Administrator",
  "module": "Custom Erpnext",
  "name": "District",

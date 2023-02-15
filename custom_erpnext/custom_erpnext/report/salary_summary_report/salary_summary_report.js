@@ -43,7 +43,7 @@ frappe.query_reports["Salary Summary Report"] = {
 	],
 	onload: function() {
 		return  frappe.call({
-			method: "erpnext.payroll.report.salary_summary_report.salary_summary_report.get_salary_slip_years",
+			method: "custom_erpnext.custom_erpnext.report.salary_summary_report.salary_summary_report.get_salary_slip_years",
 			callback: function(r) {
 				var year_filter = frappe.query_report.get_filter('year');
 				year_filter.df.options = r.message;

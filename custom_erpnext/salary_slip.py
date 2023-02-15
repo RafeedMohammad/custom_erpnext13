@@ -72,19 +72,18 @@ class override_SalarySlip(TransactionBase):
 
 		#overtime_hours will return a tuple. Which will be accessible using overtime_hours[0][0]
 
-		# total overtime calculation for acctual overtime
-		# overtime_hours = frappe.db.sql("""SELECT SUM(TIME_TO_SEC(overtime)) FROM `tabAttendance` WHERE employee = %s AND attendance_date between %s and %s""",
-		# (self.employee, self.start_date, self.end_date)
-		# )
-		# if(overtime_hours[0][0] and self.overtime_rate):
-		# 	total_pay = 0
-		# 	return total_pay, overtime_hours[0][0]/3600
-		# else:
-		# 	total_pay = 0
-		# 	return total_pay, overtime_hours[0][0]/3600
-
+				# total overtime calculation for acctual overtime
+				# overtime_hours = frappe.db.sql("""SELECT IFNULL(SUM(TIME_TO_SEC(overtime)),0) FROM `tabAttendance` WHERE employee = %s AND attendance_date between %s and %s""",
+				# (self.employee, self.start_date, self.end_date))
+				# if(overtime_hours[0][0] and self.overtime_rate):
+				# 	total_pay = self.overtime_rate*overtime_hours[0][0]/3600
+				# 	return total_pay, overtime_hours[0][0]/3600
+				# else:
+				# 	total_pay = 0
+				# 	return total_pay, overtime_hours[0][0]/3600
+				# total overtime calculation for rounded overtime
 		# total overtime calculation for rounded overtime
-		overtime_hours = frappe.db.sql("""SELECT SUM(rounded_ot) FROM `tabAttendance` WHERE employee = %s AND attendance_date between %s and %s""",
+		overtime_hours = frappe.db.sql("""SELECT IFNULL(SUM(rounded_ot),0) FROM `tabAttendance` WHERE employee = %s AND attendance_date between %s and %s""",
 		(self.employee, self.start_date, self.end_date)
 		)
 		if(overtime_hours[0][0] and self.overtime_rate):
@@ -101,7 +100,7 @@ class override_SalarySlip(TransactionBase):
 		(self.employee, self.start_date, self.end_date)
 		)
 		if(tolal_late_entry_duration[0][0]):
-			return tolal_late_entry_duration[0][0]/3600
+			return tolal_late_entry_duration[0][0]/60#/216000#3600
 			# return str(tolal_late_entry_duration[0][0]).split(":")[0]*60+str(tolal_late_entry_duration[0][0]).split(":")[1]
 			#return float(str(tolal_late_entry_duration[0][0]).split(":")[0])*60 + float(str(tolal_late_entry_duration[0][0]).split(":")[1]) 
 
@@ -109,12 +108,13 @@ class override_SalarySlip(TransactionBase):
 			return 0
 
 
-
+	def get_salary_medical(self,ss):
+		return frappe.db.get_value('Salary Detail', {'parent': ss, 'abbr': 'M'}, 'amount')
 
 
 		#set the filter according to the name of the field
 	def calculate_late_count(self):
-		late_count = frappe.db.sql("""SELECT COUNT(*) FROM `tabAttendance` WHERE late_entry = 1 AND employee = %s AND attendance_date between %s and %s""",
+		late_count = frappe.db.sql("""SELECT COUNT(*) FROM `tabAttendance` WHERE status in ('Holiday','Weekly Off') and in_time and employee = %s AND attendance_date between %s and %s""",
 		(self.employee, self.start_date, self.end_date)
 		)
 		return late_count[0][0]
@@ -125,8 +125,9 @@ class override_SalarySlip(TransactionBase):
 	def validate(self):
 		self.status = self.get_status()
 		validate_active_employee(self.employee)
-		self.late = self.calculate_late_count()
-		self.late_days = 0#int(self.calculate_late_count())
+		self.late_days = int(self.calculate_late_count())
+		#self.late = self.calculate_late_count()
+		
 		#Assiging total overtime_pay and overtime_hours of the month
 		if (self.overtime_rate == None and self.overtime_hours == None):
 			self.total_overtime_pay, self.overtime_hours = self.calculate_overtime_amount()
@@ -153,10 +154,13 @@ class override_SalarySlip(TransactionBase):
 
 
 		self.base_pay = self.fetch_base_pay()
+		medical_amount=self.get_salary_medical(self.salary_structure)
+		if (medical_amount is None):
+			medical_amount=0
 		self.total_month_minutes=(date_diff(self.end_date,self.start_date)+1)*8*60
 		#self.total_month_minutes = ((date(int(self.end_date.split('-')[0]), int(self.end_date.split('-')[1]), int(self.end_date.split('-')[2])) - date(int(self.start_date.split('-')[0]), int(self.start_date.split('-')[1]), int(self.start_date.split('-')[2]))).days) * 8 * 60 #fetch regular_working_hour from shift_type		
 		if (self.overtime_rate == None):
-			self.overtime_rate = round(((self.base_pay - 1450) * 2/3 ) / 104)
+			self.overtime_rate = round(((self.base_pay - medical_amount) * 2/3 ) / 104)	
 
 
 		self.validate_dates()
@@ -740,7 +744,7 @@ class override_SalarySlip(TransactionBase):
 		self.set_net_pay()
 
 	def set_net_pay(self):
-		self.total_deduction = self.get_component_totals("deductions")
+		self.total_deduction = self.get_component_totals("deductions")+self.income_tax
 		self.base_total_deduction = flt(
 			flt(self.total_deduction) * flt(self.exchange_rate), self.precision("base_total_deduction")
 		)

@@ -172,10 +172,10 @@ def get_conditions(filters):
     if filters.get("department"): conditions += " and att.department= '%s'" % filters["department"]
     if filters.get("designation"): conditions += " and tabEmployee.designation='%s'" % filters["designation"]
     if filters.get("shift"): conditions += " and att.shift='%s'" % filters["shift"]
-    if filters.get("section"): conditions += " and tabEmployee.section='%s'" % filters["section"]
-    if filters.get("floor"): conditions += " and tabEmployee.floor='%s'" % filters["floor"]
-    if filters.get("facility_or_line"): conditions += " and tabEmployee.facility_or_line='%s'" % filters["facility_or_line"]
-    if filters.get("group_name"): conditions += " and tabEmployee.group='%s'" % filters["group_name"]
+    if filters.get("section"): conditions += " and emp.section='%s'" % filters["section"]
+    if filters.get("floor"): conditions += " and emp.floor='%s'" % filters["floor"]
+    if filters.get("facility_or_line"): conditions += " and emp.facility_or_line='%s'" % filters["facility_or_line"]
+    if filters.get("group_name"): conditions += " and emp.group='%s'" % filters["group_name"]
 
     return conditions, filters
 
