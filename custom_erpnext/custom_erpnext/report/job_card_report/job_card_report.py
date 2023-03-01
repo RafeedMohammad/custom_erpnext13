@@ -8,12 +8,6 @@
 from datetime import datetime, timedelta
 import frappe
 from frappe import _
-#if frappe.session.user=="Administrator":
-max_allowed_hour=13
-max_allowed_minute=00
-# else:
-# 	max_allowed_hour=2
-# 	max_allowed_minute=00
 
 def execute(filters= None):
 	if not filters:
@@ -54,6 +48,15 @@ def get_columns():
 	]
 
 def get_attendance(filters):
+	type = frappe.db.get_value('User', frappe.session.user, 'type')
+	if type is None:
+		max_allowed_hour=13
+		max_allowed_minute=00
+	else:
+		type_float=float(type)
+		max_allowed_hour=int(type_float)
+		max_allowed_minute=int((type_float%1)*60)
+
 	rounded_over_time1 = frappe.db.get_value('Company', filters.company, 'rounding_overtime')
 	rounded_over_time2 = frappe.db.get_value('Company', filters.company, 'rounding_overtime_for_extra_30min')
 

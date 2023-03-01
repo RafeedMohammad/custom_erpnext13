@@ -7,6 +7,12 @@ from frappe.utils import add_days, cstr, date_diff, get_first_day, get_last_day,
 
 
 def execute(filters= None):
+	type = frappe.db.get_value('User', frappe.session.user, 'type')
+	if type is None:
+		hours_for_ot=11
+	else:
+		hours_for_ot=float(type)
+	
 	from_date = get_first_day(filters["month"] + "-" + filters["year"])
 	to_date = get_last_day(filters["month"] + "-" + filters["year"])
 	if not filters:
@@ -30,7 +36,41 @@ def execute(filters= None):
 		if salary_slip_basic is None:
 			salary_slip_basic = 0
 		allowance = get_allowance(ss.name)
+		acctual_lunch=get_lunch_tr_allowance(ss.name)
+		if acctual_lunch is None:
+			acctual_lunch=0
+		leaves=frappe.db.sql('''select lt.name leave_name, ifnull(tot_lv,0) total_leaves from `tabLeave Type` lt left join  (select lti.name, count(a.attendance_date) tot_lv from `tabLeave Type` lti join tabAttendance a on lti.name = a.leave_type where a.employee=%s and a.status="On Leave" and a.attendance_date between %s and %s group by lti.name) ali on lt.name = ali.name;''',(ss.employee,ss.start_date,ss.end_date), as_dict=1)
+		CL,EL,ML,SL,OL=0,0,0,0,0
+		for l in leaves:
+			if l.leave_name=="CL":
+				CL=l.total_leaves
+			elif l.leave_name=="EL":
+				EL=l.total_leaves
+			elif l.leave_name=="ML":
+				ML=l.total_leaves
+			elif l.leave_name=="SL":
+				SL=l.total_leaves
+			elif l.leave_name=="OL":
+				OL=l.total_leaves
+
 		
+		if hours_for_ot>=10:
+			overtime_hours=ss.overtime_hours
+			ot_amount=ss.total_overtime_pay
+			lunch=float(acctual_lunch)
+
+
+		else:
+			ot_hours = frappe.db.sql("""SELECT SUM(case when rounded_ot>%s then %s else rounded_ot end) FROM `tabAttendance` where status not in ('Holiday','Weekly Off') and employee=%s AND attendance_date between %s and %s group by employee""",
+			(hours_for_ot,hours_for_ot,ss.employee, ss.start_date, ss.end_date))
+			overtime_hours=ot_hours[0][0]
+			ot_amount=ot_hours[0][0]*float(ss.overtime_rate)
+			if ss.present_days!=0:
+				lunch=(float(acctual_lunch)*ss.present_days/(ss.present_days+max(ss.late_days,ss.working_holidays)))#previously we count working_holidays in late_days 
+
+
+
+
 		row = [
 			ss.name,
 			ss.employee,
@@ -46,31 +86,32 @@ def execute(filters= None):
 			allowance,
 			acctual_basic + allowance,
 			ss.present_days,
-			worked_on_off_days(ss.employee, ss.start_date, ss.end_date),
-			len(frappe.db.sql('''select * from tabAttendance where employee=%s and leave_type='CL' and attendance_date between %s and %s''',(ss.employee,ss.start_date,ss.end_date))),
-			len(frappe.db.sql('''select * from tabAttendance where employee=%s and leave_type='EL' and attendance_date between %s and %s''',(ss.employee,ss.start_date,ss.end_date))),
-			len(frappe.db.sql('''select * from tabAttendance where employee=%s and leave_type='ML' and attendance_date between %s and %s''',(ss.employee,ss.start_date,ss.end_date))),
-			len(frappe.db.sql('''select * from tabAttendance where employee=%s and leave_type='SL' and attendance_date between %s and %s''',(ss.employee,ss.start_date,ss.end_date))),
-			len(frappe.db.sql('''select * from tabAttendance where employee=%s and leave_type IN ('Leave Without Pay','OL') and attendance_date between %s and %s''',(ss.employee,ss.start_date,ss.end_date))),
-			#frappe.db.count('Attendance', {'employee': ss.employee,'leave_type': 'CL','attendance_date':['>',ss.start_date] and ['<', ss.end_date]}),
-			#frappe.db.get_value('Attendance', {'employee': ss.employee, 'leave_type': 'CL', 'attendance_date': ['>',  ss.start_date], 'attendance_date': ['<',  ss.end_date]}, 'count(*)'),
-			# frappe.db.get_value('Attendance', {'employee': ss.employee, 'leave_type': 'EL', 'attendance_date': ['>',  ss.start_date], 'attendance_date': ['<',  ss.end_date]}, 'count(*)'),
-			# frappe.db.get_value('Attendance', {'employee': ss.employee, 'leave_type': 'ML', 'attendance_date': ['>',  ss.start_date], 'attendance_date': ['<',  ss.end_date]}, 'count(*)'),
-			# frappe.db.get_value('Attendance', {'employee': ss.employee, 'leave_type': 'SL', 'attendance_date': ['>',  ss.start_date], 'attendance_date': ['<',  ss.end_date]}, 'count(*)'),
-			# frappe.db.get_value('Attendance', {'employee': ss.employee, 'leave_type': 'Leave Without Pay', 'attendance_date': ['>',  ss.start_date], 'attendance_date': ['<',  ss.end_date]}, 'count(*)'),
+			off_days(ss.employee, ss.start_date, ss.end_date),
+			# len(frappe.db.sql('''select * from tabAttendance where employee=%s and status="On Leave" and leave_type='CL' and attendance_date between %s and %s''',(ss.employee,ss.start_date,ss.end_date))),
+			# len(frappe.db.sql('''select * from tabAttendance where employee=%s and status="On Leave" and leave_type='EL' and attendance_date between %s and %s''',(ss.employee,ss.start_date,ss.end_date))),
+			# len(frappe.db.sql('''select * from tabAttendance where employee=%s and status="On Leave" and leave_type='ML' and attendance_date between %s and %s''',(ss.employee,ss.start_date,ss.end_date))),
+			# len(frappe.db.sql('''select * from tabAttendance where employee=%s and status="On Leave" and leave_type='SL' and attendance_date between %s and %s''',(ss.employee,ss.start_date,ss.end_date))),
+			# len(frappe.db.sql('''select * from tabAttendance where employee=%s and status="On Leave" and leave_type='OL' and attendance_date between %s and %s''',(ss.employee,ss.start_date,ss.end_date))),
+			CL,
+			EL,
+			ML,
+			SL,
+			OL,
 
 
 			ss.absent_days,
 			# ss.gross_pay,
 			salary_slip_basic+allowance,
-			ss.overtime_hours,
-			ss.total_overtime_pay,
+			overtime_hours,
+			#ss.total_overtime_pay,
+			ot_amount,
 			get_attendance_bonus(ss.name),
-			get_lunch_tr_allowance(ss.name),
+			# get_lunch_tr_allowance(ss.name),
+			lunch,
 			ss.night_days,
 			get_night_allowance(ss.name),
 			ss.arrear,
-			ss.gross_pay,
+			ss.gross_pay-float(ss.total_overtime_pay)-float(acctual_lunch)+lunch+float(ot_amount),
 
 
 			
@@ -80,7 +121,7 @@ def execute(filters= None):
 		for d in ded_types:
 			row.append(ss_ded_map.get(ss.name, {}).get(d))
 		
-		row += [ss.total_loan_repayment,ss.total_deduction, ss.net_pay, None]
+		row += [ss.total_loan_repayment,ss.total_deduction, (ss.net_pay-float(ss.total_overtime_pay)-float(acctual_lunch)+lunch+float(ot_amount)), None]
 		
 
 		data.append(row)
@@ -244,8 +285,7 @@ def get_allowance(ss):
 
 
 
-def worked_on_off_days(employee, start_date, end_date):
-	#return frappe.db.get_value('Salary Detail', {'parent': ss, 'abbr': 'HR'}, 'SUM(amount)')
+def off_days(employee, start_date, end_date):
 	return frappe.db.sql("""SELECT COUNT(*) FROM `tabAttendance` as a where a.employee='%s' and status IN('Weekly Off', 'Holiday') and a.attendance_date BETWEEN '%s' AND '%s'""" % (employee, start_date, end_date))[0][0]
 
 

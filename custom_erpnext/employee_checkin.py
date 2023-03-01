@@ -144,13 +144,14 @@ def mark_attendance_and_link_log(
 
 	allowed_for_overtime = frappe.get_cached_value("Employee", employee, "ot_enable")
 
-	allowed_for_late = frappe.get_cached_value("Employee", employee, "late_allow")
 	shift_start = logs[0].shift_start
 	shift_end = logs[0].shift_end
 
-	if allowed_for_late=="Y" and attendance_status=="Late":
-		late_entry_duration=0
-		attendance_status="Present"
+	#allowed_for_late = frappe.get_cached_value("Employee", employee, "late_allow")
+
+	# if allowed_for_late=="Y" and attendance_status=="Late":
+	# 	late_entry_duration=0
+	# 	attendance_status="Present"
 
 	# if attendance_status in ("Weekly Off", "Holiday"):
 	# 	overtime_hour=working_hours

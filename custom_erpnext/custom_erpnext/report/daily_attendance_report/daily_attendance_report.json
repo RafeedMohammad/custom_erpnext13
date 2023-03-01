@@ -1,5 +1,5 @@
 {
- "add_total_row": 0,
+ "add_total_row": 1,
  "columns": [],
  "creation": "2022-10-23 16:03:17.545700",
  "disable_prepared_report": 0,
@@ -9,7 +9,7 @@
  "filters": [],
  "idx": 0,
  "is_standard": "Yes",
- "modified": "2022-10-23 16:03:17.545700",
+ "modified": "2023-03-01 10:47:45.739350",
  "modified_by": "Administrator",
  "module": "Custom Erpnext",
  "name": "Daily Attendance Report",
