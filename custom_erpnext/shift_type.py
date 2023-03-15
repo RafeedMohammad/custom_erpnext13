@@ -12,6 +12,7 @@ from frappe.utils import cint, get_datetime, get_time, getdate
 from erpnext.buying.doctype.supplier_scorecard.supplier_scorecard import daterange
 
 import frappe
+from frappe.utils import today
 from frappe.model.document import Document
 from frappe.utils import cint, get_datetime, getdate
 from erpnext.hr.doctype.employee.employee import get_holiday_list_for_employee
@@ -46,7 +47,11 @@ from custom_erpnext.shift_assignment import (
 
 class override_ShiftType(Document):
 	@frappe.whitelist()
-	def process_auto_attendance(self):
+	def process_auto_attendance(self,from_date=None,to_date=None):
+		if from_date and to_date:
+			self.process_attendance_after=from_date
+			se =to_date+" "+ str(self.start_time)
+			self.last_sync_of_checkin = datetime.strptime(se, "%Y-%m-%d %H:%M:%S")+timedelta(days=1)
 		if (
 			not cint(self.enable_auto_attendance)
 			or not self.process_attendance_after
@@ -115,15 +120,16 @@ class override_ShiftType(Document):
 		in_date1 = str(logs[0].shift_start).split(" ")[0]
 		weekly_off_check = frappe.db.get_value('Holiday', {'parent': self.holiday_list, 'holiday_date': in_date1}, 'weekly_off')
 
-		if (datetime.strptime(self.lunch_start, "%H:%M:%S") < datetime.strptime(self.start_time, "%H:%M:%S")):
-			start_time_to_lunch_duration=datetime.strptime(self.lunch_start, "%H:%M:%S")-datetime.strptime(self.start_time, "%H:%M:%S")+timedelta(days=1)
-		else:
-			start_time_to_lunch_duration=datetime.strptime(self.lunch_start, "%H:%M:%S")-datetime.strptime(self.start_time, "%H:%M:%S")
+		# if (datetime.strptime(str(self.lunch_start), "%H:%M:%S") < datetime.strptime(str(self.start_time), "%H:%M:%S")):
+		# 	start_time_to_lunch_duration=datetime.strptime(str(self.lunch_start), "%H:%M:%S")-datetime.strptime(str(self.start_time), "%H:%M:%S")+timedelta(days=1)
+		# else:
+		# 	start_time_to_lunch_duration=datetime.strptime(str(self.lunch_start), "%H:%M:%S")-datetime.strptime(str(self.start_time), "%H:%M:%S")
 
-		if(datetime.strptime(self.lunch_end, "%H:%M:%S") < datetime.strptime(self.lunch_start, "%H:%M:%S")):
-			lunch_duration	=datetime.strptime(self.lunch_end, "%H:%M:%S")-datetime.strptime(self.lunch_start, "%H:%M:%S")+timedelta(days=1)
-		else:
-			lunch_duration	=datetime.strptime(self.lunch_end, "%H:%M:%S")-datetime.strptime(self.lunch_start, "%H:%M:%S")
+		# if(datetime.strptime(str(self.lunch_end), "%H:%M:%S") < datetime.strptime(str(self.lunch_start), "%H:%M:%S")):
+		# 	lunch_duration	=datetime.strptime(str(self.lunch_end), "%H:%M:%S")-datetime.strptime(str(self.lunch_start), "%H:%M:%S")+timedelta(days=1)
+		# else:
+		# 	lunch_duration	=datetime.strptime(str(self.lunch_end), "%H:%M:%S")-datetime.strptime(str(self.lunch_start), "%H:%M:%S")
+
 
 		if (
 			cint(self.enable_entry_grace_period)
@@ -144,12 +150,13 @@ class override_ShiftType(Document):
 		):
 			early_exit = True
 		if (
-			cint(self.enable_entry_grace_period)
+			cint(self.enable_auto_attendance)
 			and out_time
 			and out_time > logs[0].shift_end #- timedelta(minutes=cint(self.early_exit_grace_period))
 		):
 			overtime=out_time-logs[0].shift_end
-		if (out_time):		
+		if (out_time):
+			start_time_to_lunch_duration,lunch_duration= self.lunch_timing()
 			if(weekly_off_check==0 or weekly_off_check==1):
 				if(in_time<= (logs[0].shift_start+start_time_to_lunch_duration) and (logs[0].shift_start+start_time_to_lunch_duration+lunch_duration) <= out_time):
 					overtime=out_time-in_time-lunch_duration
@@ -263,13 +270,27 @@ class override_ShiftType(Document):
 			default_shift_employees = frappe.get_all("Employee", filters, pluck="name")
 			return list(set(assigned_employees + default_shift_employees))
 		return assigned_employees
+	
+	def lunch_timing(self):
+		if (datetime.strptime(str(self.lunch_start), "%H:%M:%S") < datetime.strptime(str(self.start_time), "%H:%M:%S")):
+			start_time_to_lunch_duration=datetime.strptime(str(self.lunch_start), "%H:%M:%S")-datetime.strptime(str(self.start_time), "%H:%M:%S")+timedelta(days=1)
+		else:
+			start_time_to_lunch_duration=datetime.strptime(str(self.lunch_start), "%H:%M:%S")-datetime.strptime(str(self.start_time), "%H:%M:%S")
+
+		if(datetime.strptime(str(self.lunch_end), "%H:%M:%S") < datetime.strptime(str(self.lunch_start), "%H:%M:%S")):
+			lunch_duration	=datetime.strptime(str(self.lunch_end), "%H:%M:%S")-datetime.strptime(str(self.lunch_start), "%H:%M:%S")+timedelta(days=1)
+		else:
+			lunch_duration	=datetime.strptime(str(self.lunch_end), "%H:%M:%S")-datetime.strptime(str(self.lunch_start), "%H:%M:%S")
+		return start_time_to_lunch_duration, lunch_duration
 
 
-def process_auto_attendance_for_all_shifts():
+
+@frappe.whitelist()
+def process_auto_attendance_for_all_shifts(from_date,to_date):
 	shift_list = frappe.get_all("Shift Type", filters={"enable_auto_attendance": "1"}, pluck="name")
 	for shift in shift_list:
 		doc = frappe.get_cached_doc("Shift Type", shift)
-		doc.process_auto_attendance()
+		doc.process_auto_attendance(from_date,to_date)
 
 
 def get_filtered_date_list(
