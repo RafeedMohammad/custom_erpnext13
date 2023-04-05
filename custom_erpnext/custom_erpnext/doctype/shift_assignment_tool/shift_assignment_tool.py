@@ -26,7 +26,7 @@ def get_employees(date, shift = None , department=None, designation=None, floor=
 			filters[field] = value
 
 	employee_list = frappe.get_list(
-		"Employee", fields=["employee", "employee_name"], filters=filters, order_by="employee_name"
+		"Employee", fields=["employee", "employee_name"], filters=filters, order_by="employee asc"
 	)
 	# marked_employee = {}
 

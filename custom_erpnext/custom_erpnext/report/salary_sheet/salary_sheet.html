@@ -1,0 +1,78 @@
+{%
+	var report_columns = report.get_columns_for_print();
+	report_columns = report_columns.filter(col => !col.hidden);
+
+	if (report_columns.length > 50) {
+		frappe.throw(__("Too many columns. Export the report and print it using a spreadsheet application."));
+	}
+%}
+
+
+
+<style>
+    tr{
+        border: 1px solid black;
+		font-size: 11.5px;
+		margin-left: 0;
+    }
+	td{
+        border: 1px solid black;
+		font-size: 11.5px;
+		margin-left: 0;
+    }
+
+</style>
+
+
+
+<h3 class="text-center">{%= filters.company %}</h3>
+<h5 class="text-center">Salary for the month of - {%= filters.month %}, {%= filters.year %}</h5>
+<h3 class="text-center">{%= filters.date %}</h3>
+<h3 class="text-center">{%= filters.status %}</h3>
+{% if (!is_null(filters.department)) { %}
+	<h6>Department: {%= filters.department %}</h6>
+{% } %}
+{% if (!is_null(filters.employee)) { %}
+	<h6>Department: {%= filters.employee %}</h6>
+{% } %}
+
+
+
+
+<table class="table table-bordered">
+	
+	<thead>
+		
+		<tr>
+			<th>Sl No</th>
+			{% for (let i=0, l=report_columns.length; i<l; i++) { %}
+				<th class="text-center">{%= report_columns[i].label %}</th>
+			{% } %}
+		</tr>
+	</thead>
+	<tbody>
+		{% for(let j=0, k=data.length; j<k; j++) { %}
+			<!-- {%
+				var row = data[j];
+				var row_class = data[j].parent_account ? "" : "financial-statements-important";
+				row_class += data[j].account_name ? "" : " financial-statements-blank-row";
+			%} -->
+			<tr class="{%= row_class %}">
+				<td> {%=j%}	</td>
+				{% for(let i=0, l=report_columns.length; i<l; i++) { %}
+					<td class="text-center">
+						{% const fieldname = report_columns[i].fieldname; %}
+						{% if (!is_null(row[fieldname])) { %}
+							{%= frappe.format(row[fieldname], report_columns[i], {}, row) %}
+						{% } %}
+					</td>
+				{% } %}
+			</tr>
+		{% } %}
+	</tbody>
+</table>
+
+
+<p class="text-right text-muted">
+	Printed On {%= frappe.datetime.str_to_user(frappe.datetime.get_datetime_as_string()) %}
+</p>

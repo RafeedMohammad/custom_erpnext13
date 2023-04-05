@@ -29,10 +29,10 @@ def execute(filters= None):
 
 	for ss in salary_slips:
 		allowance = 0
-		acctual_basic = get_basic(ss.name)
+		acctual_basic,salary_slip_basic = get_basic(ss.name)
 		if acctual_basic is None:
 			acctual_basic = 0
-		salary_slip_basic = get_salary_basic(ss.name)
+		# salary_slip_basic = get_salary_basic(ss.name)
 		if salary_slip_basic is None:
 			salary_slip_basic = 0
 		allowance = get_allowance(ss.name)
@@ -72,7 +72,7 @@ def execute(filters= None):
 
 
 		row = [
-			ss.name,
+			#ss.name,
 			ss.employee,
 			ss.employee_name,
 			doj_map.get(ss.employee),
@@ -82,9 +82,9 @@ def execute(filters= None):
 			# ss.company,
 			# ss.start_date,
 			# ss.end_date,
-			acctual_basic,
+			round(acctual_basic,0),
 			allowance,
-			acctual_basic + allowance,
+			round(acctual_basic + allowance,0),
 			ss.present_days,
 			off_days(ss.employee, ss.start_date, ss.end_date),
 			# len(frappe.db.sql('''select * from tabAttendance where employee=%s and status="On Leave" and leave_type='CL' and attendance_date between %s and %s''',(ss.employee,ss.start_date,ss.end_date))),
@@ -102,16 +102,16 @@ def execute(filters= None):
 			ss.absent_days,
 			# ss.gross_pay,
 			salary_slip_basic+allowance,
-			overtime_hours,
+			round(float(overtime_hours),1),
 			#ss.total_overtime_pay,
-			ot_amount,
+			round(float(ot_amount),0),
 			get_attendance_bonus(ss.name),
 			# get_lunch_tr_allowance(ss.name),
 			lunch,
 			ss.night_days,
 			get_night_allowance(ss.name),
 			ss.arrear,
-			ss.gross_pay-float(ss.total_overtime_pay)-float(acctual_lunch)+lunch+float(ot_amount),
+			round(ss.gross_pay-float(ss.total_overtime_pay)-float(acctual_lunch)+lunch+float(ot_amount),0),
 
 
 			
@@ -121,7 +121,7 @@ def execute(filters= None):
 		for d in ded_types:
 			row.append(ss_ded_map.get(ss.name, {}).get(d))
 		
-		row += [ss.total_loan_repayment,ss.total_deduction, (ss.net_pay-float(ss.total_overtime_pay)-float(acctual_lunch)+lunch+float(ot_amount)), None]
+		row += [round(ss.total_loan_repayment,0),round(ss.total_deduction,0), round((ss.net_pay-float(ss.total_overtime_pay)-float(acctual_lunch)+lunch+float(ot_amount)),0), None]
 		
 
 		data.append(row)
@@ -134,36 +134,37 @@ def execute(filters= None):
 
 def get_columns(salary_slips):
 	columns = [
-		_("Salary Slip ID") + ":Link/Salary Slip:150",
-		_("Employee") + ":Link/Employee:120",
-		_("Employee Name") + "::140",
-		_("Date of Joining") + "::80",
-		_("Designation") + ":Link/Designation:120",
+		# _("Salary Slip ID") + ":Link/Salary Slip:150",
+		_("Employee") + "::80",
+		_("Employee Name") + "::40",
+		_("Date of Joining") + "::12",
+		_("Designation") + "::40",
 		# _("Start Date") + "::80",
 		# _("End Date") + "::80",
-		_("Basic") + "::80",
-		_("Allowance") + "::80",
-		_("Gross") + "::80",
-		_("P") + ":Float:120",
-		_("W/H") + ":Float:120",
-		_("CL") + ":Float:80",
-		_("EL") + ":Float:80",
-		_("ML") + ":Float:80",
-		_("SL") + ":Float:80",
-		_("LL LWP") + ":Float:80",
-		_("A") + ":Float:80",
-		_("Total Salary") + ":Float:80",
-		_("O.T Hr.") + ":Float:80",
-		_("O.T Amt.") + ":Currency:80",
-		_("Attn. Bon.") + ":Currency:80",
-		_("Lunch Tran. Allow") + ":Currency:80",
-		_("Night Allow - Day") + ":Float:80",
-		_("Night Allow - Amt.") + ":Currency:80",
-		_("Arrear") + ":Currency:80",
-		_("Gross Payable") + ":Currency:80",
+		_("Basic") + "::10",
+		_("Allowance") + "::10",
+		_("Gross") + "::10",
+		_("P") + ":Integer:5",
+		_("W/H") + ":Integer:5",
+		_("CL") + ":Integer:5",
+		_("EL") + ":Integer:5",
+		_("ML") + ":Integer:5",
+		_("SL") + ":Integer:5",
+		_("LL LWP") + ":Integer:5",
+		_("A") + ":Integer:5",
+		_("Total Salary") + ":Integer:10",
+		_("O.T Hr.") + ":%.2Float:7",
+		_("O.T Amt.") + "::10",
+		_("Attn. Bon.") + ":Integer:5",
+		_("Lunch Tran. Allow") + ":Integer:20",
+		_("Night Allow Day") + ":Integer:5",
+		_("Night Allow Amt") + ":Integer:20",
+		_("Arrear") + ":Integer:10",
+		_("Gross Payable") + ":Integer:20",
 
 
 		#_("Date of Joining") + "::80",
+	#("Total Salary") + ":Float:80",
 
 	]
 
@@ -181,12 +182,12 @@ def get_columns(salary_slips):
 
 	columns = (
 		columns
-		+ [(d + ":Currency:120") for d in salary_components[_("Deduction")]]
+		+ [(d + ":Integer:10") for d in salary_components[_("Deduction")]]
 		+ [
-			_("Advance") + ":Currency:120",
-			_("Total Deduction") + ":Currency:120",
-			_("Net Pay") + ":Currency:120",
-			_("Signature & Stamp") + ":Text:140",
+			_("Advance") + ":Integer:10",
+			_("Total Deduction") + ":Integer:20",
+			_("Net Pay") + ":Integer:20",
+			_("Signature & Stamp") + ":Text:10",
 
 		]
 		
@@ -274,10 +275,10 @@ def get_conditions(from_date,to_date,filters):
 	return conditions, filters
 
 def get_basic(ss):
-	return frappe.db.get_value('Salary Detail', {'parent': ss, 'abbr': 'B'}, 'default_amount')
+	return frappe.db.get_value('Salary Detail', {'parent': ss, 'abbr': 'B'}, ['default_amount','amount'])
 
-def get_salary_basic(ss):
-	return frappe.db.get_value('Salary Detail', {'parent': ss, 'abbr': 'B'}, 'amount')
+# def get_salary_basic(ss):
+	# return frappe.db.get_value('Salary Detail', {'parent': ss, 'abbr': 'B'}, 'amount')
 
 def get_allowance(ss):
 	#return frappe.db.get_value('Salary Detail', {'parent': ss, 'abbr': 'HR'}, 'SUM(amount)')
@@ -289,8 +290,8 @@ def off_days(employee, start_date, end_date):
 	return frappe.db.sql("""SELECT COUNT(*) FROM `tabAttendance` as a where a.employee='%s' and status IN('Weekly Off', 'Holiday') and a.attendance_date BETWEEN '%s' AND '%s'""" % (employee, start_date, end_date))[0][0]
 
 
-def on_leave(employee, start_date, end_date):
-	return frappe.db.sql("""SELECT COUNT(*) FROM `tabAttendance` as a where a.employee='%s' and status IN('Weekly Off', 'Holiday') and a.attendance_date BETWEEN '%s' AND '%s'""" % (employee, start_date, end_date))[0][0]
+# def on_leave(employee, start_date, end_date):
+# 	return frappe.db.sql("""SELECT COUNT(*) FROM `tabAttendance` as a where a.employee='%s' and status IN('Weekly Off', 'Holiday') and a.attendance_date BETWEEN '%s' AND '%s'""" % (employee, start_date, end_date))[0][0]
 
 
 def get_attendance_bonus(ss):
