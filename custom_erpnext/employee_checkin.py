@@ -25,6 +25,8 @@ from datetime import datetime
 class override_EmployeeCheckin(Document):
 	
 	def validate(self):
+		if self.card_no:
+			self.employee,self.employee_name = frappe.db.get_value("Employee",{"attendance_device_id":self.card_no},('name','employee_name'))
 		validate_active_employee(self.employee)
 		self.validate_duplicate_log()
 		self.fetch_shift()
@@ -247,7 +249,7 @@ def mark_attendance_and_link_log(
 			attendance=frappe.db.set_value('Attendance', previous_attendance_name, {'out_time': doc_dict['out_time'],'working_hours': doc_dict['working_hours'],
             'in_time': doc_dict['in_time'],'status': doc_dict['status'],'late_entry': doc_dict['late_entry'],'early_exit': doc_dict['early_exit'], 
 			'rounded_ot': doc_dict['rounded_ot'],'late_entry_duration':doc_dict['late_entry_duration'], 'shift_start':doc_dict['shift_start'],
-			'shift_end':doc_dict['shift_end'], "overtime":doc_dict['overtime']}, update_modified=True)
+			'shift_end':doc_dict['shift_end'], 'shift':doc_dict['shift'], "overtime":doc_dict['overtime']}, update_modified=True)
 			#Changed Code - End
 
 			#Attendance document with updated values will be saved

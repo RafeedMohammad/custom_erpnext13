@@ -114,7 +114,13 @@ class override_SalarySlip(TransactionBase):
 
 		#set the filter according to the name of the field
 	def calculate_working_holidays_count(self):
-		late_count = frappe.db.sql("""SELECT COUNT(*) FROM `tabAttendance` WHERE status in ('Holiday','Weekly Off') and in_time and employee = %s AND attendance_date between %s and %s""",
+		working_holidays = frappe.db.sql("""SELECT COUNT(*) FROM `tabAttendance` WHERE status in ('Holiday','Weekly Off') and in_time and employee = %s AND attendance_date between %s and %s""",
+		(self.employee, self.start_date, self.end_date)
+		)
+		return working_holidays[0][0]
+	
+	def calculate_late_days_count(self):
+		late_count = frappe.db.sql("""SELECT COUNT(*) FROM `tabAttendance` WHERE status in ('Late') and in_time and employee = %s AND attendance_date between %s and %s""",
 		(self.employee, self.start_date, self.end_date)
 		)
 		return late_count[0][0]
@@ -125,7 +131,7 @@ class override_SalarySlip(TransactionBase):
 	def validate(self):
 		self.status = self.get_status()
 		validate_active_employee(self.employee)
-		self.late_days = int(self.calculate_working_holidays_count())
+		self.late_days = int(self.calculate_late_days_count())
 		self.working_holidays = int(self.calculate_working_holidays_count())
 		
 		#Assiging total overtime_pay and overtime_hours of the month
