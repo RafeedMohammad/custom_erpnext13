@@ -82,7 +82,7 @@ class override_ShiftType(Document):
 				late_entry_duration,
 				overtime,
 			) = self.get_attendance(single_shift_logs)
-			mark_attendance_and_link_log(
+			frappe.enqueue(mark_attendance_and_link_log(
 				single_shift_logs,
 				attendance_status,
 				key[1].date(),
@@ -94,7 +94,7 @@ class override_ShiftType(Document):
 				self.name,
 				late_entry_duration,
 				overtime,
-			)
+			),queue="long")
 		for employee in self.get_assigned_employee(self.process_attendance_after, True):
 			self.mark_absent_for_dates_with_no_attendance(employee)
 
@@ -286,11 +286,11 @@ class override_ShiftType(Document):
 
 
 @frappe.whitelist()
-def process_auto_attendance_for_all_shifts(from_date,to_date):
+def process_auto_attendance_for_all_shifts(from_date=None,to_date=None):
 	shift_list = frappe.get_all("Shift Type", filters={"enable_auto_attendance": "1"}, pluck="name")
 	for shift in shift_list:
 		doc = frappe.get_cached_doc("Shift Type", shift)
-		frappe.enqueue(doc.process_auto_attendance(from_date,to_date), queue="long")
+		doc.process_auto_attendance(from_date,to_date)
 
 
 def get_filtered_date_list(
