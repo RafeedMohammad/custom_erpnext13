@@ -50,8 +50,8 @@ class override_ShiftType(Document):
 	def process_auto_attendance(self,from_date=None,to_date=None):
 		if from_date and to_date:
 			self.process_attendance_after=from_date
-			se =to_date+" "+ str(self.start_time)
-			self.last_sync_of_checkin = datetime.strptime(se, "%Y-%m-%d %H:%M:%S")+timedelta(days=1)
+			shift_start_time =to_date+" "+ str(self.start_time)
+			self.last_sync_of_checkin = datetime.strptime(shift_start_time, "%Y-%m-%d %H:%M:%S")+timedelta(days=1)
 		if (
 			not cint(self.enable_auto_attendance)
 			or not self.process_attendance_after
@@ -290,7 +290,7 @@ def process_auto_attendance_for_all_shifts(from_date,to_date):
 	shift_list = frappe.get_all("Shift Type", filters={"enable_auto_attendance": "1"}, pluck="name")
 	for shift in shift_list:
 		doc = frappe.get_cached_doc("Shift Type", shift)
-		doc.process_auto_attendance(from_date,to_date)
+		frappe.enqueue(doc.process_auto_attendance(from_date,to_date), queue="long")
 
 
 def get_filtered_date_list(
