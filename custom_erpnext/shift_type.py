@@ -47,11 +47,12 @@ from custom_erpnext.shift_assignment import (
 
 class override_ShiftType(Document):
 	@frappe.whitelist()
-	def process_auto_attendance(self,from_date=None,to_date=None):
+	def process_auto_attendance(self,from_date=None,to_date=None): #added from date to date in oder to access the date given in mark attendance in shift type front desk
 		if from_date and to_date:
 			self.process_attendance_after=from_date
 			shift_start_time =to_date+" "+ str(self.start_time)
 			self.last_sync_of_checkin = datetime.strptime(shift_start_time, "%Y-%m-%d %H:%M:%S")+timedelta(days=1)
+			# added to set eligiable time for the shifts to process the attendance which is given in mark attendance in shift type front desk
 		if (
 			not cint(self.enable_auto_attendance)
 			or not self.process_attendance_after
@@ -82,7 +83,7 @@ class override_ShiftType(Document):
 				late_entry_duration,
 				overtime,
 			) = self.get_attendance(single_shift_logs)
-			frappe.enqueue(mark_attendance_and_link_log(
+			mark_attendance_and_link_log(
 				single_shift_logs,
 				attendance_status,
 				key[1].date(),
@@ -94,7 +95,7 @@ class override_ShiftType(Document):
 				self.name,
 				late_entry_duration,
 				overtime,
-			),queue="long")
+			)
 		for employee in self.get_assigned_employee(self.process_attendance_after, True):
 			self.mark_absent_for_dates_with_no_attendance(employee)
 
@@ -286,12 +287,11 @@ class override_ShiftType(Document):
 
 
 @frappe.whitelist()
-def process_auto_attendance_for_all_shifts(from_date=None,to_date=None):
+def process_auto_attendance_for_all_shifts(from_date=None,to_date=None): #added from date to date in oder to access the date given in mark attendance in shift type
 	shift_list = frappe.get_all("Shift Type", filters={"enable_auto_attendance": "1"}, pluck="name")
 	for shift in shift_list:
 		doc = frappe.get_cached_doc("Shift Type", shift)
-		doc.process_auto_attendance(from_date,to_date)
-
+		doc.process_auto_attendance(from_date,to_date) #added from date to date in oder to access the date given in mark attendance in shift type
 
 def get_filtered_date_list(
 	employee, start_date, end_date, filter_attendance=True, holiday_list=None
