@@ -291,7 +291,7 @@ def process_auto_attendance_for_all_shifts(from_date=None,to_date=None): #added 
 	shift_list = frappe.get_all("Shift Type", filters={"enable_auto_attendance": "1"}, pluck="name")
 	for shift in shift_list:
 		doc = frappe.get_cached_doc("Shift Type", shift)
-		doc.process_auto_attendance(from_date,to_date) #added from date to date in oder to access the date given in mark attendance in shift type
+		frappe.enqueue(doc.process_auto_attendance(from_date,to_date),queue="long",is_async='False',timeout=2500)#,now='True') #added from date to date in order to access the date given in mark attendance in shift type
 
 def get_filtered_date_list(
 	employee, start_date, end_date, filter_attendance=True, holiday_list=None

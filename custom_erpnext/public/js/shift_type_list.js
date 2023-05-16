@@ -2,9 +2,9 @@ frappe.listview_settings['Shift Type'] = {
 	onload: function(list_view) {
             let me = this;
             const months = moment.months();
-            list_view.page.add_inner_button(__("Mark Attendance"), function() {
+            list_view.page.add_inner_button(__("Mark All Shift"), function() {
                 let dialog = new frappe.ui.Dialog({
-                    title: __("Mark Attendance"),
+                    title: __("Mark All Shift"),
                     fields: [{
                             "fieldname":"from_date",
                             "label": __("From Date"),
