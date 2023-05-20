@@ -27,7 +27,7 @@ frappe.listview_settings['Shift Type'] = {
                     ],
                 primary_action(data) {
                     frappe.call({
-                        method: 'custom_erpnext.shift_type.process_auto_attendance_for_all_shifts',
+                        method: 'custom_erpnext.shift_type.process_auto_attendance_for_all',
                         args: {
                             from_date: data.from_date,
                             to_date: data.to_date
