@@ -50,9 +50,21 @@ class override_ShiftType(Document):
 	def process_auto_attendance(self,from_date=None,to_date=None): #added from date to date in oder to access the date given in mark attendance in shift type front desk
 		if from_date and to_date:
 			self.process_attendance_after=from_date
+			#self.name=name
 			shift_start_time =to_date+" "+ str(self.start_time)
 			self.last_sync_of_checkin = datetime.strptime(shift_start_time, "%Y-%m-%d %H:%M:%S")+timedelta(days=1)
 			# added to set eligiable time for the shifts to process the attendance which is given in mark attendance in shift type front desk
+	# def process_auto_attendance(self,**kwargs):#from_date=None,to_date=None): #added from date to date in oder to access the date given in mark attendance in shift type front desk
+	# 	#if from_date and to_date:
+	# 	frappe.publish_realtime('msgprint', 'Starting long job...'+kwargs['name'])
+	# 	if kwargs['from_date'] and kwargs['to_date']:
+	# 		self.name=kwargs['name']
+	# 		from_date=kwargs['from_date']
+	# 		to_date=kwargs['to_date']
+	# 		self.process_attendance_after=from_date
+	# 		shift_start_time =to_date+" "+ str(self.start_time)
+	# 		self.last_sync_of_checkin = datetime.strptime(shift_start_time, "%Y-%m-%d %H:%M:%S")+timedelta(days=1)	
+	
 		if (
 			not cint(self.enable_auto_attendance)
 			or not self.process_attendance_after
@@ -291,8 +303,17 @@ def process_auto_attendance_for_all(from_date=None,to_date=None): #added from da
 	shift_list = frappe.get_all("Shift Type", filters={"enable_auto_attendance": "1"}, pluck="name")
 	for shift in shift_list:
 		doc = frappe.get_cached_doc("Shift Type", shift)
-		#frappe.enqueue(doc.process_auto_attendance,timeout=1,from_date=from_date,to_date=to_date)#,now='True') #added from date to date in order to access the date given in mark attendance in shift type
-		frappe.enqueue_doc("Shift Type", doc,doc.process_auto_attendance(from_date,to_date),queue="long",timeout=2500)
+		shift_args={
+			#"name":doc.name,
+			"from_date":from_date,
+			"to_date":to_date,
+		}
+		#frappe.enqueue("process_auto_attendance",queue="long",timeout=10,name=doc.name,from_date=from_date,to_date=to_date)#,now='True') #added from date to date in order to access the date given in mark attendance in shift type
+		#frappe.enqueue_doc("Shift Type", doc.name,"process_auto_attendance",queue="long",timeout=2500,from_date=from_date,to_date=to_date)
+		#frappe.enqueue("process_auto_attendance",queue="long",is_async=False,timeout=100,**shift_args)#name=doc.name,from_date=from_date,to_date=to_date)
+		#doc.process_auto_attendance(**shift_args)
+		frappe.enqueue_doc(doctype="Shift Type", name=doc.name,method="process_auto_attendance",queue="long",is_async=False,timeout=3600,**shift_args)
+
 
 def get_filtered_date_list(
 	employee, start_date, end_date, filter_attendance=True, holiday_list=None
