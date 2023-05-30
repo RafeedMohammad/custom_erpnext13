@@ -48,6 +48,7 @@ from custom_erpnext.shift_assignment import (
 class override_ShiftType(Document):
 	@frappe.whitelist()
 	def process_auto_attendance(self,from_date=None,to_date=None): #added from date to date in oder to access the date given in mark attendance in shift type front desk
+		frappe.publish_realtime('msgprint', 'Starting process for '+self.name+' at-> '+str(datetime.now()))
 		if from_date and to_date:
 			self.process_attendance_after=from_date
 			#self.name=name
@@ -110,6 +111,8 @@ class override_ShiftType(Document):
 			)
 		for employee in self.get_assigned_employee(self.process_attendance_after, True):
 			self.mark_absent_for_dates_with_no_attendance(employee)
+		frappe.publish_realtime('msgprint', 'Ending process for '+self.name+' at-> '+str(datetime.now()))
+
 
 	def get_attendance(self, logs):
 		"""Return attendance_status, working_hours, late_entry, early_exit, in_time, out_time
@@ -300,16 +303,25 @@ class override_ShiftType(Document):
 
 @frappe.whitelist()
 def process_auto_attendance_for_all(from_date=None,to_date=None): #added from date to date in oder to access the date given in mark attendance in shift type
+	shift_args1={
+	#"name":doc.name,
+	"from_date":from_date,
+	"to_date":to_date,
+	}
+	# frappe.enqueue(method="test123",queue="long",**shift_args1)
+	#frappe.enqueue_doc(doctype="Shift Type", name="Shift Type",method="test123",queue="long",timeout=3600,**shift_args1)
+	frappe.enqueue("custom_erpnext.shift_type.process_auto_attendance_intermediate_function",queue="long",**shift_args1)
+
+def process_auto_attendance_intermediate_function(from_date=None,to_date=None):
 	shift_list = frappe.get_all("Shift Type", filters={"enable_auto_attendance": "1"}, pluck="name")
 	for shift in shift_list:
 		doc = frappe.get_cached_doc("Shift Type", shift)
 		shift_args={
-			#"name":doc.name,
-			"from_date":from_date,
-			"to_date":to_date,
+		#"name":doc.name,
+		"from_date":from_date,
+		"to_date":to_date,
 		}
-		frappe.enqueue_doc("Shift Type",doc.name,"process_auto_attendance",timeout=1800,**shift_args)
-
+		doc.process_auto_attendance(**shift_args)
 
 def get_filtered_date_list(
 	employee, start_date, end_date, filter_attendance=True, holiday_list=None
