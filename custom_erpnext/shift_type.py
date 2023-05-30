@@ -308,11 +308,7 @@ def process_auto_attendance_for_all(from_date=None,to_date=None): #added from da
 			"from_date":from_date,
 			"to_date":to_date,
 		}
-		#frappe.enqueue("process_auto_attendance",queue="long",timeout=10,name=doc.name,from_date=from_date,to_date=to_date)#,now='True') #added from date to date in order to access the date given in mark attendance in shift type
-		#frappe.enqueue_doc("Shift Type", doc.name,"process_auto_attendance",queue="long",timeout=2500,from_date=from_date,to_date=to_date)
-		#frappe.enqueue("process_auto_attendance",queue="long",is_async=False,timeout=100,**shift_args)#name=doc.name,from_date=from_date,to_date=to_date)
-		#doc.process_auto_attendance(**shift_args)
-		frappe.enqueue_doc(doctype="Shift Type", name=doc.name,method="process_auto_attendance",queue="long",timeout=3600,**shift_args)
+		frappe.enqueue_doc("Shift Type",doc.name,"process_auto_attendance",timeout=1800,**shift_args)
 
 
 def get_filtered_date_list(
