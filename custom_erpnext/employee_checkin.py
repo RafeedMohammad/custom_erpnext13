@@ -129,9 +129,11 @@ def mark_attendance_and_link_log(
 	out_time=None,
 	shift=None,
 	late_entry_duration=None,
-	overtime=None
+	overtime=None,
+	rounding_ot=None
 	
 ):
+	frappe.publish_realtime('msgprint', 'Starting mark_attendance of '+logs[0].employee+" for "+str(attendance_date)+' at-> '+str(datetime.now()))
 	"""Creates an attendance and links the attendance to the Employee Checkin.
 	Note: If attendance is already present for the given date, the logs are marked as skipped and no exception is thrown.
 
@@ -163,7 +165,6 @@ def mark_attendance_and_link_log(
 		overtime=0
 	
 	else:
-		rounding_ot = frappe.db.get_value("Company", company, "rounding_overtime") 
 		#overtime_hour=rounding_ot
 		overtime_hour_fraction  = ((overtime.total_seconds())%3600)//60
 		if overtime_hour_fraction >= rounding_ot:			
@@ -222,6 +223,7 @@ def mark_attendance_and_link_log(
 				where name in %s""",
 				(attendance.name, log_names),
 			)
+			frappe.publish_realtime('msgprint', 'Ending mark_attendance of '+employee+" for "+str(attendance_date)+' at-> '+str(datetime.now()))
 			return attendance
 		else:
 			#change_start
@@ -259,7 +261,7 @@ def mark_attendance_and_link_log(
 			#skip_attendance_in_checkins(log_names)
 			# if duplicate:
 			# 	add_comment_in_checkins(log_names, duplicate)
-
+			frappe.publish_realtime('msgprint', 'Ending mark_attendance of '+employee+" for "+str(attendance_date)+' at-> '+str(datetime.now()))
 			return None
 	else:
 		frappe.throw(_("{} is an invalid Attendance Status.").format(attendance_status))

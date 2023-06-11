@@ -55,17 +55,6 @@ class override_ShiftType(Document):
 			shift_start_time =to_date+" "+ str(self.start_time)
 			self.last_sync_of_checkin = datetime.strptime(shift_start_time, "%Y-%m-%d %H:%M:%S")+timedelta(days=1)
 			# added to set eligiable time for the shifts to process the attendance which is given in mark attendance in shift type front desk
-	# def process_auto_attendance(self,**kwargs):#from_date=None,to_date=None): #added from date to date in oder to access the date given in mark attendance in shift type front desk
-	# 	#if from_date and to_date:
-	# 	frappe.publish_realtime('msgprint', 'Starting long job...'+kwargs['name'])
-	# 	if kwargs['from_date'] and kwargs['to_date']:
-	# 		self.name=kwargs['name']
-	# 		from_date=kwargs['from_date']
-	# 		to_date=kwargs['to_date']
-	# 		self.process_attendance_after=from_date
-	# 		shift_start_time =to_date+" "+ str(self.start_time)
-	# 		self.last_sync_of_checkin = datetime.strptime(shift_start_time, "%Y-%m-%d %H:%M:%S")+timedelta(days=1)	
-	
 		if (
 			not cint(self.enable_auto_attendance)
 			or not self.process_attendance_after
@@ -79,9 +68,17 @@ class override_ShiftType(Document):
 			"shift_actual_end": ("<", self.last_sync_of_checkin),
 			"shift": self.name,
 		}
+		weekly_off_list=frappe.db.sql("""select holiday_date,weekly_off from tabHoliday where parent=%s and holiday_date between %s and %s""",
+				(self.holiday_list,self.process_attendance_after,self.last_sync_of_checkin))
+
 		logs = frappe.db.get_list(
 			"Employee Checkin", fields="*", filters=filters, order_by="employee,time"
 		)
+		if logs:
+			employee=logs[0].employee
+			company =frappe.db.get_value("Employee", employee, "company")
+			rounding_ot = frappe.db.get_value("Company", company, "rounding_overtime") 
+		
 		for key, group in itertools.groupby(
 			logs, key=lambda x: (x["employee"], x["shift_actual_start"])
 		):
@@ -95,7 +92,7 @@ class override_ShiftType(Document):
 				out_time,
 				late_entry_duration,
 				overtime,
-			) = self.get_attendance(single_shift_logs)
+			) = self.get_attendance(single_shift_logs,weekly_off_list)
 			mark_attendance_and_link_log(
 				single_shift_logs,
 				attendance_status,
@@ -108,13 +105,15 @@ class override_ShiftType(Document):
 				self.name,
 				late_entry_duration,
 				overtime,
+				rounding_ot,
 			)
 		for employee in self.get_assigned_employee(self.process_attendance_after, True):
 			self.mark_absent_for_dates_with_no_attendance(employee)
 		frappe.publish_realtime('msgprint', 'Ending process for '+self.name+' at-> '+str(datetime.now()))
 
 
-	def get_attendance(self, logs):
+	def get_attendance(self, logs,weekly_off_list):
+		frappe.publish_realtime('msgprint', 'Starting Get_attendance for '+self.name+' at-> '+str(datetime.now()))
 		"""Return attendance_status, working_hours, late_entry, early_exit, in_time, out_time
 		for a set of logs belonging to a single shift.
 		Assumtion:
@@ -133,8 +132,15 @@ class override_ShiftType(Document):
 		late_entry_duration=0
 		overtime=timedelta(0)
 
-		in_date1 = str(logs[0].shift_start).split(" ")[0]
-		weekly_off_check = frappe.db.get_value('Holiday', {'parent': self.holiday_list, 'holiday_date': in_date1}, 'weekly_off')
+		in_date1 = datetime.strptime(str(logs[0].shift_start).split(" ")[0], "%Y-%m-%d")
+		weekly_off_check=None
+
+		#weekly_off_check = frappe.db.get_value('Holiday', {'parent': self.holiday_list, 'holiday_date': in_date1}, 'weekly_off')
+		for i in range(len(weekly_off_list)):
+			if(weekly_off_list[i][0]==in_date1.date()):
+				weekly_off_check= weekly_off_list[i][1]
+				break
+
 
 		# if (datetime.strptime(str(self.lunch_start), "%H:%M:%S") < datetime.strptime(str(self.start_time), "%H:%M:%S")):
 		# 	start_time_to_lunch_duration=datetime.strptime(str(self.lunch_start), "%H:%M:%S")-datetime.strptime(str(self.start_time), "%H:%M:%S")+timedelta(days=1)
@@ -322,6 +328,7 @@ def process_auto_attendance_intermediate_function(from_date=None,to_date=None):
 		"to_date":to_date,
 		}
 		doc.process_auto_attendance(**shift_args)
+		#frappe.enqueue_doc("Shift Type",doc.name,"process_auto_attendance",timeout=1800,**shift_args)
 
 def get_filtered_date_list(
 	employee, start_date, end_date, filter_attendance=True, holiday_list=None
