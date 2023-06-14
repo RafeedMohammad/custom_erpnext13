@@ -190,6 +190,7 @@ def mark_attendance_and_link_log(
 		)
 
 		if not duplicate:
+			frappe.publish_realtime('msgprint', 'Starting insertion attendance of '+logs[0].employee+" for "+str(attendance_date)+' at-> '+str(datetime.now()))
 			doc_dict = {
 				"doctype": "Attendance",
 				"employee": employee,
@@ -210,25 +211,25 @@ def mark_attendance_and_link_log(
 			}
 			attendance = frappe.get_doc(doc_dict).insert()
 			attendance.submit()
-
+			frappe.publish_realtime('msgprint', 'Ending insertion attendance of '+logs[0].employee+" for "+str(attendance_date)+' at-> '+str(datetime.now()))
 			if attendance_status == "Absent":
 				attendance.add_comment(
 					text=_("Employee was marked Absent for not meeting the working hours threshold.")
 				)
 
-			#Updated the Employee Checkin document for multi-attendance processing. The checkins which are given later, will be set with the attendance ID processed before
-			frappe.db.sql(
-				"""update `tabEmployee Checkin`
-				set attendance = %s
-				where name in %s""",
-				(attendance.name, log_names),
-			)
+			#-->Updated the Employee Checkin document for multi-attendance processing. The checkins which are given later, will be set with the attendance ID processed before
+			# frappe.db.sql(
+			# 	"""update `tabEmployee Checkin`
+			# 	set attendance = %s
+			# 	where name in %s""",
+			# 	(attendance.name, log_names),
+			# )
 			frappe.publish_realtime('msgprint', 'Ending mark_attendance of '+employee+" for "+str(attendance_date)+' at-> '+str(datetime.now()))
 			return attendance
 		else:
 			#change_start
   
-			
+			frappe.publish_realtime('msgprint', 'Starting insertion attendance for duplicate '+logs[0].employee+" for "+str(attendance_date)+' at-> '+str(datetime.now()))		
 			previous_attendance_name=frappe.db.get_value("Attendance",{"attendance_date":attendance_date,"employee":employee},'name')
 			doc_dict = {
                 "doctype": "Attendance",
@@ -257,7 +258,7 @@ def mark_attendance_and_link_log(
 			#Attendance document with updated values will be saved
 			attendance = frappe.get_doc('Attendance',previous_attendance_name).save()
 
-			skip_attendance_in_checkins(log_names,previous_attendance_name)#added previous_attendance
+			#-->skip_attendance_in_checkins(log_names,previous_attendance_name)#added previous_attendance
 			#skip_attendance_in_checkins(log_names)
 			# if duplicate:
 			# 	add_comment_in_checkins(log_names, duplicate)
