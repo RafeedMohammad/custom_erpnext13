@@ -183,11 +183,12 @@ def mark_attendance_and_link_log(
 
 	elif attendance_status in ("Present", "Absent", "Half Day", "Weekly Off", "Holiday", "Late"):
 		company = frappe.get_cached_value("Employee", employee, "company")
-
+		frappe.publish_realtime('msgprint', 'Starting duplicate check attendance of '+logs[0].employee+" for "+str(attendance_date)+' at-> '+str(datetime.now()))
 		duplicate = frappe.db.exists(
 			"Attendance",
 			{"employee": employee, "attendance_date": attendance_date, "docstatus": ("!=", "2")},
 		)
+		frappe.publish_realtime('msgprint', 'Ending duplicate check attendances o f '+logs[0].employee+" for "+str(attendance_date)+' at-> '+str(datetime.now()))
 
 		if not duplicate:
 			frappe.publish_realtime('msgprint', 'Starting insertion attendance of '+logs[0].employee+" for "+str(attendance_date)+' at-> '+str(datetime.now()))
