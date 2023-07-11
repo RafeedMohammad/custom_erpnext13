@@ -113,7 +113,7 @@ class override_ShiftType(Document):
 
 
 	def get_attendance(self, logs,weekly_off_list):
-		frappe.publish_realtime('msgprint', 'Starting Get_attendance for '+self.name+' at-> '+str(datetime.now()))
+		frappe.publish_realtime('msgprint', 'Starting Get_attendance for '+logs[0].employee+' at-> '+str(datetime.now()))
 		"""Return attendance_status, working_hours, late_entry, early_exit, in_time, out_time
 		for a set of logs belonging to a single shift.
 		Assumtion:
@@ -314,7 +314,9 @@ def process_auto_attendance_for_all(from_date=None,to_date=None): #added from da
 	"from_date":from_date,
 	"to_date":to_date,
 	}
-	# frappe.enqueue(method="test123",queue="long",**shift_args1)
+	# added in 10-7-23 for delete attendance
+	#frappe.db.sql("""delete from tabAttendance where status in ("Present", "Absent", "Half Day", "Weekly Off", "Holiday", "Late") and attendance_date between %s and %s""",(from_date,to_date))
+	#frappe.enqueue(method="test123",queue="long",**shift_args1)
 	#frappe.enqueue_doc(doctype="Shift Type", name="Shift Type",method="test123",queue="long",timeout=3600,**shift_args1)
 	frappe.enqueue("custom_erpnext.shift_type.process_auto_attendance_intermediate_function",queue="long",**shift_args1)
 

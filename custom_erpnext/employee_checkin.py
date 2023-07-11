@@ -133,7 +133,8 @@ def mark_attendance_and_link_log(
 	rounding_ot=None
 	
 ):
-	frappe.publish_realtime('msgprint', 'Starting mark_attendance of '+logs[0].employee+" for "+str(attendance_date)+' at-> '+str(datetime.now()))
+	#frappe.publish_realtime('msgprint', 'Starting mark_attendance of '+logs[0].employee+" for "+str(attendance_date))
+	mark_attendance_start=datetime.now()
 	"""Creates an attendance and links the attendance to the Employee Checkin.
 	Note: If attendance is already present for the given date, the logs are marked as skipped and no exception is thrown.
 
@@ -183,15 +184,18 @@ def mark_attendance_and_link_log(
 
 	elif attendance_status in ("Present", "Absent", "Half Day", "Weekly Off", "Holiday", "Late"):
 		company = frappe.get_cached_value("Employee", employee, "company")
-		frappe.publish_realtime('msgprint', 'Starting duplicate check attendance of '+logs[0].employee+" for "+str(attendance_date)+' at-> '+str(datetime.now()))
+		#frappe.publish_realtime('msgprint', 'Starting duplicate check attendance of '+logs[0].employee+" for "+str(attendance_date)+' at-> '+str(datetime.now()))
+		duplicate_check_start=datetime.now()
 		duplicate = frappe.db.exists(
 			"Attendance",
 			{"employee": employee, "attendance_date": attendance_date, "docstatus": ("!=", "2")},
 		)
-		frappe.publish_realtime('msgprint', 'Ending duplicate check attendances o f '+logs[0].employee+" for "+str(attendance_date)+' at-> '+str(datetime.now()))
-
+		duplicate_check_end=datetime.now()
+		#frappe.publish_realtime('msgprint', 'Ending duplicate check attendances o f '+logs[0].employee+" for "+str(attendance_date)+' at-> '+str(datetime.now()))
+		frappe.publish_realtime('msgprint','Duplicate check time= '+str(duplicate_check_end-duplicate_check_start))
 		if not duplicate:
-			frappe.publish_realtime('msgprint', 'Starting insertion attendance of '+logs[0].employee+" for "+str(attendance_date)+' at-> '+str(datetime.now()))
+			#frappe.publish_realtime('msgprint', 'Starting insertion attendance of '+logs[0].employee+" for "+str(attendance_date)+' at-> '+str(datetime.now()))
+			insert_start=datetime.now()
 			doc_dict = {
 				"doctype": "Attendance",
 				"employee": employee,
@@ -225,12 +229,17 @@ def mark_attendance_and_link_log(
 			# 	where name in %s""",
 			# 	(attendance.name, log_names),
 			# )
-			frappe.publish_realtime('msgprint', 'Ending mark_attendance of '+employee+" for "+str(attendance_date)+' at-> '+str(datetime.now()))
+			#frappe.publish_realtime('msgprint', 'Ending mark_attendance of '+employee+" for "+str(attendance_date)+' at-> '+str(datetime.now()))
+			insert_end=datetime.now()
+			frappe.publish_realtime('msgprint', 'insertion time= '+str(insert_end-insert_start))
+			frappe.publish_realtime('msgprint', 'Mark Attendance time= '+str(insert_end-mark_attendance_start))
+
+
 			return attendance
 		else:
 			#change_start
-  
-			frappe.publish_realtime('msgprint', 'Starting insertion attendance for duplicate '+logs[0].employee+" for "+str(attendance_date)+' at-> '+str(datetime.now()))		
+			insert_start=datetime.now()  
+			#frappe.publish_realtime('msgprint', 'Starting insertion attendance for duplicate '+logs[0].employee+" for "+str(attendance_date)+' at-> '+str(datetime.now()))		
 			previous_attendance_name=frappe.db.get_value("Attendance",{"attendance_date":attendance_date,"employee":employee},'name')
 			doc_dict = {
                 "doctype": "Attendance",
@@ -263,7 +272,10 @@ def mark_attendance_and_link_log(
 			#skip_attendance_in_checkins(log_names)
 			# if duplicate:
 			# 	add_comment_in_checkins(log_names, duplicate)
-			frappe.publish_realtime('msgprint', 'Ending mark_attendance of '+employee+" for "+str(attendance_date)+' at-> '+str(datetime.now()))
+			#frappe.publish_realtime('msgprint', 'Ending mark_attendance of '+employee+" for "+str(attendance_date)+' at-> '+str(datetime.now()))
+			insert_end=datetime.now()
+			frappe.publish_realtime('msgprint', 'insertion time= '+str(insert_end-insert_start))
+			frappe.publish_realtime('msgprint', 'Mark Attendance time= '+str(insert_end-mark_attendance_start))
 			return None
 	else:
 		frappe.throw(_("{} is an invalid Attendance Status.").format(attendance_status))
