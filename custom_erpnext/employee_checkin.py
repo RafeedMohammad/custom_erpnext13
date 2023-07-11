@@ -216,7 +216,7 @@ def mark_attendance_and_link_log(
 			}
 			attendance = frappe.get_doc(doc_dict).insert()
 			attendance.submit()
-			frappe.publish_realtime('msgprint', 'Ending insertion attendance of '+logs[0].employee+" for "+str(attendance_date)+' at-> '+str(datetime.now()))
+			#frappe.publish_realtime('msgprint', 'Ending insertion attendance of '+logs[0].employee+" for "+str(attendance_date)+' at-> '+str(datetime.now()))
 			if attendance_status == "Absent":
 				attendance.add_comment(
 					text=_("Employee was marked Absent for not meeting the working hours threshold.")
