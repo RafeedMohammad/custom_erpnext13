@@ -48,7 +48,7 @@ from custom_erpnext.shift_assignment import (
 class override_ShiftType(Document):
 	@frappe.whitelist()
 	def process_auto_attendance(self,from_date=None,to_date=None): #added from date to date in oder to access the date given in mark attendance in shift type front desk
-		frappe.publish_realtime('msgprint', 'Starting process for '+self.name+' at-> '+str(datetime.now()))
+		#frappe.publish_realtime('msgprint', 'Starting process for '+self.name+' at-> '+str(datetime.now()))
 		if from_date and to_date:
 			self.process_attendance_after=from_date
 			#self.name=name
@@ -109,11 +109,11 @@ class override_ShiftType(Document):
 			)
 		for employee in self.get_assigned_employee(self.process_attendance_after, True):
 			self.mark_absent_for_dates_with_no_attendance(employee)
-		frappe.publish_realtime('msgprint', 'Ending process for '+self.name+' at-> '+str(datetime.now()))
+		#frappe.publish_realtime('msgprint', 'Ending process for '+self.name+' at-> '+str(datetime.now()))
 
 
 	def get_attendance(self, logs,weekly_off_list):
-		frappe.publish_realtime('msgprint', 'Starting Get_attendance for '+logs[0].employee+' at-> '+str(datetime.now()))
+		#frappe.publish_realtime('msgprint', 'Starting Get_attendance for '+logs[0].employee+' at-> '+str(datetime.now()))
 		"""Return attendance_status, working_hours, late_entry, early_exit, in_time, out_time
 		for a set of logs belonging to a single shift.
 		Assumtion:

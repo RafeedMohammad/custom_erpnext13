@@ -35,7 +35,7 @@ frappe.listview_settings['Shift Type'] = {
                         freeze: true,
 
                         callback: () => {
-                            frappe.msgprint(__('Attendance has been marked as per employee check-ins'));
+                            //frappe.msgprint(__('Attendance has been marked as per employee check-ins'));
                         }
                 
                         
