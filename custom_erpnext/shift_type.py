@@ -48,7 +48,7 @@ from custom_erpnext.shift_assignment import (
 class override_ShiftType(Document):
 	@frappe.whitelist()
 	def process_auto_attendance(self,from_date=None,to_date=None): #added from date to date in oder to access the date given in mark attendance in shift type front desk
-		#frappe.publish_realtime('msgprint', 'Starting process for '+self.name+' at-> '+str(datetime.now()))
+		frappe.publish_realtime('msgprint', 'Starting process for '+self.name+' at-> '+str(datetime.now()))
 		if from_date and to_date:
 			self.process_attendance_after=from_date
 			#self.name=name
@@ -109,7 +109,7 @@ class override_ShiftType(Document):
 			)
 		for employee in self.get_assigned_employee(self.process_attendance_after, True):
 			self.mark_absent_for_dates_with_no_attendance(employee)
-		#frappe.publish_realtime('msgprint', 'Ending process for '+self.name+' at-> '+str(datetime.now()))
+		frappe.publish_realtime('msgprint', 'Ending process for '+self.name+' at-> '+str(datetime.now()))
 
 
 	def get_attendance(self, logs,weekly_off_list):
@@ -330,6 +330,7 @@ def process_auto_attendance_intermediate_function(from_date=None,to_date=None):
 		"to_date":to_date,
 		}
 		doc.process_auto_attendance(**shift_args)
+	frappe.publish_realtime('msgprint', 'Attendance has been marked as per employee check-ins')
 		#frappe.enqueue_doc("Shift Type",doc.name,"process_auto_attendance",timeout=1800,**shift_args)
 
 def get_filtered_date_list(
