@@ -48,7 +48,7 @@ from custom_erpnext.shift_assignment import (
 class override_ShiftType(Document):
 	@frappe.whitelist()
 	def process_auto_attendance(self,from_date=None,to_date=None): #added from date to date in oder to access the date given in mark attendance in shift type front desk
-		frappe.publish_realtime('msgprint', 'Starting process for '+self.name+' at-> '+str(datetime.now()))
+		#frappe.publish_realtime('msgprint', 'Starting process for '+self.name+' at-> '+str(datetime.now()))
 		if from_date and to_date:
 			self.process_attendance_after=from_date
 			#self.name=name
@@ -109,7 +109,7 @@ class override_ShiftType(Document):
 			)
 		for employee in self.get_assigned_employee(self.process_attendance_after, True):
 			self.mark_absent_for_dates_with_no_attendance(employee)
-		frappe.publish_realtime('msgprint', 'Ending process for '+self.name+' at-> '+str(datetime.now()))
+		# frappe.publish_realtime('msgprint', 'Ending process for '+self.name+' at-> '+str(datetime.now()))
 
 
 	def get_attendance(self, logs,weekly_off_list):
@@ -163,6 +163,8 @@ class override_ShiftType(Document):
 			# late_entry_duration=str(int(late_entry_time/60)).zfill(2)+":"+str(late_entry_time%60).zfill(2)
 			late_entry_duration=in_time-logs[0].shift_start-timedelta(minutes=cint(self.late_entry_grace_period))
 			#late_entry_duration=str(int(late_entry_time/60)).zfill(2)+":"+str(late_entry_time%60).zfill(2)
+			if(late_entry_duration>=timedelta(days=1)):
+				late_entry_duration=timedelta(days=1)-timedelta(minutes=1)
 
 
 		if (
@@ -184,8 +186,8 @@ class override_ShiftType(Document):
 					overtime=out_time-in_time-lunch_duration
 				else:
 					overtime=out_time-in_time
-				# if(overtime>=timedelta(days=1)):
-				# 	overtime=timedelta(days=1)-timedelta(minutes=1)
+				if(overtime>=timedelta(days=1)):
+					overtime=timedelta(days=1)-timedelta(minutes=1)
 
 
 #if (lunch_start_datetime.time() > in_time_time) and (lunch_end_datetime.time() < out_time_time):
@@ -322,6 +324,7 @@ def process_auto_attendance_for_all(from_date=None,to_date=None): #added from da
 
 def process_auto_attendance_intermediate_function(from_date=None,to_date=None):
 	shift_list = frappe.get_all("Shift Type", filters={"enable_auto_attendance": "1"}, pluck="name")
+	frappe.publish_realtime('msgprint', 'Attendance is Processing')
 	for shift in shift_list:
 		doc = frappe.get_cached_doc("Shift Type", shift)
 		shift_args={
