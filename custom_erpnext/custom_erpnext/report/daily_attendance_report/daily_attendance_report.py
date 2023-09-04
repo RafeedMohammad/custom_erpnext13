@@ -33,8 +33,8 @@ def execute(filters= None):
 
 def get_columns():
 	return [
-		_("ID") + ":Data/:120",
-		_("Employee") + ":Link/Employee:120",
+		_("Employee No") + ":Data/:120",
+		_("Name") + ":Link/Employee:120",
 		_("Desingnation") + ":Data/:120",
 		_("Shift") + ":Data/:120",
 		_("In Time") + ":Data/Attendance:120",
@@ -58,7 +58,7 @@ def get_attendance(filters):
 	rounded_over_time2 = frappe.db.get_value('Company', filters.company, 'rounding_overtime_for_extra_30min')
 
 	conditions, filters = get_conditions(filters)
-	result= frappe.db.sql("""select DISTINCT tabEmployee.attendance_device_id,  tabAttendance.employee, tabEmployee.designation,tabAttendance.shift,
+	result= frappe.db.sql("""select DISTINCT tabEmployee.employee,  tabAttendance.employee_name, tabEmployee.designation,tabAttendance.shift,
 	tabAttendance.in_time, tabAttendance.late_entry_duration, tabAttendance.out_time, tabAttendance.rounded_ot, tabAttendance.status,
 	tabAttendance.shift_start,tabAttendance.shift_end,`tabAttendance`.leave_type
 	FROM tabAttendance

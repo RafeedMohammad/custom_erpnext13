@@ -12,7 +12,7 @@
 <style>
 	
 	.financial-statements-blank-row td {
-		height: 37px;
+		height: 17px;
 	}
 
     tr, td{
@@ -35,7 +35,6 @@
 <table class="table table-bordered">
 	<thead>
 		<tr>
-			<th style="width: {%= 100 - (report_columns.length - 1) * 13 %}%"></th>
 			{% for (let i=0, l=report_columns.length; i<l; i++) { %}
 				<th class="text-center">{%= report_columns[i].label %}</th>
 			{% } %}
@@ -49,9 +48,7 @@
 				row_class += data[j].account_name ? "" : " financial-statements-blank-row";
 			%}
 			<tr class="{%= row_class %}">
-				<td>
-					<span style="padding-left: {%= cint(data[j].indent) * 2 %}em">{%= row.account_name %}</span>
-				</td>
+				
 				{% for(let i=0, l=report_columns.length; i<l; i++) { %}
 					<td class="text-center">
 						{% const fieldname = report_columns[i].fieldname; %}

@@ -20,7 +20,7 @@ from erpnext.hr.utils import validate_active_employee
 
 
 
-from datetime import datetime
+from datetime import datetime,timedelta
 
 class override_EmployeeCheckin(Document):
 	
@@ -168,10 +168,19 @@ def mark_attendance_and_link_log(
 	else:
 		#overtime_hour=rounding_ot
 		overtime_hour_fraction  = ((overtime.total_seconds())%3600)//60
-		if overtime_hour_fraction >= rounding_ot:			
-			overtime_hour = (overtime.total_seconds()//3600)+1
-		else:		
-			overtime_hour = (overtime.total_seconds()//3600)
+		if rounding_ot<0:
+		#for the company which has ot_rules as Queen South
+			if overtime_hour_fraction >= abs(rounding_ot):			
+				overtime_hour = (overtime.total_seconds()//3600)+.5
+				overtime=overtime-timedelta(minutes=overtime_hour_fraction//30)
+			else:			
+				overtime_hour = (overtime.total_seconds()//3600)
+				overtime=overtime-timedelta(minutes=overtime_hour_fraction//30)
+		else:
+			if overtime_hour_fraction >= rounding_ot:			
+				overtime_hour = (overtime.total_seconds()//3600)+1
+			else:		
+				overtime_hour = (overtime.total_seconds()//3600)
 
 
 
