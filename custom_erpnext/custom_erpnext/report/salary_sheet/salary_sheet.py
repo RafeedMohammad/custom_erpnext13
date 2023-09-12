@@ -36,7 +36,7 @@ def execute(filters= None):
 		if salary_slip_basic is None:
 			salary_slip_basic = 0
 		allowance = get_allowance(ss.name)
-		acctual_lunch=get_lunch_tr_allowance(ss.name)
+		acctual_lunch=get_lunch_tr_allowance(ss.name)+get_lunch(ss.name)+get_convanse(ss.name)
 		if acctual_lunch is None:
 			acctual_lunch=0
 		leaves=frappe.db.sql('''select lt.name leave_name, ifnull(tot_lv,0) total_leaves from `tabLeave Type` lt left join  (select lti.name, count(a.attendance_date) tot_lv from `tabLeave Type` lti join tabAttendance a on lti.name = a.leave_type where a.employee=%s and a.status="On Leave" and a.attendance_date between %s and %s group by lti.name) ali on lt.name = ali.name;''',(ss.employee,ss.start_date,ss.end_date), as_dict=1)
@@ -295,10 +295,16 @@ def off_days(employee, start_date, end_date):
 
 
 def get_attendance_bonus(ss):
-	return frappe.db.get_value('Salary Detail', {'parent': ss, 'abbr': 'AB'}, 'amount')
+	return (frappe.db.get_value('Salary Detail', {'parent': ss, 'abbr': 'AB'}, 'amount') or 0)
 
 def get_lunch_tr_allowance(ss):
-	return frappe.db.get_value('Salary Detail', {'parent': ss, 'abbr': 'LT'}, 'amount')
+	return (frappe.db.get_value('Salary Detail', {'parent': ss, 'abbr': 'LT'}, 'amount') or 0)
+
+def get_lunch(ss):
+	return (frappe.db.get_value('Salary Detail', {'parent': ss, 'abbr': 'Lunch Allowance'}, 'amount') or 0)
 
 def get_night_allowance(ss):
-	return frappe.db.get_value('Salary Detail', {'parent': ss, 'abbr': 'NA'}, 'amount')
+	return (frappe.db.get_value('Salary Detail', {'parent': ss, 'abbr': 'NA'}, 'amount') or 0)
+
+def get_convanse(ss):
+	return (frappe.db.get_value('Salary Detail', {'parent': ss, 'abbr': 'CNV'}, 'amount') or 0)

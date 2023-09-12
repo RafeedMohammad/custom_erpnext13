@@ -26,6 +26,7 @@ from frappe.utils.background_jobs import enqueue
 from six import iteritems
 
 import erpnext
+from erpnext.setup.utils import get_exchange_rate
 from erpnext.accounts.utils import get_fiscal_year
 from erpnext.hr.utils import get_holiday_dates_for_employee, validate_active_employee
 from erpnext.loan_management.doctype.loan_repayment.loan_repayment import (
@@ -159,7 +160,7 @@ class override_SalarySlip(TransactionBase):
 		self.day_days = self.calculate_day_days()
 
 
-		self.base_pay = self.fetch_base_pay()
+		#self.base_pay = self.fetch_base_pay()
 		medical_amount=self.get_salary_medical(self.salary_structure)
 		if (medical_amount is None):
 			medical_amount=0
@@ -198,9 +199,9 @@ class override_SalarySlip(TransactionBase):
 					alert=True,
 				)
 		
-	def fetch_base_pay(self):
-		b_pay = frappe.db.get_value('Salary Structure Assignment', {'employee': self.employee}, ['base'])
-		return b_pay
+	# def fetch_base_pay(self):
+	# 	b_pay = frappe.db.get_value('Salary Structure Assignment', {'employee': self.employee}, ['base'])
+	# 	return b_pay
 
 
 	def set_net_total_in_words(self):
@@ -838,6 +839,10 @@ class override_SalarySlip(TransactionBase):
 			order_by="from_date desc",
 			as_dict=True,
 		)
+		exchange_rate_usd=get_exchange_rate("USD","BDT",self.posting_date) #dollar to taka for qstml
+		if(employee.group=="Worker"):
+			salary_structure_assignment["base"]= salary_structure_assignment["base"]*exchange_rate_usd  #Worker in QSTML have base in dollar
+		self.base_pay=salary_structure_assignment["base"]
 
 		if not salary_structure_assignment:
 			frappe.throw(
