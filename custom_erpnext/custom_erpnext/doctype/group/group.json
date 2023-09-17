@@ -37,6 +37,7 @@
    "read_only": 1
   },
   {
+   "default": "0",
    "fieldname": "is_group",
    "fieldtype": "Check",
    "label": "Is Group"
@@ -57,7 +58,7 @@
  "index_web_pages_for_search": 1,
  "is_tree": 1,
  "links": [],
- "modified": "2022-10-25 17:44:18.767379",
+ "modified": "2023-09-12 13:20:56.522134",
  "modified_by": "Administrator",
  "module": "Custom Erpnext",
  "name": "Group",

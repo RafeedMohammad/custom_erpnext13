@@ -167,7 +167,7 @@ class override_SalarySlip(TransactionBase):
 		self.total_month_minutes=(date_diff(self.end_date,self.start_date)+1)*8*60
 		#self.total_month_minutes = ((date(int(self.end_date.split('-')[0]), int(self.end_date.split('-')[1]), int(self.end_date.split('-')[2])) - date(int(self.start_date.split('-')[0]), int(self.start_date.split('-')[1]), int(self.start_date.split('-')[2]))).days) * 8 * 60 #fetch regular_working_hour from shift_type		
 		#if (self.overtime_rate == None):
-		self.overtime_rate = round((((self.base_pay - medical_amount) * 2/3 ) / 104),4)
+		self.overtime_rate = round((((self.base_pay or 0 - medical_amount) * 2/3 ) / 104),4)
 
 
 		self.validate_dates()
@@ -1593,8 +1593,9 @@ class override_SalarySlip(TransactionBase):
 							"interest_amount": amounts["interest_amount"],
 							"principal_amount": amounts["payable_principal_amount"],
 							"total_payment": amounts["interest_amount"] + amounts["payable_principal_amount"]
-							if not loan.manually_update_paid_amount_in_salary_slip
-							else 0,
+							# if not loan.manually_update_paid_amount_in_salary_slip
+							# else 0, //removed for getting remain value when manually update checked
+							,
 							"loan_account": loan.loan_account,
 							"interest_income_account": loan.interest_income_account,
 						},
