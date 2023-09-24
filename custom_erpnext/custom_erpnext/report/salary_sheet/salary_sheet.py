@@ -101,10 +101,10 @@ def execute(filters= None):
 
 			ss.absent_days,
 			# ss.gross_pay,
-			salary_slip_basic+allowance,
-			round(float(overtime_hours),1),
+			round(float((salary_slip_basic+allowance) or 0),2),
+			round(float(overtime_hours or 0),1),
 			#ss.total_overtime_pay,
-			round(float(ot_amount),0),
+			round(float(ot_amount or 0),0),
 			get_attendance_bonus(ss.name),
 			# get_lunch_tr_allowance(ss.name),
 			lunch,

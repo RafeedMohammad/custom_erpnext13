@@ -89,10 +89,10 @@ class override_SalarySlip(TransactionBase):
 		)
 		if(overtime_hours[0][0] and self.overtime_rate):
 			total_pay = float(self.overtime_rate)*overtime_hours[0][0]
-			return total_pay, overtime_hours[0][0]
+			return total_pay or 0, overtime_hours[0][0] or 0
 		else:
 			total_pay = 0
-			return total_pay, overtime_hours[0][0]
+			return total_pay, overtime_hours[0][0] or 0
 		
 	def calculate_total_late_entry_duration(self):
 
@@ -137,7 +137,6 @@ class override_SalarySlip(TransactionBase):
 		
 		#Assiging total overtime_pay and overtime_hours of the month
 		#if (self.overtime_hours == None):
-		self.total_overtime_pay, self.overtime_hours = self.calculate_overtime_amount()
 		#Assigning to total_late_entry_duration of the month
 		#else:
 		#self.total_overtime_pay = float(self.overtime_hours) * float(self.overtime_rate)
@@ -154,20 +153,17 @@ class override_SalarySlip(TransactionBase):
 		# else:
 		# 	self.present_days = self.calculate_day_days()
 
-		self.present_days = self.calculate_day_days() + self.calculate_night_days()
+		#self.present_days = self.calculate_day_days() + self.calculate_night_days()
 		
 		self.night_days = self.calculate_night_days()
 		self.day_days = self.calculate_day_days()
+		self.present_days= self.night_days + self.day_days #for calculating total present days
 
 
 		#self.base_pay = self.fetch_base_pay()
-		medical_amount=self.get_salary_medical(self.salary_structure)
-		if (medical_amount is None):
-			medical_amount=0
 		self.total_month_minutes=(date_diff(self.end_date,self.start_date)+1)*8*60
 		#self.total_month_minutes = ((date(int(self.end_date.split('-')[0]), int(self.end_date.split('-')[1]), int(self.end_date.split('-')[2])) - date(int(self.start_date.split('-')[0]), int(self.start_date.split('-')[1]), int(self.start_date.split('-')[2]))).days) * 8 * 60 #fetch regular_working_hour from shift_type		
 		#if (self.overtime_rate == None):
-		self.overtime_rate = round((((self.base_pay or 0 - medical_amount) * 2/3 ) / 104),4)
 
 
 		self.validate_dates()
@@ -738,6 +734,11 @@ class override_SalarySlip(TransactionBase):
 	def calculate_net_pay(self):
 		if self.salary_structure:
 			self.calculate_component_amounts("earnings")
+		medical_amount=self.get_salary_medical(self.salary_structure)
+		if (medical_amount is None):
+			medical_amount=0
+		self.overtime_rate = round((((self.base_pay or 0 - medical_amount) * 2/3 ) / 104),4) #For payroll base_pay initiaziled as 0 then while creating salary slip it will fetch the base value for 875 line
+		self.total_overtime_pay, self.overtime_hours = self.calculate_overtime_amount()
 		self.gross_pay = self.get_component_totals("earnings", depends_on_payment_days=1) + self.arear + flt(self.total_overtime_pay)
 		self.base_gross_pay = flt(
 			flt(self.gross_pay) * flt(self.exchange_rate), self.precision("base_gross_pay")

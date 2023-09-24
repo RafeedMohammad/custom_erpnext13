@@ -36,6 +36,7 @@ app_license = "MIT"
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 doctype_list_js = {"Shift Type" : "public/js/shift_type_list.js"}
+doctype_js = {"Payroll Entry" : "public/js/payroll_entry.js"}
 
 # Home Pages
 # ----------
@@ -96,7 +97,7 @@ override_doctype_class = {
     "Employee Checkin": "custom_erpnext.employee_checkin.override_EmployeeCheckin",
 	"Shift Assignment": "custom_erpnext.shift_assignment.override_ShiftAssignment",
 	"Salary Slip": "custom_erpnext.salary_slip.override_SalarySlip",
-	
+	"Payroll Entry":"custom_erpnext.payroll_entry.PayrollEntry",
 	#"Asset": "custom_erpnext.asset.override_Asset",
 }
 
