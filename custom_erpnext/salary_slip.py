@@ -110,7 +110,7 @@ class override_SalarySlip(TransactionBase):
 
 
 	def get_salary_medical(self,ss):
-		return frappe.db.get_value('Salary Detail', {'parent': ss, 'abbr': 'M'}, 'amount')
+		return frappe.db.get_value('Salary Detail', {'parent': ss, 'abbr': 'M'}, 'amount') or 0
 
 
 		#set the filter according to the name of the field
@@ -735,9 +735,9 @@ class override_SalarySlip(TransactionBase):
 		if self.salary_structure:
 			self.calculate_component_amounts("earnings")
 		medical_amount=self.get_salary_medical(self.salary_structure)
-		if (medical_amount is None):
-			medical_amount=0
-		self.overtime_rate = round((((self.base_pay or 0 - medical_amount) * 2/3 ) / 104),4) #For payroll base_pay initiaziled as 0 then while creating salary slip it will fetch the base value for 875 line
+		# if (medical_amount is None):
+		# 	medical_amount=0
+		self.overtime_rate = round((((self.base_pay - medical_amount) * 2/3 ) / 104),4) #For payroll base_pay initiaziled as 0 then while creating salary slip it will fetch the base value for 875 line
 		self.total_overtime_pay, self.overtime_hours = self.calculate_overtime_amount()
 		self.gross_pay = self.get_component_totals("earnings", depends_on_payment_days=1) + self.arear + flt(self.total_overtime_pay)
 		self.base_gross_pay = flt(

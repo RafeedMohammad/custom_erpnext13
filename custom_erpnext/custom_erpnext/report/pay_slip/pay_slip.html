@@ -1,0 +1,114 @@
+{%
+	var report_columns = report.get_columns_for_print();
+	report_columns = report_columns.filter(col => !col.hidden);
+
+	if (report_columns.length > 50) {
+		frappe.throw(__("Too many columns. Export the report and print it using a spreadsheet application."));
+	}
+%}
+{% for(let j=0, k=data.length; j<k; j++) { %}
+
+<style>
+    tr{
+        border: 1px solid black;
+		font-size: 11.5px;
+		margin-left: 0;
+    }
+	td{
+        border: 1px solid black;
+		font-size: 11.5px;
+		margin-left: 0;
+    }
+
+</style>
+
+
+
+<h3 class="text-center">{%= filters.company %}</h3>
+<h5 class="text-center">Salary for the month of - {%= filters.month %}, {%= filters.year %}</h5>
+<h3 class="text-center">{%= filters.date %}</h3>
+<h3 class="text-center">{%= filters.status %}</h3>
+
+
+<p>Emp_No: &ensp; &ensp;&ensp; &ensp;&ensp; &ensp; Name: </p>
+<p>Designation: &ensp; &ensp; Department: &ensp; &ensp; Joining Date: </p>
+
+
+<table class="table table-bordered" style="width:100%">
+	<thead>
+	</thead>
+	<tbody>
+		<tr>
+			<th>Statement of Salary</th>
+			<th colspan="3">Attendance</th>
+			<th colspan="2">O.T & Allowance</th>
+			<th colspan="2">Adjustment</th>
+		</tr>
+	
+		<tr>
+			<td>Gross: </td>
+			<td>Present:</td>
+			<td colspan="2">Absent: </td>
+			<td>O.T. Rate:</td>
+			<td>O.T. Hr: </td>
+			<td colspan="2">Providend Fund: </td>    
+		</tr>
+	
+	
+		<tr>
+			<td>Basic:  </td>
+			<td>CL: </td>
+			<td>EL: </td>
+			<td>ML: </td>
+			<td>O.T. Amount:</td>
+			<td>Arear: </td>  
+			<td>Others</td>
+			<td>Advance</td>
+		</tr>
+		
+		<tr>
+			<td>Others:  </td>
+			<td>SL & LWP: </td>
+			<td colspan="2">Late: </td>
+			<td>Night Day: </td>
+			<td>Night Allowance:</td>  
+			<td colspan="2">Income Tax:</td>    
+		</tr>
+		
+		<tr>
+			<td>&nbsp;</td>
+			<td colspan="3">A. & LWP Amnt: </td>
+			<td>Trn & Lunch </td>
+			<td>Attn. Bonus</td>  
+			<td>Stamp</td>   
+		</tr>
+		
+		<tr>
+			<td>&nbsp;</td>
+			<td colspan="3">&nbsp;</td>
+			<td colspan="2">&nbsp;</td>
+			<td colspan="2">Late Amt</td>   
+		</tr>
+		
+		<tr>
+			<td colspan="4">&nbsp;</td>
+			<td colspan="2">Gross Payable: </td>
+			<td colspan="2">Net Payable: </td>   
+		</tr>
+	
+		{% for(let j=0, k=data.length; j<k; j++) { %}
+			<!-- {%
+				var row = data[j];
+				var row_class = data[j].parent_account ? "" : "financial-statements-important";
+				row_class += data[j].account_name ? "" : " financial-statements-blank-row";
+			%} -->
+			
+		{% } %}
+	</tbody>
+</table>
+
+{% } %}
+<p class="text-right text-muted">
+	Printed On {%= frappe.datetime.str_to_user(frappe.datetime.get_datetime_as_string()) %}
+</p>
+
