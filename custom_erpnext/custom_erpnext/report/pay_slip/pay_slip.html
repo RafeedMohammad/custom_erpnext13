@@ -7,6 +7,16 @@
 	}
 %}
 {% for(let j=0, k=data.length; j<k; j++) { %}
+	<!-- var row = data[j]; -->
+	{% var cou=1 %}
+	{% for(let i=0, l=report_columns.length; i<l; i++) { %}
+
+			{% att= cou%}
+			{%cou ++%}
+			
+
+					
+	{% } %}
 
 <style>
     tr{
@@ -19,6 +29,9 @@
 		font-size: 11.5px;
 		margin-left: 0;
     }
+	p{
+		font-size: 12.5px;
+	}
 
 </style>
 
@@ -29,10 +42,8 @@
 <h3 class="text-center">{%= filters.date %}</h3>
 <h3 class="text-center">{%= filters.status %}</h3>
 
-
-<p>Emp_No: &ensp; &ensp;&ensp; &ensp;&ensp; &ensp; Name: </p>
-<p>Designation: &ensp; &ensp; Department: &ensp; &ensp; Joining Date: </p>
-
+<p>Emp_No: {{data[j].employee}}  &#160; &nbsp; &ensp; &ensp; &ensp; &ensp; &#160; &nbsp; &ensp; &ensp; &ensp; &ensp; Name: {{data[j].employee_name}} </p>
+<p>Designation: {{data[j].designation}} &ensp; &ensp; Department: {{data[j].department}} &ensp; &ensp; Joining Date: {{data[j].date_of_joining}}</p>
 
 <table class="table table-bordered" style="width:100%">
 	<thead>
@@ -46,54 +57,54 @@
 		</tr>
 	
 		<tr>
-			<td>Gross: </td>
-			<td>Present:</td>
-			<td colspan="2">Absent: </td>
-			<td>O.T. Rate:</td>
-			<td>O.T. Hr: </td>
-			<td colspan="2">Providend Fund: </td>    
+			<td>Gross: {{data[j].gross}} </td>
+			<td>Present: {{data[j].p}}</td>
+			<td colspan="2">Absent: {{data[j].a}}</td>
+			<td>O.T. Rate: {{data[j].ot_rate}}</td>
+			<td>O.T. Hr: {{data[j].ot_hr}} </td>
+			<td colspan="2">Providend Fund: {{data[j].pf}} </td>    
 		</tr>
 	
 	
 		<tr>
-			<td>Basic:  </td>
-			<td>CL: </td>
-			<td>EL: </td>
-			<td>ML: </td>
-			<td>O.T. Amount:</td>
-			<td>Arear: </td>  
-			<td>Others</td>
-			<td>Advance</td>
+			<td>Basic: {{data[j].basic}}  </td>
+			<td>CL: {{data[j].cl}}</td>
+			<td>EL: {{data[j].el}}</td>
+			<td>ML: {{data[j].ml}}</td>
+			<td>O.T. Amount:{{data[j].ot_amt}}</td>
+			<td>Arear: {{data[j].arrear}}</td>  
+			<td>Others 0</td>
+			<td>Advance: {{data[j].advance}}</td>
 		</tr>
 		
 		<tr>
-			<td>Others:  </td>
-			<td>SL & LWP: </td>
-			<td colspan="2">Late: </td>
-			<td>Night Day: </td>
-			<td>Night Allowance:</td>  
-			<td colspan="2">Income Tax:</td>    
+			<td>Others: {{data[j].allowance}} </td>
+			<td>SL & LWP: {{data[j].sl}}</td>
+			<td colspan="2">Late: {{data[j].late_days}} </td>
+			<td>Night Day: {{data[j].night_days}} </td>
+			<td>Night Allowance: {{data[j].night_amt}}</td>  
+			<td colspan="2">Income Tax: {{data[j].income_tax}}</td>    
 		</tr>
 		
 		<tr>
 			<td>&nbsp;</td>
-			<td colspan="3">A. & LWP Amnt: </td>
-			<td>Trn & Lunch </td>
-			<td>Attn. Bonus</td>  
-			<td>Stamp</td>   
+			<td colspan="3">A. & LWP Amnt: {{data[j].absent_penalty}}</td>
+			<td>Trn & Lunch: {{data[j].lunch_tran_allow}}</td>
+			<td>Attn. Bonus: {{data[j].attn_bon}}</td>  
+			<td>Stamp </td>   
 		</tr>
 		
 		<tr>
 			<td>&nbsp;</td>
 			<td colspan="3">&nbsp;</td>
 			<td colspan="2">&nbsp;</td>
-			<td colspan="2">Late Amt</td>   
+			<td colspan="2">Late Amt: {{data[j].late_ded}}</td>   
 		</tr>
 		
 		<tr>
 			<td colspan="4">&nbsp;</td>
-			<td colspan="2">Gross Payable: </td>
-			<td colspan="2">Net Payable: </td>   
+			<td colspan="2">Gross Payable: {{data[j].gross_payable}}</td>
+			<td colspan="2">Net Payable:{{data[j].net_pay}} </td>   
 		</tr>
 	
 		{% for(let j=0, k=data.length; j<k; j++) { %}

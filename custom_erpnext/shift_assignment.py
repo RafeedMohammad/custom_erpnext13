@@ -176,7 +176,7 @@ def get_employee_shift(
 	shift_assignment_details = frappe.db.get_value(
 		"Shift Assignment",
 		{"employee": employee, "start_date": ("<=", for_date), "docstatus": "1", "status": "Active"},
-		["shift_type", "end_date"],
+		["shift_type", "end_date"], order_by='start_date desc', #include order_by as it takes the latest assignment before even if it has a previous date than the time
 	)
 
 	if shift_assignment_details:

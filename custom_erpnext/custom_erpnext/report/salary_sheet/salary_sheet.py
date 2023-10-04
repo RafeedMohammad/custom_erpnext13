@@ -110,7 +110,7 @@ def execute(filters= None):
 			lunch,
 			ss.night_days,
 			get_night_allowance(ss.name),
-			ss.arrear,
+			ss.arear,
 			round(ss.gross_pay-float(ss.total_overtime_pay)-float(acctual_lunch)+lunch+float(ot_amount),0),
 
 

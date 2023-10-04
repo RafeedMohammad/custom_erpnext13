@@ -58,7 +58,7 @@
 				row_class += data[j].account_name ? "" : " financial-statements-blank-row";
 			%} -->
 			<tr class="{%= row_class %}">
-				<td> {%=j%}	</td>
+				<td> {%=j+1%}	</td>
 				{% for(let i=0, l=report_columns.length; i<l; i++) { %}
 					<td class="text-center">
 						{% const fieldname = report_columns[i].fieldname; %}

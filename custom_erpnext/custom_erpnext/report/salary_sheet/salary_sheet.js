@@ -50,7 +50,7 @@ frappe.query_reports["Salary Sheet"] = {
             "label":__("Document Status"),
             "fieldtype":"Select",
             "options":["Draft", "Submitted", "Cancelled"],
-            "default": "Submitted",
+            "default": "Draft",
             "width": "100px"
         },
 			{
