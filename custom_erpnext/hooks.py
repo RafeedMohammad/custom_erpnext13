@@ -98,6 +98,8 @@ override_doctype_class = {
 	"Shift Assignment": "custom_erpnext.shift_assignment.override_ShiftAssignment",
 	"Salary Slip": "custom_erpnext.salary_slip.override_SalarySlip",
 	"Payroll Entry":"custom_erpnext.payroll_entry.PayrollEntry",
+    "Loan Repayment":"custom_erpnext.loan_repayment.override_LoanRepayment",
+    "Loan" : "custom_erpnext.loan.Loan",
 	#"Asset": "custom_erpnext.asset.override_Asset",
 }
 

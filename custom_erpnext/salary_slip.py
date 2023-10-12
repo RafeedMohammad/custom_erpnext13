@@ -29,10 +29,10 @@ import erpnext
 from erpnext.setup.utils import get_exchange_rate
 from erpnext.accounts.utils import get_fiscal_year
 from erpnext.hr.utils import get_holiday_dates_for_employee, validate_active_employee
-from erpnext.loan_management.doctype.loan_repayment.loan_repayment import (
-	calculate_amounts,
-	create_repayment_entry,
-)
+# from erpnext.loan_management.doctype.loan_repayment.loan_repayment import (
+# 	# calculate_amounts,
+# 	create_repayment_entry,
+# )
 from erpnext.loan_management.doctype.process_loan_interest_accrual.process_loan_interest_accrual import (
 	process_loan_interest_accrual_for_term_loans,
 )
@@ -53,6 +53,10 @@ from erpnext.payroll.doctype.payroll_period.payroll_period import (
 )
 from erpnext.utilities.transaction_base import TransactionBase
 
+from custom_erpnext.loan_repayment import (
+	calculate_amounts,
+	create_repayment_entry,
+)
 
 class override_SalarySlip(TransactionBase):
 	def __init__(self, *args, **kwargs):
@@ -1571,7 +1575,7 @@ class override_SalarySlip(TransactionBase):
 				amounts = calculate_amounts(loan.name, self.posting_date, "Regular Payment")
 				if (
 					amounts["interest_amount"] + amounts["payable_principal_amount"]
-					> amounts["written_off_amount"]
+					> amounts["written_off_amount"]+amounts["loan_opening_amount"] 
 				):
 					if amounts["interest_amount"] > amounts["written_off_amount"]:
 						amounts["interest_amount"] -= amounts["written_off_amount"]
@@ -1586,6 +1590,21 @@ class override_SalarySlip(TransactionBase):
 					else:
 						amounts["written_off_amount"] -= amounts["payable_principal_amount"]
 						amounts["payable_principal_amount"] = 0
+
+					if amounts["interest_amount"] > amounts["loan_opening_amount"]:
+						amounts["interest_amount"] -= amounts["loan_opening_amount"]
+						amounts["loan_opening_amount"] = 0
+					else:
+						amounts["loan_opening_amount"] -= amounts["interest_amount"]
+						amounts["interest_amount"] = 0
+
+					if amounts["payable_principal_amount"] > amounts["loan_opening_amount"]:
+						amounts["payable_principal_amount"] -= amounts["loan_opening_amount"]
+						amounts["loan_opening_amount"] = 0
+					else:
+						amounts["loan_opening_amount"] -= amounts["payable_principal_amount"]
+						amounts["payable_principal_amount"] = 0
+
 
 					self.append(
 						"loans",
