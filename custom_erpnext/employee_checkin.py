@@ -25,24 +25,11 @@ from datetime import datetime,timedelta
 class override_EmployeeCheckin(Document):
 	
 	def validate(self):
-		x=datetime.now()
-		if self.card_no:
+		if self.card_no: #added card no if there is only card number with out any employee info. this fuction will fetch employee data in the field.
 			self.employee,self.employee_name = frappe.db.get_value("Employee",{"attendance_device_id":self.card_no},('name','employee_name'))
-		y=datetime.now()
-		frappe.publish_realtime('msgprint', 'Time for fetch employee from card_no ' +str(y-x))
-		e=datetime.now()	
 		validate_active_employee(self.employee)
-		f=datetime.now()
-		frappe.publish_realtime('msgprint', 'Time for validate_active check ' +str(f-e))
-		a=datetime.now()
 		self.validate_duplicate_log()
-		b=datetime.now()
-		frappe.publish_realtime('msgprint', 'Time for duplicate_log check ' +str(b-a))
-		c=datetime.now()
 		self.fetch_shift()
-		d=datetime.now()
-		frappe.publish_realtime('msgprint', 'Time for fetch shift ' +str(d-c))
-
 
 	def validate_duplicate_log(self):
 		doc = frappe.db.exists(
