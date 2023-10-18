@@ -728,7 +728,7 @@ def get_amounts(amounts, against_loan, posting_date):
 	if due_date:
 		pending_days = date_diff(posting_date, due_date) + 1
 	else:
-		last_accrual_date = get_last_accrual_date(against_loan_doc.name)
+		last_accrual_date = get_last_accrual_date(against_loan_doc.name,posting_date)# added posting date as server version has 2 arg for this function
 		pending_days = date_diff(posting_date, last_accrual_date) + 1
 
 	if pending_days > 0:

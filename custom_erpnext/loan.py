@@ -72,13 +72,13 @@ class Loan(AccountsController):
 		self.link_loan_security_pledge()
 		# Interest accrual for backdated term loans
 		self.accrue_loan_interest()
-		if(self.loan_opening_amount >0):
+		if(self.loan_opening_amount >0):#creates a gl entry when there is loan openning balance in loan for adjestment in gl entry.(loan_opening is added newly) at 11-10-23
 				self.make_gl_entries()
 
 	def on_cancel(self):
 		self.unlink_loan_security_pledge()
 		self.ignore_linked_doctypes = ["GL Entry"]
-	def make_gl_entries(self, cancel=0):
+	def make_gl_entries(self, cancel=0):# added to make gl_etry at 11-10-23
 		gl_entries = []
 
 		gl_entries.append(
