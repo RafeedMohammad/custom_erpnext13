@@ -81,6 +81,7 @@
     let count_late = 0;
 	let count_weekly = 0;
     let count_holiday= 0;
+    let count_night=0;
 
 
 %}
@@ -88,6 +89,9 @@
 {% for(let i=0; i<data.length; i++) { %}
     {% if (data[i].status == 'P') { %}
         {% count_present = count_present+1; %}
+        {% if (data[i].is_night == 'Yes') { %}
+            {% count_night = count_night+1; %}
+        {% } %}
     {% } %}
 
     {% if (data[i].status == 'A') { %}
@@ -141,6 +145,10 @@
 	<tr>
         <td>Holiday</td>
         <td>{{count_holiday}}</td>
+    </tr>
+    <tr>
+        <td>Night</td>
+        <td>{{count_night}}</td>
     </tr>
 
 </table>

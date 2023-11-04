@@ -844,7 +844,7 @@ class override_SalarySlip(TransactionBase):
 			order_by="from_date desc",
 			as_dict=True,
 		)
-		exchange_rate_usd=get_exchange_rate("USD","BDT",self.posting_date) #dollar to taka for qstml
+		exchange_rate_usd=get_exchange_rate("USD","BDT",self.posting_date) or 1 #dollar to taka for qstml
 		if(employee.group=="Worker"):
 			salary_structure_assignment["base"]= salary_structure_assignment["base"]*exchange_rate_usd  #Worker in QSTML have base in dollar
 		self.base_pay=salary_structure_assignment["base"]

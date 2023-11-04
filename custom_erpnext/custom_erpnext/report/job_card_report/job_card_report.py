@@ -90,7 +90,7 @@ def get_attendance(filters):
 	
 
 	result= frappe.db.sql("""select DISTINCT att.attendance_date, att.employee, att.shift,
-	att.in_time, att.late_entry_duration, att.out_time, att.rounded_ot, att.status, att.shift_start, att.shift_end, att.leave_type, emp.first_name
+	att.in_time, att.late_entry_duration, att.out_time, att.rounded_ot, att.status, att.shift_start, att.shift_end, att.leave_type, emp.first_name, att.is_night
 	FROM tabAttendance as att
 	INNER JOIN tabEmployee as emp ON emp.name = att.employee  	
 	where %s
@@ -190,12 +190,14 @@ def get_report_summary(data,a):
 	if not data:
 		return None
 
-	total_present=total_absent=total_leave=total_late=work_from_home=total_weekly_off=total_holiday=total_null=0
+	total_present=total_absent=total_leave=total_late=work_from_home=total_weekly_off=total_holiday=total_null=total_night=0
 	for i in range(len(data)):
 		total_null=total_null+1
 
 		if data[i][a] == 'Present':
 			total_present = total_present+1 
+			if data[i][-1] =='Yes':
+				total_night=total_night+1
 		elif data[i][a] == 'Absent':
 			total_absent = total_absent+1
 		elif data[i][a] in ['On Leave' , 'SL','CL','EL','OL','RL']:
@@ -241,6 +243,11 @@ def get_report_summary(data,a):
 		{
 			"value": total_holiday,
 			"label": _("Total Holiday"),
+			"datatype": "Int",
+		},
+		{
+			"value": total_night,
+			"label": _("Total Night"),
 			"datatype": "Int",
 		},	
 	]
