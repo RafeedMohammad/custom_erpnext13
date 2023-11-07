@@ -59,7 +59,7 @@ def add_data(
 		row = []
 		if filters.group_by:
 			row += [" "]
-		row += [emp]
+		row += [emp,emp_det.employee_name]
 
 		emp_status_map = []
 		total_ot=0
@@ -100,7 +100,7 @@ def get_columns(filters):
 	if filters.group_by:
 		columns = [_(filters.group_by) + ":Link/Branch:120"]
 
-	columns += [_("Employee") + ":Link/Employee:120",]
+	columns += [_("Employee") + ":Data:120",_("Employee Name") + ":Data/:120"]
 	days = []
 	for day in range(filters["total_days_in_month"]):
 		date = str(filters.year) + "-" + str(filters.month) + "-" + str(day + 1)
