@@ -1,0 +1,92 @@
+{%
+	var report_columns = report.get_columns_for_print();
+	report_columns = report_columns.filter(col => !col.hidden);
+
+	if (report_columns.length > 10) {
+		frappe.throw(__("Too many columns. Export the report and print it using a spreadsheet application."));
+	}
+%}
+
+
+
+<style>
+	
+	.financial-statements-blank-row td {
+		height: 12px;
+	}
+
+    tr, td{
+        border: 1px solid black;
+    }
+
+</style>
+
+
+
+<!-- <h3 class="text-center">{%= __(report.report_name) %}</h3> -->
+<!-- <h3 class="text-center">{%= filters.company %}</h3> -->
+<!-- <h4 class="text-center">{%= filters.employee %}</h4> -->
+
+
+
+
+<!-- {% let emp_name =  data[0].first_name  %}  
+<h1>{{ emp_name }}</h1> -->
+
+
+
+
+        
+
+
+
+<table class="table table-bordered">
+	<thead>
+        <tr><th class="text-center" colspan="8"><font size="+1">{%= __(report.report_name) %}</font></th></tr>
+		
+		<tr>
+            {% if (!is_null(filters.from_date)) { %}
+					<th class="text-left"><font size="+.5">From Date: {%= filters.from_date %}</font></th>
+			{% } %}
+            {% if (!is_null(filters.to_date)) { %}
+					<th class="text-left"><font size="+.5">To Date: {%= filters.to_date %}</font></th>
+			{% } %}
+			{% if (!is_null(filters.department)) { %}
+					<th class="text-left"><font size="+.5">Department: {%= filters.department %}</font></th>
+			{% } %}
+			{% if (!is_null(filters.group_name)) { %}
+					<th class="text-left"><font size="+.5">Group: {%= filters.group_name %}</font></th>
+			{% } %}
+			{% if (!is_null(filters.employee)) { %}
+					<th class="text-left" colspan="2"><font size="+.5">Employee: {%= filters.employee %}</font></th>
+			{% } %}
+		</tr>
+		<tr>
+
+			{% for (let i=0, l=report_columns.length; i<l; i++) { %}
+				<th class="text-center">{%= report_columns[i].label %}</th>
+			{% } %}
+		</tr>
+	</thead>
+	<tbody>
+		{% for(let j=0, k=data.length; j<k; j++) { %}
+			{%
+				var row = data[j];
+				var row_class = data[j].parent_account ? "" : "financial-statements-important";
+				row_class += data[j].account_name ? "" : " financial-statements-blank-row";
+			%}
+			<tr class="{%= row_class %}">
+				
+				{% for(let i=0, l=report_columns.length; i<l; i++) { %}
+					<td class="text-center">
+						{% const fieldname = report_columns[i].fieldname; %}
+						{% if (!is_null(row[fieldname])) { %}
+							{%= frappe.format(row[fieldname], report_columns[i], {}, row) %}
+						{% } %}
+					</td>
+				{% } %}
+			</tr>
+		{% } %}
+	</tbody>
+</table>
+
