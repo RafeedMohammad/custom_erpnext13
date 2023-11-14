@@ -39,7 +39,7 @@ def get_columns() -> List[Dict]:
 		},
 		{
 			"label": _("Employee"),
-			"fieldtype": "Link",
+			"fieldtype": "Data",
 			"fieldname": "employee",
 			"width": 100,
 			"options": "Employee",

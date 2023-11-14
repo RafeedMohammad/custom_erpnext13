@@ -23,17 +23,36 @@
 
 
 
-<h2 class="text-center">{%= __(report.report_name) %}</h2>
+<!-- <h2 class="text-center">{%= __(report.report_name) %}</h2>
 <h3 class="text-center">{%= filters.company %}</h3>
 <h3 class="text-center">{%= filters.employee %}</h3>
 <h3 class="text-center">{%= filters.date %}</h3>
-<h3 class="text-center">{%= filters.status %}</h3>
+<h3 class="text-center">{%= filters.status %}</h3> -->
 
 
 
 
 <table class="table table-bordered">
 	<thead>
+		<tr><th class="text-center" colspan="9"><font size="+1">{%= __(report.report_name) %}</font></th></tr>
+		
+		<tr>
+            {% if (!is_null(filters.date)) { %}
+					<th class="text-left"><font size="+.5">Date: {%= filters.date %}</font></th>
+			{% } %}
+			{% if (!is_null(filters.department)) { %}
+					<th class="text-left"><font size="+.5">Department: {%= filters.department %}</font></th>
+			{% } %}
+			{% if (!is_null(filters.group_name)) { %}
+					<th class="text-left"><font size="+.5">Group: {%= filters.group_name %}</font></th>
+			{% } %}
+			{% if (!is_null(filters.employee)) { %}
+					<th class="text-left"><font size="+.5">Employee: {%= filters.employee %}</font></th>
+			{% } %}
+			{% if (!is_null(filters.status)) { %}
+					<th class="text-left"><font size="+.5">Status: {%= filters.status %}</font></th>
+			{% } %}
+		</tr>
 		<tr>
 			{% for (let i=0, l=report_columns.length; i<l; i++) { %}
 				<th class="text-center">{%= report_columns[i].label %}</th>

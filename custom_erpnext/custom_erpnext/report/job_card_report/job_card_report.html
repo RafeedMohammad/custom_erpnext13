@@ -23,9 +23,9 @@
 
 
 
-<h2 class="text-center">{%= __(report.report_name) %}</h2>
-<h3 class="text-center">{%= filters.company %}</h3>
-<h3 class="text-center">{%= filters.employee %}</h3>
+<!-- <h3 class="text-center">{%= __(report.report_name) %}</h3> -->
+<!-- <h3 class="text-center">{%= filters.company %}</h3> -->
+<!-- <h4 class="text-center">{%= filters.employee %}</h4> -->
 <h3 class="text-center">{%= filters.date %}</h3>
 <h3 class="text-center">{%= filters.status %}</h3>
 
@@ -43,6 +43,25 @@
 
 <table class="table table-bordered">
 	<thead>
+        <tr><th class="text-center" colspan="8"><font size="+1">{%= __(report.report_name) %}</font></th></tr>
+		
+		<tr>
+            {% if (!is_null(filters.from_date)) { %}
+					<th class="text-left"><font size="+.5">From Date: {%= filters.from_date %}</font></th>
+			{% } %}
+            {% if (!is_null(filters.to_date)) { %}
+					<th class="text-left"><font size="+.5">To Date: {%= filters.to_date %}</font></th>
+			{% } %}
+			{% if (!is_null(filters.department)) { %}
+					<th class="text-left"><font size="+.5">Department: {%= filters.department %}</font></th>
+			{% } %}
+			{% if (!is_null(filters.group_name)) { %}
+					<th class="text-left"><font size="+.5">Group: {%= filters.group_name %}</font></th>
+			{% } %}
+			{% if (!is_null(filters.employee)) { %}
+					<th class="text-left"><font size="+.5">Employee: {%= filters.employee %}</font></th>
+			{% } %}
+		</tr>
 		<tr>
 
 			{% for (let i=0, l=report_columns.length; i<l; i++) { %}

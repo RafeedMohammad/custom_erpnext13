@@ -20,21 +20,41 @@
 		font-size: 11.5px;
 		margin-left: 0;
     }
+	.footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  top: 40;
+  width: 100%;
+  color: white;
+  text-align: center;
+  font-size: 11px;
+}
+.column {
+    float: left;
+    width: 25%;
+	/* padding-top: 10px; */
+    }
 
+    .row:after {
+    content: "";
+    display: table;
+    clear: both;
+    }
 </style>
 
 
 
-<h3 class="text-center">{%= filters.company %}</h3>
-<h5 class="text-center">Salary for the month of - {%= filters.month %}, {%= filters.year %}</h5>
+<!-- <h3 class="text-center">{%= filters.company %}</h3> -->
+<!-- <h4 class="text-center">Salary for the month of - {%= filters.month %}, {%= filters.year %}</h4> -->
 <h3 class="text-center">{%= filters.date %}</h3>
 <h3 class="text-center">{%= filters.status %}</h3>
-{% if (!is_null(filters.department)) { %}
+<!-- {% if (!is_null(filters.department)) { %}
 	<h6>Department: {%= filters.department %}</h6>
-{% } %}
-{% if (!is_null(filters.employee)) { %}
+{% } %} -->
+<!-- {% if (!is_null(filters.employee)) { %}
 	<h6>Department: {%= filters.employee %}</h6>
-{% } %}
+{% } %} -->
 
 
 
@@ -42,7 +62,19 @@
 <table class="table table-bordered">
 	
 	<thead>
+		<tr><th class="text-center" colspan="32"><font size="+1">Salary for the month of - {%= filters.month %}, {%= filters.year %}</font></th></tr>
 		
+		<tr>
+			{% if (!is_null(filters.department)) { %}
+					<th class="text-left" colspan="6"><font size="+.5">Department: {%= filters.department %}</font></th>
+			{% } %}
+			{% if (!is_null(filters.group_name)) { %}
+					<th class="text-left" colspan="6"><font size="+.5">Group: {%= filters.group_name %}</font></th>
+			{% } %}
+			{% if (!is_null(filters.employee)) { %}
+					<th class="text-left" colspan="6"><font size="+.5">Employee: {%= filters.employee %}</font></th>
+			{% } %}
+		</tr>
 		<tr>
 			<th>Sl No</th>
 			{% for (let i=0, l=report_columns.length; i<l; i++) { %}
@@ -70,9 +102,26 @@
 			</tr>
 		{% } %}
 	</tbody>
+	<div class="footer">
+		<div class="row">
+			<div class="column">
+			</br></br></br></br>
+				<p padding-top: 150px;><span style="text-decoration: overline;">Prepared By</span></p>
+			</div>
+			<div class="column">
+			</br></br></br></br>
+				<p padding-top: 150px;><span style="text-decoration: overline;">Checked By(HR)</span></p>
+			</div>
+			<div class="column">
+			</br></br></br></br>
+				<p padding-top: 150px;><span style="text-decoration: overline;">Checked By(A/C)</span></p>
+			</div>
+			<div class="column">
+				</br></br></br></br>
+				<p padding-top: 150px;><span style="text-decoration: overline;">Approved By</span></p>
+			</div>
+		</div>
+	  </div>	
 </table>
 
 
-<p class="text-right text-muted">
-	Printed On {%= frappe.datetime.str_to_user(frappe.datetime.get_datetime_as_string()) %}
-</p>
