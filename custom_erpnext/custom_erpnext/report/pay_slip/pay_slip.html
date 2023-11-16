@@ -32,6 +32,27 @@
 	p{
 		font-size: 12.5px;
 	}
+	.footer {
+		padding-top: 60%;
+		position: fixed;
+		left: 0;
+		bottom: 0;
+		width: 100%;
+		color: white;
+		text-align: center;
+		font-size: 11px;
+		}
+		.column {
+			float: left;
+			width: 25%;
+			/* padding-top: 10px; */
+			}
+	
+		.row:after {
+		content: "";
+		display: table;
+		clear: both;
+		}
 
 </style>
 
@@ -105,6 +126,16 @@
 			<td colspan="4">&nbsp;</td>
 			<td colspan="2">Gross Payable: {{data[j].gross_payable}}</td>
 			<td colspan="2">Net Payable:{{data[j].net_pay}} </td>   
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td colspan="2"><span style="text-decoration: overline;">Prepared By</span></td>
+			<td colspan="2"><span style="text-decoration: overline;">Checked By(HR)</span></td>
+			<td colspan="2"><span style="text-decoration: overline;">Checked By(A/c)</span></td>
+			<td colspan="2"><span style="text-decoration: overline;">Approved By</span></td>
+
 		</tr>
 	
 		{% for(let j=0, k=data.length; j<k; j++) { %}
