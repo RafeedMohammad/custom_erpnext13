@@ -137,12 +137,12 @@ def get_columns(salary_slips):
 		# _("Salary Slip ID") + ":Link/Salary Slip:150",
 		_("Employee") + "::80",
 		_("Employee Name") + "::40",
-		_("Date of Joining") + "::12",
+		_("Joining_Date") + "::12",
 		_("Designation") + "::40",
 		# _("Start Date") + "::80",
 		# _("End Date") + "::80",
 		_("Basic") + "::10",
-		_("Allowance") + "::10",
+		_("Allow-ance") + "::10",
 		_("Gross") + "::10",
 		_("P") + ":Integer:5",
 		_("W/H") + ":Integer:5",
@@ -187,7 +187,7 @@ def get_columns(salary_slips):
 			_("Advance") + ":Integer:10",
 			_("Total Deduction") + ":Integer:20",
 			_("Net Pay") + ":Integer:20",
-			_("Signature & Stamp") + ":Text:10",
+			_("Signature_&_Stamp") + ":Text:10",
 
 		]
 		
