@@ -33,9 +33,9 @@ def get_data(filters):
 	result = frappe.db.sql("""SELECT emp.name,emp.company,emp.image , emp.employee_name, emp.department ,emp.designation, emp.date_of_joining,emp.blood_group, emp.cell_number ,com.company_logo FROM tabEmployee as emp INNER JOIN tabCompany as com ON emp.company = com.name  where %s""" 
 	% conditions, as_list=1)
 
-	for i in range(0,len(result)):
-		if result[i][2] is None:
-			result[1][2]=result[i][-1]
+	# for i in range(0,len(result)):
+	# 	if result[i][2] is None:
+	# 		result[1][2]=result[i][-1]
 
 	# data = frappe.get_all(
 	# 	"Employee",
