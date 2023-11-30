@@ -30,7 +30,7 @@ frappe.query_reports["Employee ID Card"] = {
 			"mandatory": 0,
 			// "default":"Admin (GSD) - QSTML",
 			"options": "Department",
-			"wildcard_filter": 0
+			"wildcard_filter": 0,
 		},
 		{
 			"fieldname": "designation",
@@ -42,11 +42,17 @@ frappe.query_reports["Employee ID Card"] = {
 		},
 		{
 			"fieldname": "status",
-			"fieldtype": "Data",
+			"fieldtype": "Select",
 			"label": "Employee Status",
 			"mandatory": 0,
 			"default":"Active",
-			"options": "Active,Left",
+			// "options": "Active,Left",
+			options: [
+                'Active',
+                'Left',
+                // 'Half-Yearly',
+                // 'Yearly'
+            ],
 			"wildcard_filter": 0
 		},
 			
