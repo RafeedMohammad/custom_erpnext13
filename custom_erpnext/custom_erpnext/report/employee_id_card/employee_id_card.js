@@ -50,8 +50,6 @@ frappe.query_reports["Employee ID Card"] = {
 			options: [
                 'Active',
                 'Left',
-                // 'Half-Yearly',
-                // 'Yearly'
             ],
 			"wildcard_filter": 0
 		},

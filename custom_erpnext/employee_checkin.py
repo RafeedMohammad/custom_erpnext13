@@ -382,3 +382,25 @@ def skip_attendance_in_checkins(log_names, attendance):
 		.set("attendance",attendance) #added
 		.where(EmployeeCheckin.name.isin(log_names))
 	).run()
+
+
+@frappe.whitelist()
+def get_employee_for_zk(department=None):
+	employee=frappe.db.get_list('Employee',
+    filters={
+        "status":"Active",
+		"Department":department,
+    },
+    fields=["name", "employee_name", "attendance_device_id"],
+	as_list=1	
+	)
+
+	# employee = frappe.db.get_values(
+	# 	"Employee",
+	# 	{"status":"active"},
+	# 	["name", "employee_name", "attendance_device_id"],
+	# 	as_dict=True,
+	# )
+	# frappe.publish_realtime('msgprint', employee)
+	
+	return employee

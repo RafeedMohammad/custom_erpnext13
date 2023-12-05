@@ -48,12 +48,28 @@ def get_data(filters):
 	
 
 def get_conditions(filters):
-    conditions="" 
-    if filters.get("company"): conditions += "company= '%s'" % filters["company"]
-    if filters.get("employee"): conditions += " and employee= '%s'" % filters["employee"]
-    if filters.get("department"): conditions += "and department= '%s'" % filters["department"]
-    if filters.get("designation"): conditions += " and designation='%s'" % filters["designation"]
-    if filters.get("status"): conditions += " and status='%s'" % filters["status"]
-	
-    return conditions, filters
+	conditions="" 
+	if filters.get("company"): conditions += "company= '%s'" % filters["company"]
+	# if (filters.get("employee")): 
+	# 	valu = list(map(str.strip, (filters.get("employee")).split(','))) 
+	# # frappe.publish_realtime('msgprint', valu)		
+	# 	for i in range(0,len(valu)): 
+	# 		if(i==len(valu)-1):
+	# 			val= '"'+valu[i]+'"'	
+	# 		else:
+	# 			val= '"'+valu[i]+'",'
+	# 		val=val.replace("\ ","")
+	# 	conditions += " and employee in '%s'" % val.replace
+	# if filters.get("employee"): conditions += "employee in ('%s'" % filters["employee"]
+	# if filters.get("employee1"): conditions += ",'%s'" % filters["employee1"]
+	# if filters.get("employee2"): conditions += "'%s'" % filters["employee2"]
+	# if filters.get("employee"): conditions += ")"
+	if filters.get("employee"): conditions += "and employee= '%s'" % filters["employee"]
+
+
+	if filters.get("department"): conditions += "and department= '%s'" % filters["department"]
+	if filters.get("designation"): conditions += " and designation='%s'" % filters["designation"]
+	if filters.get("status"): conditions += " and status='%s'" % filters["status"]
+
+	return conditions, filters
 
