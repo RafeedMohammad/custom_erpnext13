@@ -403,4 +403,4 @@ def get_employee_for_zk(department=None):#custom code for pull data from employe
 	)
 	for i in range(0,len(employee)):
 		frappe.db.set_value('Employee', employee[i][0], 'attendance_device_id',int(max_user_id[0][0])+i+1)
-	return employee,max_user_id
+	return employee
