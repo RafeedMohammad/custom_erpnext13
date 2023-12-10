@@ -30,6 +30,7 @@ class override_EmployeeCheckin(Document):
 		validate_active_employee(self.employee)
 		self.validate_duplicate_log()
 		self.fetch_shift()
+		get_employee_for_zk()
 
 	def validate_duplicate_log(self):
 		doc = frappe.db.exists(
@@ -385,22 +386,21 @@ def skip_attendance_in_checkins(log_names, attendance):
 
 
 @frappe.whitelist()
-def get_employee_for_zk(department=None):
+def get_employee_for_zk(department=None):#custom code for pull data from employee to device"
+	
+	max_user_id=frappe.db.sql("""select max(attendance_device_id) from tabEmployee""") or 0
+	if max_user_id[0][0] is None:
+		max_user_id=('0')
 	employee=frappe.db.get_list('Employee',
     filters={
         "status":"Active",
 		"Department":department,
+		"employee_card_number": ["is", "set"],
+		"attendance_device_id": ["is", "not set"]
     },
-    fields=["name", "employee_name", "attendance_device_id"],
-	as_list=1	
+    fields=["name", "employee_name", "attendance_device_id","employee_card_number"],
+	as_list=1
 	)
-
-	# employee = frappe.db.get_values(
-	# 	"Employee",
-	# 	{"status":"active"},
-	# 	["name", "employee_name", "attendance_device_id"],
-	# 	as_dict=True,
-	# )
-	# frappe.publish_realtime('msgprint', employee)
-	
-	return employee
+	for i in range(0,len(employee)):
+		frappe.db.set_value('Employee', employee[i][0], 'attendance_device_id',int(max_user_id[0][0])+i+1)
+	return employee,max_user_id
