@@ -23,20 +23,20 @@
       gap: 40px;
       justify-content: center;
       align-items: center;
-      /* margin-top: 20px; */
+      margin-top: 20px; 
     }
 
     .box {
       width: 200px;
       height: 320px;
       /* background-color: lightblue; */
-      /* border: 1px solid #333; */
+      border: 1px solid #333;
       display: flex;
       flex-direction:row;
       max-width: fit-content;
       justify-content: space-between;
       /* align-items: center; */
-      padding-top: 17px;
+      padding-top: 20px;
     }
 
     .id-card {
@@ -74,8 +74,8 @@
     }
 
     .info {
-      margin-top: 10px;
-      font-size: 0.8em;
+      margin-top: 1px;
+      font-size: 0.7em;
     }
     .Sign{
       float: right;
@@ -111,8 +111,8 @@
             <p><nobr>{{data[j].employee_name}}</nobr></p>
           </div>
           <div class="info">
-            <p><nobr> Designation: {{data[j].designation}}</br>Department: {{data[j].department}}<br /> Joining Date: {{data[j].joining_date}}
-              <br /> Blood Group: {{ data[j].blood_group}}<br /> EMC No.:{{ data[j].phone_no}}</nobr></p> <br/>
+            <p><nobr> Designation  &nbsp;: {{data[j].designation}}</br>Department &nbsp;: {{data[j].department}}<br /> Joining Date : {{data[j].joining_date}}
+              <br /> Blood Group : {{ data[j].blood_group}}<br /> EMC No.  &nbsp; &nbsp; &nbsp; :{{ data[j].phone_no}}</nobr></p> 
               <img style="float: right;" src="{{data[j].boss_signature}}" alt="Signature" height="12px" width="80px"><br/>
               <p class="Sign">Authorized Signature</p>
           </div>
