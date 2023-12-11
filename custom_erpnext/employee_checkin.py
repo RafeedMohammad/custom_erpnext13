@@ -30,7 +30,8 @@ class override_EmployeeCheckin(Document):
 		validate_active_employee(self.employee)
 		self.validate_duplicate_log()
 		self.fetch_shift()
-		get_employee_for_zk()
+		# get_employee_for_zk()
+		#get_all_employee_for_att_device()
 
 	def validate_duplicate_log(self):
 		doc = frappe.db.exists(
@@ -419,5 +420,5 @@ def get_all_employee_for_att_device(department=None):#custom code for pull data 
 	as_list=1
 	)
 	for i in range(0,len(employee)):
-		frappe.db.set_value('Employee', employee[i][0], 'attendance_device_id','')
+		frappe.db.set_value('Employee', employee[i][0], 'attendance_device_id',None)
 	return employee
