@@ -27,8 +27,8 @@
     }
 
     .box {
-      width: 200px;
-      height: 270px;
+      width: 198px;
+      height: 287px;
       /* background-color: lightblue; */
       border: 1px solid #333;
       display: flex;
@@ -56,7 +56,7 @@
     .header {
       grid-area: header;
       text-align: center;
-      width: 190px;
+      width: 188px;
     }
 
     .sidebar {
@@ -71,18 +71,18 @@
     .content {
       grid-area: content;
       position: relative;
-      width: 175px;
+      width: 173px;
       margin-top: -5px;
     }
 
     .info {
-      margin-top: -3px;
+      margin-top: -1px;
       font-size: 0.7em;
     }
     .Sign{
       float: right;
-            padding-top: 1px; /* Adjust the value as needed */
-            border-top: 1px solid black; 
+      padding-top: 1px; /* Adjust the value as needed */
+      border-top: 1px solid black; 
     }
   </style>
 
@@ -104,16 +104,16 @@
             <img src="{{data[j].company_logo}}" alt="logo" height="30px" width="40px">
             <span>ID NO: {{data[j].name}}</span>
           </div>
-          <p><b><font size="2%">{{data[j].company}}</font></b></p>
+          <p style="padding-top: 2px;"><b><font size="2%">{{data[j].company}}</font></b></p>
       </div>
         <div class="sidebar"><font size="3%"><b>IDENTITY CARD</b></font></div>
         <div class="content">
           <div style="text-align: center;">
-            <img src="{{data[j].image}}" alt="Employee Picture" height="90px" width="100px">
+            <img src="{{data[j].image}}" alt="Employee Picture" height="105px" width="90px">
             <p><nobr>{{data[j].employee_name}}</nobr></p>
           </div>
           <div class="info">
-            <p><nobr> Designation  &nbsp;: {{data[j].designation}}</br>Department &nbsp;: {{data[j].department}}<br /> Joining Date : {{data[j].joining_date}}
+            <p ><nobr> Designation  &nbsp;: {{data[j].designation}}</br>Department &nbsp;: {{data[j].department}}<br /> Joining Date : {{data[j].joining_date}}
               <br /> Blood Group : {{ data[j].blood_group}}<br /> EMC No.  &nbsp; &nbsp; &nbsp; :{{ data[j].phone_no}}</nobr></p> 
               <img style="float: right;" src="{{data[j].boss_signature}}" alt="Signature" height="24px" width="80px"><br/><br/>
               <p class="Sign">Authorized Signature</p>
