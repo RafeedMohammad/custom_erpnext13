@@ -403,11 +403,11 @@ def get_employee_for_zk(department=None):#custom code for pull data from employe
 	as_list=1
 	)
 	for i in range(0,len(employee)):
-		frappe.db.set_value('Employee', employee[i][0], 'attendance_device_id',int(employee[i][3]))
+		frappe.db.set_value('Employee', employee[i][0], 'attendance_device_id',int(max_user_id[0][0])+i+1)
 	return employee,max_user_id
 
 @frappe.whitelist()
-def get_all_employee_for_att_device(department=None):#custom code for pull data from employee and give to device for delete user
+def get_left_employees_for_att_device(department=None):#custom code for pull data from employee and give to device for delete user
 	
 	employee=frappe.db.get_list('Employee',
     filters={
@@ -419,6 +419,6 @@ def get_all_employee_for_att_device(department=None):#custom code for pull data 
     fields=["name", "employee_name", "attendance_device_id"],
 	as_list=1
 	)
-	for i in range(0,len(employee)):
-		frappe.db.set_value('Employee', employee[i][0], 'attendance_device_id',None)
+	# for i in range(0,len(employee)):
+	# 	frappe.db.set_value('Employee', employee[i][0], 'attendance_device_id',None)
 	return employee
