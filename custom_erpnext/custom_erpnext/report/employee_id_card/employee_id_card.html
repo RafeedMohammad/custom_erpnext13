@@ -48,7 +48,7 @@
         "sidebar content content";
       background-color: #fff;
       color: #333;
-      border-radius: 5px;
+      /* border-radius: 5px; */
       /* padding: 1px; */
       font-size: 1em;
     }
@@ -72,6 +72,7 @@
       grid-area: content;
       position: relative;
       width: 175px;
+      margin-top: -5px;
     }
 
     .info {
@@ -103,7 +104,7 @@
             <img src="{{data[j].company_logo}}" alt="logo" height="30px" width="40px">
             <span>ID NO: {{data[j].name}}</span>
           </div>
-          <h5>{{data[j].company}}</h5>
+          <p><b><font size="2%">{{data[j].company}}</font></b></p>
       </div>
         <div class="sidebar"><font size="3%"><b>IDENTITY CARD</b></font></div>
         <div class="content">
@@ -114,7 +115,7 @@
           <div class="info">
             <p><nobr> Designation  &nbsp;: {{data[j].designation}}</br>Department &nbsp;: {{data[j].department}}<br /> Joining Date : {{data[j].joining_date}}
               <br /> Blood Group : {{ data[j].blood_group}}<br /> EMC No.  &nbsp; &nbsp; &nbsp; :{{ data[j].phone_no}}</nobr></p> 
-              <img style="float: right;" src="{{data[j].boss_signature}}" alt="Signature" height="12px" width="80px"><br/>
+              <img style="float: right;" src="{{data[j].boss_signature}}" alt="Signature" height="24px" width="80px"><br/><br/>
               <p class="Sign">Authorized Signature</p>
           </div>
         </div>
