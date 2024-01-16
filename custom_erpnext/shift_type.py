@@ -214,7 +214,7 @@ class override_ShiftType(Document):
 			self.working_hours_threshold_for_half_day
 			and total_working_hours < self.working_hours_threshold_for_half_day
 		):
-			return "Half Day", total_working_hours, late_entry, early_exit, in_time, out_time,overtime
+			return "Half Day", total_working_hours, late_entry, early_exit, in_time, out_time,late_entry_duration,overtime
 		return "Present", total_working_hours, late_entry, early_exit, in_time, out_time, late_entry_duration,overtime
 
 	def mark_absent_for_dates_with_no_attendance(self, employee):
