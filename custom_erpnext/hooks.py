@@ -100,6 +100,7 @@ override_doctype_class = {
 	"Payroll Entry":"custom_erpnext.payroll_entry.PayrollEntry",
     "Loan Repayment":"custom_erpnext.loan_repayment.override_LoanRepayment",
     "Loan" : "custom_erpnext.loan.Loan",
+    "Department" : "custom_erpnext.department.Department",
 	#"Asset": "custom_erpnext.asset.override_Asset",
 }
 

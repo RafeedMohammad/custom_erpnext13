@@ -31,7 +31,7 @@ def get_columns():
 
 def get_data(filters):
 	conditions, filters = get_conditions(filters)
-	result = frappe.db.sql("""SELECT emp.name,emp.company,emp.image , emp.employee_name, emp.department ,emp.designation,TO_CHAR(emp.date_of_joining, 'dd-mm-YYYY'),emp.blood_group, emp.cell_number ,com.company_logo,com.lai_boss_signature FROM tabEmployee as emp INNER JOIN tabCompany as com ON emp.company = com.name  where %s""" 
+	result = frappe.db.sql("""SELECT emp.name,emp.company,emp.image , emp.employee_name, emp.department ,emp.designation,TO_CHAR(emp.date_of_joining, 'dd-mm-YYYY'),emp.blood_group, emp.emergency_phone_number ,com.company_logo,com.lai_boss_signature FROM tabEmployee as emp INNER JOIN tabCompany as com ON emp.company = com.name  where %s""" 
 	% conditions, as_list=1)
 
 	# for i in range(0,len(result)):
@@ -64,12 +64,16 @@ def get_conditions(filters):
 	# if filters.get("employee1"): conditions += ",'%s'" % filters["employee1"]
 	# if filters.get("employee2"): conditions += "'%s'" % filters["employee2"]
 	# if filters.get("employee"): conditions += ")"
-	if filters.get("employee"): conditions += "and employee= '%s'" % filters["employee"]
+	if filters.get("employee"): conditions += " and employee in %s'" % filters["employee"]
 
 
-	if filters.get("department"): conditions += "and department= '%s'" % filters["department"]
+	if filters.get("department"): conditions += " and department= '%s'" % filters["department"]
 	if filters.get("designation"): conditions += " and designation='%s'" % filters["designation"]
 	if filters.get("status"): conditions += " and status='%s'" % filters["status"]
 
+	#frappe.publish_realtime('msgprint', 'condition = '+conditions)		
+	conditions=conditions.replace("]'", ")")
+	conditions=conditions.replace("[", "(")
+	
 	return conditions, filters
 

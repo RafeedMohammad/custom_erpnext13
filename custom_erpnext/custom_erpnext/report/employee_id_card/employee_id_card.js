@@ -16,12 +16,16 @@ frappe.query_reports["Employee ID Card"] = {
 		},
 		{
 			"fieldname": "employee",
-			"fieldtype": "Link",
+			// "fieldtype": "Link",
 			"label": "Employee",
 			"mandatory": 0,
+			"fieldtype": "MultiSelectList",
 			// "default":"Tah 120",
 			"options": "Employee",
-			"wildcard_filter": 0
+			"wildcard_filter": 0,
+			"get_data": function(txt) {
+				return frappe.db.get_link_options("Employee", txt);
+			 }
 		},
 		{
 			"fieldname": "department",
