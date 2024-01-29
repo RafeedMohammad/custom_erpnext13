@@ -168,7 +168,7 @@ def get_report_summary(data,a):
 			total_present = total_present+1 
 		elif data[i][a] == 'Absent':
 			total_absent = total_absent+1
-		elif data[i][a] in ['On Leave' , 'SL','CL','EL','OL']:
+		elif data[i][a] in ['On Leave' , 'SL','CL','EL','OL','RL', 'Maternity Leave', 'Sick Leave', 'Miscarriage Leave','Casual Leave','Earn Leave','Leave Without Pay']:
 			total_leave = total_leave+1
 		elif data[i][a] == 'Late':
 			total_late = total_late+1 

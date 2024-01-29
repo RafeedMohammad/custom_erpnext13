@@ -105,7 +105,51 @@
         {% count_late = count_late+1; %}
     {% } %}
 
-    {% if (data[i].status == 'OL') { %}
+    {% if (data[i].status == 'On Leave') { %}
+        {% count_onLeave = count_onLeave+1; %}
+    {% } %}
+
+	{% if (data[i].status == 'SL') { %}
+        {% count_onLeave = count_onLeave+1; %}
+    {% } %}
+
+	{% if (data[i].status == 'CL') { %}
+        {% count_onLeave = count_onLeave+1; %}
+    {% } %}
+
+	{% if (data[i].status == 'EL') { %}
+        {% count_onLeave = count_onLeave+1; %}
+    {% } %}
+
+	{% if (data[i].status == 'OL') { %}
+        {% count_onLeave = count_onLeave+1; %}
+    {% } %}
+
+	{% if (data[i].status == 'RL') { %}
+        {% count_onLeave = count_onLeave+1; %}
+    {% } %}
+
+	{% if (data[i].status == 'Maternity Leave') { %}
+        {% count_onLeave = count_onLeave+1; %}
+    {% } %}
+
+	{% if (data[i].status == 'Sick Leave') { %}
+        {% count_onLeave = count_onLeave+1; %}
+    {% } %}
+
+	{% if (data[i].status == 'Miscarriage Leave') { %}
+        {% count_onLeave = count_onLeave+1; %}
+    {% } %}
+
+	{% if (data[i].status == 'Casual Leave') { %}
+        {% count_onLeave = count_onLeave+1; %}
+    {% } %}
+
+	{% if (data[i].status == 'Earn Leave') { %}
+        {% count_onLeave = count_onLeave+1; %}
+    {% } %}
+
+	{% if (data[i].status == 'Leave Without Pay') { %}
         {% count_onLeave = count_onLeave+1; %}
     {% } %}
 

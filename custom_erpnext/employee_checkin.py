@@ -389,7 +389,8 @@ def skip_attendance_in_checkins(log_names, attendance):
 @frappe.whitelist()
 def get_employee_for_zk(department=None):#custom code for pull data from employee and give to device for add user
 	
-	max_user_id=frappe.db.sql("""select max(attendance_device_id) from tabEmployee""") or 0
+	#max_user_id=frappe.db.sql("""select max(attendance_device_id) from tabEmployee""") or 0
+	max_user_id=frappe.db.sql("""SELECT CAST(SUBSTRING_INDEX(attendance_device_id, ' ', -1) AS UNSIGNED) AS numeric_value FROM  tabEmployee ORDER BY numeric_value DESC LIMIT 1""") or 0
 	if max_user_id[0][0] is None:
 		max_user_id=('0')
 	employee=frappe.db.get_list('Employee',
