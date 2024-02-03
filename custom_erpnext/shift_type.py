@@ -209,7 +209,7 @@ class override_ShiftType(Document):
 			self.working_hours_threshold_for_absent
 			and total_working_hours < self.working_hours_threshold_for_absent
 		): 
-			return "Absent", total_working_hours, late_entry, early_exit, in_time, out_time,0,0
+			return "Absent", total_working_hours, late_entry, early_exit, in_time, out_time,0,overtime
 		if (
 			self.working_hours_threshold_for_half_day
 			and total_working_hours < self.working_hours_threshold_for_half_day
