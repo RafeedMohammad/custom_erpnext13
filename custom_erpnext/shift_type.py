@@ -200,8 +200,8 @@ class override_ShiftType(Document):
 		if(weekly_off_check==0):
 			return "Holiday", total_working_hours, 0, early_exit, in_time, out_time, 0,overtime
 		
-		if(late_entry):
-			return "Late", total_working_hours, late_entry, early_exit, in_time, out_time, late_entry_duration,overtime
+		if (len(logs)==1 or out_time-in_time<timedelta(minutes=5)):
+			return "Present", total_working_hours, late_entry, early_exit, in_time, out_time, late_entry_duration,overtime
 
 		#change end
 
@@ -215,6 +215,8 @@ class override_ShiftType(Document):
 			and total_working_hours < self.working_hours_threshold_for_half_day
 		):
 			return "Half Day", total_working_hours, late_entry, early_exit, in_time, out_time,late_entry_duration,overtime
+		if(late_entry):
+			return "Late", total_working_hours, late_entry, early_exit, in_time, out_time, late_entry_duration,overtime
 		return "Present", total_working_hours, late_entry, early_exit, in_time, out_time, late_entry_duration,overtime
 
 	def mark_absent_for_dates_with_no_attendance(self, employee):
