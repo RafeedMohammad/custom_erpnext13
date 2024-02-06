@@ -64,7 +64,7 @@ def get_attendance(filters):
 	FROM tabAttendance
 	LEFT JOIN tabEmployee ON tabEmployee.name = tabAttendance.employee 
 	where  %s
-	ORDER BY tabAttendance.department , tabAttendance.attendance_date""" 
+	ORDER BY tabEmployee.employee , tabAttendance.attendance_date""" 
 		% conditions, 
 		as_list=1)
 		

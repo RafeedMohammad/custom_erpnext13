@@ -94,7 +94,7 @@ def get_attendance(filters):
 	FROM tabAttendance as att
 	INNER JOIN tabEmployee as emp ON emp.name = att.employee  	
 	where %s
-	ORDER BY att.attendance_date and att.employee""" 
+	ORDER BY att.attendance_date desc""" 
 	% conditions, as_list=1)
 
 

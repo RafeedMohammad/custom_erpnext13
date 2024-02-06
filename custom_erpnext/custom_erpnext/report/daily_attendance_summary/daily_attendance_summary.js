@@ -21,12 +21,12 @@ frappe.query_reports["Daily Attendance Summary"] = {
             "options": "Company",
             "wildcard_filter": 0
         },
-		{
-			"fieldname":"group_by",
-			"label": __("Group By"),
-			"fieldtype": "Select",
-			"options": ["","Branch","Grade","Department","Designation"]
-		},
+		// {
+		// 	"fieldname":"group_by",
+		// 	"label": __("Group By"),
+		// 	"fieldtype": "Select",
+		// 	"options": ["","Branch","Grade","Department","Designation"]
+		// },
 
 	]
 };
