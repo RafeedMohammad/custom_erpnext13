@@ -196,7 +196,7 @@ erpnext.EmployeeSelector = class EmployeeSelector {
 					}
 				});
 				frappe.call({
-					method: "erpnext.hr.doctype.shift_assignment_tool.shift_assignment_tool.mark_employee_attendance1",
+					method: "custom_erpnext.custom_erpnext.doctype.shift_assignment_tool.shift_assignment_tool.mark_employee_attendance1",
 					args:{
 						"employee_list":employees_to_shift,
 						"shift": frm.doc.change_shift_to,

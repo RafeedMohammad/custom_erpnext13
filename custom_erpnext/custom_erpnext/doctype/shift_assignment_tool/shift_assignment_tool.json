@@ -10,6 +10,7 @@
   "department",
   "designation",
   "select_shift",
+  "employee_id",
   "column_break_5",
   "floor",
   "facility_or_line",
@@ -125,12 +126,19 @@
    "fieldname": "to_date",
    "fieldtype": "Date",
    "label": "To Date"
+  },
+  {
+   "default": "0",
+   "fieldname": "employee_id",
+   "fieldtype": "Link",
+   "label": "Employee Id",
+   "options": "Employee"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-12-29 16:18:17.076250",
+ "modified": "2024-02-11 10:52:50.325310",
  "modified_by": "Administrator",
  "module": "Custom Erpnext",
  "name": "Shift Assignment Tool",
