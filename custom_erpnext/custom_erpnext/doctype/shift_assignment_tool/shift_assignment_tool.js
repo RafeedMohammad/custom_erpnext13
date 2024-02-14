@@ -14,7 +14,6 @@ frappe.ui.form.on('Shift Assignment Tool', {
 
 	select_shift: function(frm){
 		erpnext.shift_assignment_tool.load_employees(frm);
-
 	},
 
 	department: function(frm) {
@@ -216,7 +215,7 @@ erpnext.EmployeeSelector = class EmployeeSelector {
 		
 		var row;
 		$.each(employee, function(i, m) {
-			if (i===0 || (i % 2) === 0) {
+			if (i===0 || (i % 1) === 0) {
 				row = $('<div class="row"></div>').appendTo(me.wrapper);
 			}
 
@@ -224,7 +223,7 @@ erpnext.EmployeeSelector = class EmployeeSelector {
 				<div class="checkbox">\
 				<label><input type="checkbox" class="employee-check" employee="%(employee)s"/>\
 				%(employee)s</label>\
-				</div></div>', {employee: m.employee + ": " + m.employee_name})).appendTo(row); //was: m.employee_name
+				</div></div>', {employee:m[0] + ": " + m[1]+"\t Assign_shift="+m[2]+"\t End_date="+m[3]})).appendTo(row); //was: m.employee_name
 		});
 
 		mark_employee_toolbar.appendTo($(this.wrapper));

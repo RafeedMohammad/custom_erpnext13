@@ -50,11 +50,12 @@ class override_ShiftType(Document):
 	def process_auto_attendance(self,from_date=None,to_date=None): #added from date to date in oder to access the date given in mark attendance in shift type front desk
 		#frappe.publish_realtime('msgprint', 'Starting process for '+self.name+' at-> '+str(datetime.now()))
 		if from_date and to_date:
+			self.process_attendance_after1=datetime.strptime(str(from_date)+ " "+str(self.start_time-timedelta(minutes=self.begin_check_in_before_shift_start_time-2)),"%Y-%m-%d %H:%M:%S")
 			self.process_attendance_after=from_date
 			#self.name=name
 			shift_start_time =to_date+" "+ str(self.start_time)
 			self.last_sync_of_checkin = datetime.strptime(shift_start_time, "%Y-%m-%d %H:%M:%S")+timedelta(days=1,hours=2)
-			# frappe.publish_realtime("msgprint",self.last_sync_of_checkin)
+			# frappe.publish_realtime("msgprint",self.process_attendance_after1)
 			# added to set eligiable time for the shifts to process the attendance which is given in mark attendance in shift type front desk
 		if (
 			not cint(self.enable_auto_attendance)
@@ -65,7 +66,7 @@ class override_ShiftType(Document):
 		filters = {
 			"skip_auto_attendance": "0",
 			#"attendance": ("is", "not set"),
-			"time": (">=", self.process_attendance_after),
+			"time": (">=", self.process_attendance_after1),
 			"shift_actual_end": ("<", self.last_sync_of_checkin),
 			"shift": self.name,
 		}

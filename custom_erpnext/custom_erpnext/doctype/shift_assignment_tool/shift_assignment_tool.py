@@ -19,16 +19,55 @@ class ShiftAssignmentTool(Document):
 def get_employees(date, shift = None , department=None, designation=None, floor=None, facility_or_line=None, section=None, group=None, company=None, employee_id=None):
 	attendance_not_marked = []
 	attendance_marked = []
-	filters = {"status": "Active", "date_of_joining": ["<=", date]}
+	# filters = {"status": "Active", "emp.date_of_joining": ["<=", date,],"sa.start_date": ["<=", date,],"sa.end_date": [">=", date,]}
 
-	for field, value in {"default_shift": shift, "department": department, "designation": designation, "floor": floor, "facility_or_line":facility_or_line, "section":section, "group":group, "company": company, "employee": employee_id }.items():
-		if value:
-			filters[field] = value
+	# for field, value in {"default_shift": shift, "department": department, "designation": designation, "floor": floor, "facility_or_line":facility_or_line, "section":section, "group":group, "company": company, "employee": employee_id }.items():
+	# 	if value:
+	# 		filters[field] = value
 
-	employee_list = frappe.get_list(
-		"Employee", fields=["employee", "employee_name"], filters=filters, order_by="employee asc"
+	conditions="" 
+	
+	#if company: conditions += " and emp.company= '%s'" %company
+	if employee_id: conditions += " and emp.employee= '%s'" % employee_id
+	if department: conditions += " and emp.department= '%s'" % department
+	if designation: conditions += " and emp.designation='%s'" % designation
+	if shift: conditions += " and sa.shift_type='%s'" % shift
+	if section: conditions += " and emp.section='%s'" % section
+	if floor: conditions += " and emp.floor='%s'" % floor
+	if facility_or_line: conditions += " and emp.facility_or_line='%s'" % facility_or_line
+	
+	join_condition=""
+	if date: join_condition += str(date)+ " between sa.start_date and sa.end_date"
+	# if group_name: conditions += " and emp.group='%s'" % group_name
+	# if status: conditions += " and .status='%s'" % status
+
+
+	employee_list1 = frappe.get_list(
+		"Employee", fields=["employee", "employee_name"]
 	)
+	employee_list = frappe.db.sql(
+	"""
+	select DISTINCT emp.name as employee,  emp.employee_name as employee_name, sa.shift_type as shift,sa.end_date as end_date
+
+	FROM tabEmployee emp
+	LEFT JOIN `tabShift Assignment` sa ON emp.name = sa.employee and %s
+	WHERE emp.status = "Active"
+	 %s	
+	""" 
+		%(join_condition,conditions),
+		as_list=1)
+	
+	# employee_list = frappe.db.sql(
+	# """
+	# select emp.name as employee,  emp.employee_name as employee_name
+
+	# FROM emp emp
+	# """ 
+	# 	,
+	# 	as_list=1)
 	# marked_employee = {}
+	#frappe.publish_realtime('msgprint', employee_list)
+
 
 	# for emp in frappe.get_list(
 	# 	"Attendance", fields=["employee", "status"], filters={"attendance_date": date}
