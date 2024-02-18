@@ -13,9 +13,9 @@ def execute(filters= None):
 	return columns, data
 
 def get_columns():
-	shifts = frappe.get_all("Shift Type", fields=["name"],order_by="name")
+	shifts = frappe.get_all("Shift Type", fields=["name","start_time"],order_by="name")
 	#frappe.publish_realtime('msgprint', shif	
-	shift_columns = [shift["name"] + ":Data/:90" for shift in shifts]
+	shift_columns = [shift["name"] +" "+ str(shift["start_time"])[:-3].strip().replace(":",".") +":Data/:90" for shift in shifts]
 	return [
 		_("Department") + ":Data/:120",
 		_("Current Manpower") + ":Data/:90",	
@@ -35,10 +35,20 @@ def get_columns():
 def get_data(filters):
 	conditions, filters = get_conditions(filters)
 	shifts = frappe.get_all("Shift Type", fields=["name"],order_by="name")
+	
 	aggregate_string = ""
+
 	for shift in shifts:
-		field_string_for_shift ="SUM(CASE WHEN att.shift='"+str(shift["name"])+"' THEN 1 ELSE 0 END),"
+		field_string_for_shift ="SUM(CASE WHEN ifnull(sa.shift_type,emp.default_shift)='"+str(shift["name"])+"' THEN 1 ELSE 0 END),"
 		aggregate_string += field_string_for_shift
+
+	att_join_condition=""
+	if filters.get("date"): att_join_condition += "AND (att.attendance_date IS NULL OR att.attendance_date ='"+filters["date"]+"')"
+	
+	sa_join_condition=""
+	if filters.get("date"): sa_join_condition += "AND ('"+filters["date"]+"' between sa.start_date and sa.end_date)"
+
+
 	result= frappe.db.sql("""select DISTINCT emp.department,count(*),
 					   %s
 	SUM(CASE WHEN att.status in ('Present','Late','Half Day') THEN 1 ELSE 0 END),
@@ -50,10 +60,13 @@ def get_data(filters):
 	SUM(CASE WHEN emp.status_condition in ('Discharge','Discontinue','Resign') THEN 1 ELSE 0 END),	
 	CAST((SUM(CASE WHEN emp.status_condition in ('Discharge','Discontinue','Resign') THEN 1 ELSE 0 END)/count(*)*100) as int),
 	null
-	FROM tabEmployee emp	left JOIN tabAttendance att ON emp.name=att.employee	where %s
+	FROM tabEmployee emp	
+	left JOIN tabAttendance att ON emp.name=att.employee %s
+	left JOIN `tabShift Assignment` sa ON emp.name = sa.employee %s
+	where %s
 					
 	Group BY emp.department""" 
-	% (aggregate_string,conditions),
+	% (aggregate_string,att_join_condition,sa_join_condition,conditions),
 	as_list=1)
 
 	total_column=len(shifts)+11
@@ -77,8 +90,8 @@ def get_data(filters):
 
 def get_conditions(filters):
 	conditions="" 
-	if filters.get("date"): conditions += " att.attendance_date = '%s' or null" % filters["date"]
-	if filters.get("company"): conditions += " and att.company= '%s'" % filters["company"]
-	# if filters.get("date"): conditions += " and emp.relieving_date>='01-01-2024'"
+	#if filters.get("date"): conditions += " att.attendance_date = '%s' or null" % filters["date"]
+	#if filters.get("company"): conditions += "att.company= '%s'" % filters["company"]
+	if filters.get("date"): conditions += " emp.status='Active' "
 
 	return conditions, filters

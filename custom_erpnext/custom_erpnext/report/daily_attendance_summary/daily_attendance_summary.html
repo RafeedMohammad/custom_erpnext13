@@ -40,8 +40,8 @@
 		<tr>
             
 			{% for (let i=0, l=report_columns.length; i<l; i++) { %}
-				{% if (i == 2) { %}
-					<th class="text-center" colspan="7">Shift</th>
+				{% if (i > 1 && i<l-9) { %}
+					<th class="text-center">{%= report_columns[i].label.split(" ")[0] %}</th>
 				{% } %}
 				{% if (i == l-9) { %}
 					<th class="text-center" colspan="2">Today's Present Manpower</th>
@@ -77,7 +77,10 @@
 				{% if (i == 1 ) { %}
 					<th class="text-center"></th>
 				{% } %}
-				{% if (i != 0 && i!=1 ) { %}
+				{% if (i > 1 && i<l-9) { %}
+					<th class="text-center">{%= report_columns[i].label.split(" ")[1].replace(".",":") %}</th>
+				{% } %}
+				{% if (i >= l-9 ) { %}
 					<th class="text-center">{%= report_columns[i].label %}</th>
 				{% } %}
 				

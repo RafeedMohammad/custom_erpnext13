@@ -31,23 +31,20 @@ def get_employees(date, shift = None , department=None, designation=None, floor=
 	if employee_id: conditions += " and emp.employee= '%s'" % employee_id
 	if department: conditions += " and emp.department= '%s'" % department
 	if designation: conditions += " and emp.designation='%s'" % designation
-	if shift: conditions += " and sa.shift_type='%s'" % shift
+	if shift: conditions += " and ifnull(sa.shift_type,emp.default_shift)='%s'" % shift
 	if section: conditions += " and emp.section='%s'" % section
 	if floor: conditions += " and emp.floor='%s'" % floor
 	if facility_or_line: conditions += " and emp.facility_or_line='%s'" % facility_or_line
 	
 	join_condition=""
-	if date: join_condition += str(date)+ " between sa.start_date and sa.end_date"
+	if date: join_condition += "'"+date+"' between sa.start_date and sa.end_date"
 	# if group_name: conditions += " and emp.group='%s'" % group_name
 	# if status: conditions += " and .status='%s'" % status
 
 
-	employee_list1 = frappe.get_list(
-		"Employee", fields=["employee", "employee_name"]
-	)
 	employee_list = frappe.db.sql(
 	"""
-	select DISTINCT emp.name as employee,  emp.employee_name as employee_name, sa.shift_type as shift,sa.end_date as end_date
+	select DISTINCT emp.name as employee,  emp.employee_name as employee_name, ifnull(sa.shift_type,emp.default_shift) as shift,sa.start_date as start_date, sa.end_date as end_date
 
 	FROM tabEmployee emp
 	LEFT JOIN `tabShift Assignment` sa ON emp.name = sa.employee and %s
@@ -85,23 +82,23 @@ def get_employees(date, shift = None , department=None, designation=None, floor=
 
 
 @frappe.whitelist()
-def mark_employee_attendance1(employee_list, shift, from_date, to_date, company=None):
+def mark_employee_new_shift_assignment(employee_list, shift, from_date, to_date, company=None):
 
 	employee_list = json.loads(employee_list)
 	for employee in employee_list:
 
-		company = frappe.db.get_value("Employee", employee["employee"], "Company", cache=True)
+		#company = frappe.db.get_value("Employee", employee["employee"], "Company", cache=True)
 		
 
 		shift_assignemt_doc = frappe.get_doc(
 			dict(
 				doctype = "Shift Assignment",
-				employee = employee.get("employee"),
-				employee_name=employee.get("employee_name"),
+				employee = employee[0],#.get("employee"),
+				employee_name=employee[1],#.get("employee_name"),
 				shift_type = shift,
 				start_date = from_date,
 				end_date = to_date,
-				company = company,
+				#company = company,
 			)
 		)
 		

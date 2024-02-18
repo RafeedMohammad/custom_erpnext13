@@ -87,7 +87,7 @@ erpnext.shift_assignment_tool = {
 							frm.marked_employee_area = $('<div>')
 								.appendTo(frm.fields_dict.marked_attendance_html.wrapper);
 						}
-						frm.marked_employee = new erpnext.MarkedEmployee(frm, frm.marked_employee_area, r.message['marked'])
+						// frm.marked_employee = new erpnext.MarkedEmployee(frm, frm.marked_employee_area, r.message['marked'])
 					}
 					else{
 						hide_field('marked_attendance_section')
@@ -104,43 +104,43 @@ erpnext.shift_assignment_tool = {
 
 
 
-erpnext.MarkedEmployee = class MarkedEmployee {
-	constructor(frm, wrapper, employee) {
-		this.wrapper = wrapper;
-		this.frm = frm;
-		this.make(frm, employee);
-	}
-	make(frm, employee) {
-		var me = this;
-		$(this.wrapper).empty();
+// erpnext.MarkedEmployee = class MarkedEmployee {
+// 	constructor(frm, wrapper, employee) {
+// 		this.wrapper = wrapper;
+// 		this.frm = frm;
+// 		this.make(frm, employee);
+// 	}
+// 	make(frm, employee) {
+// 		var me = this;
+// 		$(this.wrapper).empty();
 
-		var row;
-		$.each(employee, function(i, m) {
-			var attendance_icon = "fa fa-check";
-			var color_class = "";
-			if(m.status == "Absent") {
-				attendance_icon = "fa fa-check-empty"
-				color_class = "text-muted";
-			}
-			else if(m.status == "Half Day") {
-				attendance_icon = "fa fa-check-minus"
-			}
+// 		var row;
+// 		$.each(employee, function(i, m) {
+// 			var attendance_icon = "fa fa-check";
+// 			var color_class = "";
+// 			if(m.status == "Absent") {
+// 				attendance_icon = "fa fa-check-empty"
+// 				color_class = "text-muted";
+// 			}
+// 			else if(m.status == "Half Day") {
+// 				attendance_icon = "fa fa-check-minus"
+// 			}
 
-			if (i===0 || i % 4===0) {
-				row = $('<div class="row"></div>').appendTo(me.wrapper);
-			}
+// 			if (i===0 || i % 4===0) {
+// 				row = $('<div class="row"></div>').appendTo(me.wrapper);
+// 			}
 
-			$(repl('<div class="col-sm-3 %(color_class)s">\
-				<label class="marked-employee-label"><span class="%(icon)s"></span>\
-				%(employee)s</label>\
-				</div>', {
-					employee: m.employee_name, //employee_name
-					icon: attendance_icon,
-					color_class: color_class
-				})).appendTo(row);
-		});
-	}
-};
+// 			$(repl('<div class="col-sm-3 %(color_class)s">\
+// 				<label class="marked-employee-label"><span class="%(icon)s"></span>\
+// 				%(employee)s</label>\
+// 				</div>', {
+// 					employee: m.employee_name, //employee_name
+// 					icon: attendance_icon,
+// 					color_class: color_class
+// 				})).appendTo(row);
+// 		});
+// 	}
+// };
 
 
 erpnext.EmployeeSelector = class EmployeeSelector {
@@ -154,11 +154,11 @@ erpnext.EmployeeSelector = class EmployeeSelector {
 
 		$(this.wrapper).empty();
 		var employee_toolbar = $('<div class="col-sm-12 top-toolbar">\
-			<button class="btn btn-default btn-add btn-xs"></button>\
-			<button class="btn btn-xs btn-default btn-remove"></button>\
+			<button class="btn btn-default btn-add btn-xs" style="background-color :LightGray"></button>\
+			<button class="btn btn-xs btn-default btn-remove" style="background-color :LightGray"></button>\
 			</div>').appendTo($(this.wrapper));
 
-		var mark_employee_toolbar = $('<div class="col-sm-12 bottom-toolbar">\
+		var mark_employee_toolbar = $('<div class="col-sm-12 bottom-toolbar" style="margin-top: 25px;">\
 			<button class="btn btn-primary btn-assign btn-xs"></button>\
 			');
 
@@ -195,7 +195,7 @@ erpnext.EmployeeSelector = class EmployeeSelector {
 					}
 				});
 				frappe.call({
-					method: "custom_erpnext.custom_erpnext.doctype.shift_assignment_tool.shift_assignment_tool.mark_employee_attendance1",
+					method: "custom_erpnext.custom_erpnext.doctype.shift_assignment_tool.shift_assignment_tool.mark_employee_new_shift_assignment",
 					args:{
 						"employee_list":employees_to_shift,
 						"shift": frm.doc.change_shift_to,
@@ -212,20 +212,86 @@ erpnext.EmployeeSelector = class EmployeeSelector {
 				});
 			});
 
+			// mark_employee_toolbar.find(".btn-edit")
+			// .html(__('Edit'))
+			// .on("click", function() {
+			// 	var employees_to_shift = [];
+			// 	$(me.wrapper).find('input[type="checkbox"]').each(function(i, check) {
+			// 		if($(check).is(":checked")) {
+			// 			employees_to_shift.push(employee[i]);
+			// 		}
+			// 	});
+			// 	frappe.call({
+			// 		method: "custom_erpnext.custom_erpnext.doctype.shift_assignment_tool.shift_assignment_tool.mark_employee_attendance1",
+			// 		args:{
+			// 			"employee_list":employees_to_shift,
+			// 			"shift": frm.doc.change_shift_to,
+			// 			"from_date":frm.doc.from_date,
+			// 			"to_date": frm.doc.to_date,
+			// 			"company":frm.doc.company
+			// 		},
+
+			// 		callback: function(r) {
+			// 			alert("Shift Assigned successfully !");
+			// 			erpnext.shift_assignment_tool.load_employees(frm);
+
+			// 		}
+			// 	});
+			// });
+
 		
 		var row;
 		$.each(employee, function(i, m) {
 			if (i===0 || (i % 1) === 0) {
 				row = $('<div class="row"></div>').appendTo(me.wrapper);
 			}
+			if (i===0){
+			$(repl('<table border="1" style="width:100%;  margin-top: 25px;">\
+			<tr>\
+				<td style="width:2%; text-align:center; color:transparent;">\
+						<label>chk</label>\
+				</td>\
+				<td style="width:30%; text-align:center;">\
+						<label><class="employee-check""/>Employee</label>\
+				</td>\
+				<td style="width:20%; text-align:center;">\
+						<label><class="employee-check""/>Shift</label>\
+				</td>\
+				<td style="width:20%; text-align:center;">\
+						<label><class="employee-check""/>Start Date</label>\
+				</td>\
+				<td style="width:20%; text-align:center;">\
+						<label><class="employee-check""/>End Date</label>\
+				</td>\
+			</tr>\
+		</table>'
+		, )).appendTo(row); }
 
-			$(repl('<div class="col-sm-6 unmarked-employee-checkbox">\
+			$(repl('<table border="1" style="width:100%">\
+			<tr>\
+				<td style="width:1%; text-align:center;">\
 				<div class="checkbox">\
-				<label><input type="checkbox" class="employee-check" employee="%(employee)s"/>\
-				%(employee)s</label>\
-				</div></div>', {employee:m[0] + ": " + m[1]+"\t Assign_shift="+m[2]+"\t End_date="+m[3]})).appendTo(row); //was: m.employee_name
+						<label><input type="checkbox" "</label>\
+					</div>\
+				</td>\
+				<td style="width:30%; text-align:center;">\
+						<label><class="employee-check""/>%(employee)s</label>\
+				</td>\
+				<td style="width:20%; text-align:center;">\
+						<label><class="employee-check""/>%(employee2)s</label>\
+				</td>\
+				<td style="width:20%; text-align:center;">\
+						<label><class="employee-check""/>%(employee3)s</label>\
+				</td>\
+				<td style="width:20%; text-align:center;">\
+						<label><class="employee-check""/>%(employee4)s</label>\
+				</td>\
+			</tr>\
+		</table>'
+		, {employee:m[0]+" : "+m[1],employee2:m[2],employee3:m[3],employee4:m[4] })).appendTo(row); //was: m.employee_name
 		});
 
 		mark_employee_toolbar.appendTo($(this.wrapper));
+		// mark_employee_toolbar.appendTo($(this.wrapper));
 	}
 };
