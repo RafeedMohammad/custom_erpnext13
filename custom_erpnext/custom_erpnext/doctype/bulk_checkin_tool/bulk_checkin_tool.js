@@ -216,13 +216,40 @@ erpnext.EmployeeSelector = class EmployeeSelector {
 			if (i===0 || (i % 2) === 0) {
 				row = $('<div class="row"></div>').appendTo(me.wrapper);
 			}
+			if (i===0){
+			$(repl('<table border="1" style="width:100%;  margin-top: 25px;">\
+			<tr>\
+				<td style="width:2%; text-align:center; color:transparent;">\
+						<label>chk</label>\
+				</td>\
+				<td style="width:30%; text-align:center;">\
+						<label><class="employee-check""/>Employee</label>\
+				</td>\
+				<td style="width:20%; text-align:center;">\
+						<label><class="employee-check""/>Shift</label>\
+				</td>\
+			</tr>\
+		</table>'
+		, )).appendTo(row); }
 
-			$(repl('<div class="col-sm-6 unmarked-employee-checkbox">\
+			$(repl('<table border="1" style="width:100%">\
+			<tr>\
+				<td style="width:1%; text-align:center;">\
 				<div class="checkbox">\
-				<label><input type="checkbox" class="employee-check" employee="%(employee)s"/>\
-				%(employee)s</label>\
-				</div></div>', {employee: m.employee + ": " + m.employee_name})).appendTo(row); //was: m.employee_name
+						<label><input type="checkbox" "</label>\
+					</div>\
+				</td>\
+				<td style="width:30%; text-align:center;">\
+						<label><class="employee-check""/>%(employee)s</label>\
+				</td>\
+				<td style="width:20%; text-align:center;">\
+						<label><class="employee-check""/>%(employee2)s</label>\
+				</td>\
+			</tr>\
+		</table>'
+		, {employee:m[0]+" : "+m[1],employee2:m[2]})).appendTo(row); //was: m.employee_name
 		});
+
 
 		mark_employee_toolbar.appendTo($(this.wrapper));
 	}

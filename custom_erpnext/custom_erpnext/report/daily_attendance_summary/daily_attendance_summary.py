@@ -46,7 +46,7 @@ def get_data(filters):
 	if filters.get("date"): att_join_condition += "AND (att.attendance_date IS NULL OR att.attendance_date ='"+filters["date"]+"')"
 	
 	sa_join_condition=""
-	if filters.get("date"): sa_join_condition += "AND ('"+filters["date"]+"' between sa.start_date and sa.end_date)"
+	if filters.get("date"): sa_join_condition += "AND '"+filters["date"]+"' between sa.start_date and sa.end_date and sa.docstatus=1 and sa.status='Active'"
 
 
 	result= frappe.db.sql("""select DISTINCT emp.department,count(*),

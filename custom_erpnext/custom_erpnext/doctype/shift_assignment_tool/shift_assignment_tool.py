@@ -37,7 +37,7 @@ def get_employees(date, shift = None , department=None, designation=None, floor=
 	if facility_or_line: conditions += " and emp.facility_or_line='%s'" % facility_or_line
 	
 	join_condition=""
-	if date: join_condition += "'"+date+"' between sa.start_date and sa.end_date"
+	if date: join_condition += "'"+date+"' between sa.start_date and sa.end_date and sa.docstatus=1 and sa.status='Active'"
 	# if group_name: conditions += " and emp.group='%s'" % group_name
 	# if status: conditions += " and .status='%s'" % status
 

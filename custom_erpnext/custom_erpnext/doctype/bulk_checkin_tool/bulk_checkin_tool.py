@@ -31,9 +31,37 @@ def get_employees(date, shift = None , department=None, designation=None, floor=
 		if value:
 			filters[field] = value
 
-	employee_list = frappe.get_list(
-		"Employee", fields=["employee", "employee_name"], filters=filters, order_by="employee asc"
-	)
+	
+	conditions="" 
+	
+	#if company: conditions += " and emp.company= '%s'" %company
+	if employee_id: conditions += " and emp.employee= '%s'" % employee_id
+	if department: conditions += " and emp.department= '%s'" % department
+	if designation: conditions += " and emp.designation='%s'" % designation
+	if shift: conditions += " and ifnull(sa.shift_type,emp.default_shift)='%s'" % shift
+	if section: conditions += " and emp.section='%s'" % section
+	if floor: conditions += " and emp.floor='%s'" % floor
+	if facility_or_line: conditions += " and emp.facility_or_line='%s'" % facility_or_line
+	
+	join_condition=""
+	if date: join_condition += "'"+date+"' between sa.start_date and sa.end_date and sa.docstatus=1 and sa.status='Active'"
+	# if group_name: conditions += " and emp.group='%s'" % group_name
+	# if status: conditions += " and .status='%s'" % status
+
+	# employee_list = frappe.get_list(
+	# 	"Employee", fields=["employee", "employee_name"], filters=filters, order_by="employee asc"
+	# )
+	employee_list = frappe.db.sql(
+	"""
+	select emp.name as employee,  emp.employee_name as employee_name, ifnull(sa.shift_type,emp.default_shift) as shift
+
+	FROM tabEmployee emp
+	LEFT JOIN `tabShift Assignment` sa ON emp.name = sa.employee and %s
+	WHERE emp.status = "Active"
+	 %s	
+	""" 
+		%(join_condition,conditions),
+		as_list=1)
 	# marked_employee = {}
 
 	# for emp in frappe.get_list(
@@ -58,15 +86,15 @@ def mark_employee_attendance2(employee_list,checkin_time=None):
 	employee_list = json.loads(employee_list)
 	for employee in employee_list:
 
-		company = frappe.db.get_value("Employee", employee["employee"], "Company", cache=True)
+		#company = frappe.db.get_value("Employee", employee["employee"], "Company", cache=True)
 		
 
 		bulk_checkin_tool_doc = frappe.get_doc(
 			dict(
 				doctype = "Employee Checkin",
-				employee = employee.get("employee"),
-				employee_name=employee.get("employee_name"),
-				company = company,
+				employee = employee[0],
+				employee_name=employee[1],
+				#company = company,
 				time=random_date(checkin_time1-timedelta(minutes=10),checkin_time1+timedelta(minutes=10))
 			)
 		)
