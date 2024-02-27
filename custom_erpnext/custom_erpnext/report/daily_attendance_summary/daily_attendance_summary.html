@@ -34,26 +34,26 @@
 
 <table class="table table-bordered">
 	<thead>
-		<tr><th class="text-center" colspan="15"><font size="+1">{%= __(report.report_name) %}</font></th>
+		<tr><th class="text-center" colspan="12"><font size="+1">{%= __(report.report_name) %}</font></th>
 		<th class="text-center" colspan="3"><font size="+1">Date: {%= filters.date %}</font></th>
 		</tr>
 		<tr>
             
 			{% for (let i=0, l=report_columns.length; i<l; i++) { %}
-				{% if (i > 1 && i<l-9) { %}
+				{% if (i > 1 && i<l-6) { %}
 					<th class="text-center">{%= report_columns[i].label.split(" ")[0] %}</th>
 				{% } %}
-				{% if (i == l-9) { %}
+				{% if (i == l-6) { %}
 					<th class="text-center" colspan="2">Today's Present Manpower</th>
 				{% } %}
-				{% if (i == l-7) { %}
-					<th class="text-center" colspan="2">Leave</th>
-				{% } %}
-				{% if (i == l-5) { %}
-					<th class="text-center" colspan="2">Absent</th>
+				{% if (i == l-4) { %}
+					<th class="text-center" >Leave</th>
 				{% } %}
 				{% if (i == l-3) { %}
-					<th class="text-center" colspan="2">Discontinue</th>
+					<th class="text-center">Absent</th>
+				{% } %}
+				{% if (i == l-2) { %}
+					<th class="text-center">Discontinue</th>
 				{% } %}
 				<!-- {% if (i != 2 && i != 4 && i != 3 && i != 5 && i != 6 && i != 7 && i != 8 && i != 9 && i != 10 && i != 11) { %}
 					<th class="text-center">{%= report_columns[i].label %}</th>
@@ -77,10 +77,10 @@
 				{% if (i == 1 ) { %}
 					<th class="text-center"></th>
 				{% } %}
-				{% if (i > 1 && i<l-9) { %}
+				{% if (i > 1 && i<l-6) { %}
 					<th class="text-center">{%= report_columns[i].label.split(" ")[1].replace(".",":") %}</th>
 				{% } %}
-				{% if (i >= l-9 ) { %}
+				{% if (i >= l-6 ) { %}
 					<th class="text-center">{%= report_columns[i].label %}</th>
 				{% } %}
 				

@@ -23,11 +23,8 @@ def get_columns():
 		_("Person") + ":Data/:90",
 		_("Parcentage") + ":Data/:90",
 		_("Person ") + ":Data/:90",
-		_("Parcentage ") + ":Data/:90",
 		_(" Person") + ":Data/:90",
-		_(" Parcentage") + ":Data/:90",
 		_("Person.") + ":Data/:90",
-		_("Parcentage.") + ":Data/:90",
 		_("Remarks") + ":Data/:120",
 		
 	]
@@ -54,11 +51,8 @@ def get_data(filters):
 	SUM(CASE WHEN att.status in ('Present','Late','Half Day') THEN 1 ELSE 0 END),
 	CAST((SUM(CASE WHEN att.status in ('Present','Late','Half Day') THEN 1 ELSE 0 END)/count(*)*100) as int),
 	SUM(CASE WHEN att.status in ('On Leave') THEN 1 ELSE 0 END),
-	CAST((SUM(CASE WHEN att.status in ('On Leave') THEN 1 ELSE 0 END)/count(*)*100) as int),
 	SUM(CASE WHEN att.status= 'Absent' THEN 1 ELSE 0 END)-SUM(CASE WHEN emp.status_condition in ('Discharge','Discontinue','Resign') THEN 1 ELSE 0 END),
-	CAST(((SUM(CASE WHEN att.status in ('Absent') THEN 1 ELSE 0 END)-SUM(CASE WHEN emp.status_condition in ('Discharge','Discontinue','Resign') THEN 1 ELSE 0 END))/count(*)*100) as int),
 	SUM(CASE WHEN emp.status_condition in ('Discharge','Discontinue','Resign') THEN 1 ELSE 0 END),	
-	CAST((SUM(CASE WHEN emp.status_condition in ('Discharge','Discontinue','Resign') THEN 1 ELSE 0 END)/count(*)*100) as int),
 	null
 	FROM tabEmployee emp	
 	left JOIN tabAttendance att ON emp.name=att.employee %s
@@ -69,14 +63,14 @@ def get_data(filters):
 	% (aggregate_string,att_join_condition,sa_join_condition,conditions),
 	as_list=1)
 
-	total_column=len(shifts)+11
+	total_column=len(shifts)+8  # here 8 is the number of rows except all_shifts
 	rows=len(result)
 	# frappe.publish_realtime('msgprint', str(total_column))
 	total_row = ["Total"]
 	for i in range(1,total_column):
 		if i==total_column-1 or i==total_column:
 			total_row.append(None)
-		elif i in (total_column-2,total_column-4,total_column-6,total_column-8):
+		elif i == total_column-5:
 			column_total = str(round(sum(row[i] for row in result) / rows, 1)) + '%'
 			total_row.append(column_total)		
 		else:

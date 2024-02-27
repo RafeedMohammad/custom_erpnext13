@@ -287,7 +287,7 @@ class override_ShiftType(Document):
 					).insert(ignore_permissions=True)
 
 	def get_assigned_employee(self, from_date=None, consider_default_shift=False):
-		filters = {"start_date": (">", from_date), "shift_type": self.name, "docstatus": "1"}
+		filters = {"start_date": ("<=", from_date),"end_date": (">=", from_date), "shift_type": self.name, "docstatus": "1"} # For gather all shift assignment data on that day
 		if not from_date:
 			del filters["start_date"]
 
