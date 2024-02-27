@@ -8,8 +8,8 @@ from frappe.utils import add_days, cstr, date_diff, get_first_day, get_last_day,
 
 def execute(filters= None):
 	type = frappe.db.get_value('User', frappe.session.user, 'type')
-	if type is None:
-		hours_for_ot=11
+	if type is None or float(type)>11:
+		hours_for_ot=34
 	else:
 		hours_for_ot=float(type)
 	

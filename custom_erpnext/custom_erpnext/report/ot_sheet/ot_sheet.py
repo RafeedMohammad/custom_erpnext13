@@ -114,10 +114,18 @@ def get_columns(filters):
 
 
 def get_attendance_list(conditions, filters):
+	type = frappe.db.get_value('User', frappe.session.user, 'type')
+	if type is None or float(type)>11:
+		hours_for_ot=34
+	else:
+		hours_for_ot=float(type)
+
 	attendance_list = frappe.db.sql(
-		"""select employee, day(attendance_date) as day_of_month,rounded_ot,
-		status from tabAttendance where docstatus = 1 %s order by employee, attendance_date"""
-		% conditions,
+		"""select employee, day(attendance_date) as day_of_month,
+	CASE when rounded_ot>%s then %s else rounded_ot end as ot,
+	status from tabAttendance where docstatus = 1 %s order by employee, attendance_date
+	"""
+		% (hours_for_ot, hours_for_ot, conditions),
 		filters,
 		as_dict=1,
 	)
@@ -128,7 +136,7 @@ def get_attendance_list(conditions, filters):
 	att_map = {}
 	for d in attendance_list:
 		att_map.setdefault(d.employee, frappe._dict()).setdefault(d.day_of_month, "")
-		att_map[d.employee][d.day_of_month] = d.rounded_ot
+		att_map[d.employee][d.day_of_month] = d.ot
 
 	return att_map
 
