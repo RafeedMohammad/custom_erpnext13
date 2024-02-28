@@ -57,7 +57,7 @@ def execute(filters= None):
 		if hours_for_ot>=10:
 			overtime_hours=ss.overtime_hours
 			ot_amount=ss.total_overtime_pay
-			lunch=float(acctual_lunch)
+			# lunch=float(acctual_lunch)
 
 
 		else:
@@ -65,8 +65,8 @@ def execute(filters= None):
 			(hours_for_ot,hours_for_ot,ss.employee, ss.start_date, ss.end_date))
 			overtime_hours=ot_hours[0][0]
 			ot_amount=ot_hours[0][0]*float(ss.overtime_rate)
-			if ss.present_days!=0:
-				lunch=(float(acctual_lunch)*ss.present_days/(ss.present_days+max(ss.late_days,ss.working_holidays)))#previously we count working_holidays in late_days 
+			# if ss.present_days!=0:
+			# 	lunch=(float(acctual_lunch)*ss.present_days/(ss.present_days+max(ss.late_days,ss.working_holidays)))#previously we count working_holidays in late_days 
 
 
 
@@ -107,11 +107,11 @@ def execute(filters= None):
 			round(float(ot_amount or 0),0),
 			get_attendance_bonus(ss.name),
 			# get_lunch_tr_allowance(ss.name),
-			lunch,
+			float(acctual_lunch),
 			ss.night_days,
 			get_night_allowance(ss.name),
 			ss.arear,
-			round(ss.gross_pay-float(ss.total_overtime_pay)-float(acctual_lunch)+lunch+float(ot_amount),0),
+			round(ss.gross_pay-float(ss.total_overtime_pay)-float(acctual_lunch)+float(acctual_lunch)+float(ot_amount),0),
 
 
 			
