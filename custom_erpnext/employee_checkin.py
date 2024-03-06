@@ -147,6 +147,7 @@ def mark_attendance_and_link_log(
 	"""
 	log_names = [x.name for x in logs]
 	employee = logs[0].employee
+	# change-start
 	company = frappe.get_cached_value("Employee", employee, "company")
 
 	allowed_for_overtime = frappe.get_cached_value("Employee", employee, "ot_enable")
@@ -184,7 +185,7 @@ def mark_attendance_and_link_log(
 			else:		
 				overtime_hour = (overtime.total_seconds()//3600)
 
-
+# change end
 
 
 

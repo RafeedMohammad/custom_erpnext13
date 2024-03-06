@@ -121,7 +121,7 @@ def execute(filters= None):
 		for d in ded_types:
 			row.append(ss_ded_map.get(ss.name, {}).get(d))
 		
-		row += [round(ss.total_loan_repayment,0),round(ss.total_deduction,0), round((ss.net_pay-float(ss.total_overtime_pay)-float(acctual_lunch)+lunch+float(ot_amount)),0), None]
+		row += [round(ss.total_loan_repayment,0),round(ss.total_deduction,0), round((ss.net_pay-float(ss.total_overtime_pay)-float(acctual_lunch)+float(acctual_lunch)+float(ot_amount)),0), None]
 		
 
 		data.append(row)
