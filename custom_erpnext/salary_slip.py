@@ -114,7 +114,7 @@ class override_SalarySlip(TransactionBase):
 
 
 	def get_salary_medical(self,ss):
-		return frappe.db.get_value('Salary Detail', {'parent': ss, 'abbr': 'M'}, 'amount') or 0
+		return frappe.db.get_value('Salary Detail', {'parent': ss, 'abbr': 'DM'}, 'amount') or 1450 #added Dm as default medical because medical amt can be changed based on join or exit_date.
 
 
 		#set the filter according to the name of the field

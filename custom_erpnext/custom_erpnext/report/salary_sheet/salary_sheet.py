@@ -35,6 +35,7 @@ def execute(filters= None):
 		# salary_slip_basic = get_salary_basic(ss.name)
 		if salary_slip_basic is None:
 			salary_slip_basic = 0
+		actual_allowance= (get_default_medical(ss.name) or 1450)+(acctual_basic/2)
 		allowance = get_allowance(ss.name)
 		acctual_lunch=get_lunch_tr_allowance(ss.name)+get_lunch(ss.name)+get_convanse(ss.name)
 		if acctual_lunch is None:
@@ -83,8 +84,8 @@ def execute(filters= None):
 			# ss.start_date,
 			# ss.end_date,
 			round(acctual_basic,0),
-			allowance,
-			round(acctual_basic + allowance,0),
+			round(actual_allowance,0),
+			round(acctual_basic + actual_allowance,0),
 			ss.present_days,
 			off_days(ss.employee, ss.start_date, ss.end_date),
 			# len(frappe.db.sql('''select * from tabAttendance where employee=%s and status="On Leave" and leave_type='CL' and attendance_date between %s and %s''',(ss.employee,ss.start_date,ss.end_date))),
@@ -284,7 +285,8 @@ def get_allowance(ss):
 	#return frappe.db.get_value('Salary Detail', {'parent': ss, 'abbr': 'HR'}, 'SUM(amount)')
 	return frappe.db.sql("""SELECT SUM(amount) FROM `tabSalary Detail` where parent=%s and abbr IN('M', 'HR')""", ss)[0][0]
 
-
+def get_default_medical(ss):
+	return frappe.db.get_value('Salary Detail', {'parent': ss, 'abbr': 'DM'}, ['default_amount'])
 
 def off_days(employee, start_date, end_date):
 	return frappe.db.sql("""SELECT COUNT(*) FROM `tabAttendance` as a where a.employee='%s' and status IN('Weekly Off', 'Holiday') and a.attendance_date BETWEEN '%s' AND '%s'""" % (employee, start_date, end_date))[0][0]
