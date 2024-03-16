@@ -132,6 +132,14 @@ frappe.query_reports["Pay Slip"] = {
 				"wildcard_filter": 0
 
 			   },
+			   {
+				"fieldname":"mode_of_payment",
+				"label":__("Salary in"),
+				"fieldtype":"Select",
+				"options":["Bank","Cash",""],
+				"default": "",
+				"width": "100px"
+			},
 			   
 
 			// {

@@ -273,6 +273,7 @@ def get_conditions(from_date,to_date,filters):
 	if filters.get("group_name"): conditions += " and ss.group='%s'" % filters["group_name"]
 	if filters.get("grade"): conditions += " and ss.grade='%s'" % filters["grade"]
 	# if filters.get("sub_department"): conditions += " and ss.sub_department like '%s'" % filters["sub_department"]
+	if filters.get("mode_of_payment"): conditions += " and ss.mode_of_payment='%s'" % filters["mode_of_payment"]
 
 
 	return conditions, filters

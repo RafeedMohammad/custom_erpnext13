@@ -72,6 +72,9 @@
 			{% if (!is_null(filters.employee)) { %}
 					<th class="text-left" colspan="6"><font size="1%">Employee: {%= filters.employee %}</font></th>
 			{% } %}
+			{% if (!is_null(filters.mode_of_payment)) { %}
+					<th class="text-left" colspan="6"><font size="1%">Salary In {%= filters.mode_of_payment %}</font></th>
+			{% } %}
 		</tr>
 		<tr>
 			<th>Sl No</th>
