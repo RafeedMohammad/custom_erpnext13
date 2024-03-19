@@ -186,9 +186,9 @@ def get_columns(salary_slips):
 		+ [(d + ":Integer:10") for d in salary_components[_("Deduction")]]
 		+ [
 			_("Advance") + ":Integer:10",
-			_("Total Deduction") + ":Integer:20",
+			_("Total Deduc tion") + ":Integer:20",
 			_("Net Pay") + ":Integer:20",
-			_("Signature_&_Stamp") + ":Text:10",
+			_("Signature &_Stamp") + ":Text:10",
 
 		]
 		
@@ -223,7 +223,7 @@ def get_salary_slip(from_date,to_date,filters):
 	conditions, filters = get_conditions(from_date,to_date,filters)
 	
 
-	salary_slips = frappe.db.sql("""select * from `tabSalary Slip` as ss WHERE %s ORDER BY employee
+	salary_slips = frappe.db.sql("""select * from `tabSalary Slip` as ss WHERE %s ORDER BY department,employee
 	""" 
 	%conditions, filters, as_dict=1)
 
