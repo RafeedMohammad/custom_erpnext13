@@ -5,8 +5,13 @@ from frappe.utils import flt
 from frappe import _
 from frappe.utils import add_days, cstr, date_diff, get_first_day, get_last_day, getdate
 
+def execute(filters = None):
+	columns = get_columns()
+	data = get_data(filters)
 
-def execute(filters= None):
+	return columns, data
+
+def get_data(filters= None):
 	type = frappe.db.get_value('User', frappe.session.user, 'type')
 	if type is None or float(type)>11:
 		hours_for_ot=34
@@ -18,20 +23,21 @@ def execute(filters= None):
 	if not filters:
 		filters = {}
 	data = []
+	total_result=[]
 	departments = frappe.db.get_list("Department", pluck="name", order_by="name")
 	for department in departments:
 		salary_slips = get_salary_slip(from_date,to_date,filters,department)
 		#columns, ded_types = get_columns(salary_slips)
-		columns=get_columns(salary_slips)
+		# columns=get_columns(salary_slips)
 		doj_map = get_employee_doj_map()
 		ss_ded_map = get_ss_ded_map(salary_slips)
 
 		
-		# if len(salary_slips) >= 1:
-		# 	data.append({"employee": department})
+		if len(salary_slips) >= 1:
+			data.append({"department": department})
 		# else:
 		# 	row = frappe._dict({"leave_type": department})
-
+		result=[]
 
 		for ss in salary_slips:
 			allowance = 0
@@ -79,6 +85,7 @@ def execute(filters= None):
 
 
 			row = [
+				None,
 				#ss.name,
 				ss.employee,
 				ss.employee_name,
@@ -122,6 +129,7 @@ def execute(filters= None):
 				round(get_pf(ss.name),0),
 				round(get_late_amt(ss.name),0),
 				get_stamp(ss.name),
+				round(ss.income_tax,0),
 
 				
 				
@@ -130,20 +138,38 @@ def execute(filters= None):
 			# for d in ded_types:
 			# 	row.append(ss_ded_map.get(ss.name, {}).get(d))
 			
-			row += [round(ss.total_loan_repayment,0),round(ss.total_deduction,0)+round(ss.total_loan_repayment,0), round((ss.net_pay-float(ss.total_overtime_pay)-float(acctual_lunch)+float(acctual_lunch)+float(ot_amount)),0), None]
+			row += [round(ss.total_loan_repayment,0),(round(ss.total_deduction,0)+round(ss.total_loan_repayment,0)+round(ss.income_tax,0)), round((ss.net_pay-float(ss.total_overtime_pay)-float(acctual_lunch)+float(acctual_lunch)+float(ot_amount)),0), None]
 			
 
+			
+			for i in range(len(row)): 
+				if i>15 and i<len(row)-1: # Use the length of 'row' to avoid accessing out of bounds
+					result.append(0)  # Initialize result with 0s or use an already initialized result list
+					result[i] = result[i] + row[i]
+				else:
+					result.append(None)
+			
 			data.append(row)
+			# for index, p in enumerate(products):
+  			# 	if index == len(products) - 1:
+			# 		result[0]="Total"
+			# 	data.append(result)
+		for index, ss in enumerate(salary_slips):
+			if index == len(salary_slips) - 1:
+				result[0]="Total"
+				result[1]="Total"
+				result[2]=len(salary_slips)
+				data.append(result)
 
 
 
-	return columns, data
+	return data
 	
 
 
-def get_columns(salary_slips):
+def get_columns():
 	columns = [
-		# _("Salary Slip ID") + ":Link/Salary Slip:150",
+		_("Department") + "::150",
 		_("Employee") + "::80",
 		_("Employee Name") + "::40",
 		_("Joining_Date") + "::12",
@@ -195,7 +221,8 @@ def get_columns(salary_slips):
 		+ [
 			_("PF") + ":Integer:10",
 			_("Late amt") + ":Integer:10",
-			_("Stamp") + ":Integer:10",
+			_("Sta mp") + ":Integer:10",
+			_("Tax") + ":Integer:10",
 			_("Advance") + ":Integer:10",
 			_("Total Deduc tion") + ":Integer:20",
 			_("Net Pay") + ":Integer:20",

@@ -1,5 +1,5 @@
 {
- "add_total_row": 1,
+ "add_total_row": 0,
  "columns": [],
  "creation": "2022-12-20 10:24:40.988433",
  "disable_prepared_report": 1,
@@ -9,7 +9,7 @@
  "filters": [],
  "idx": 0,
  "is_standard": "Yes",
- "modified": "2024-03-23 20:54:09.604225",
+ "modified": "2024-03-25 10:20:24.754551",
  "modified_by": "Administrator",
  "module": "Custom Erpnext",
  "name": "Salary Sheet",
