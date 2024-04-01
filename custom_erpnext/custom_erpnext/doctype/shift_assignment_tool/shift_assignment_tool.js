@@ -11,6 +11,10 @@ frappe.ui.form.on('Shift Assignment Tool', {
 		frm.set_value("date", frappe.datetime.get_today());
 		erpnext.shift_assignment_tool.load_employees(frm);
 	},
+	date: function(frm) {
+		// frm.set_value("date", frappe.datetime.get_today());
+		erpnext.shift_assignment_tool.load_employees(frm);
+	},
 
 	select_shift: function(frm){
 		erpnext.shift_assignment_tool.load_employees(frm);

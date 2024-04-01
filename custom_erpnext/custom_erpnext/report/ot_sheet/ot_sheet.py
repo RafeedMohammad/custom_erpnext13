@@ -119,6 +119,7 @@ def get_attendance_list(conditions, filters):
 		hours_for_ot=34
 	else:
 		hours_for_ot=float(type)
+		conditions += " and status not in ('Holiday','Weekly Off')"
 
 	attendance_list = frappe.db.sql(
 		"""select employee, day(attendance_date) as day_of_month,

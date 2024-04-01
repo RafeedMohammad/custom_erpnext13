@@ -22,7 +22,14 @@ frappe.listview_settings['Shift Type'] = {
                         "reqd": 1,
                         "width": "100px"
                     
-                }
+                    },
+                    {
+                        "fieldname":"working_holiday",
+                        "label": __("Working Holiday"),
+                        "fieldtype": "Check",
+                        "width": "100px"
+                    
+                    }
                     
                     ],
                 primary_action(data) {
@@ -30,7 +37,8 @@ frappe.listview_settings['Shift Type'] = {
                         method: 'custom_erpnext.shift_type.process_auto_attendance_for_all',
                         args: {
                             from_date: data.from_date,
-                            to_date: data.to_date
+                            to_date: data.to_date,
+                            working_holiday: data.working_holiday,
                         },
                         freeze: true,
 

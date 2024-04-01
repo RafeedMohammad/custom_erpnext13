@@ -47,13 +47,17 @@ from custom_erpnext.shift_assignment import (
 
 class override_ShiftType(Document):
 	@frappe.whitelist()
-	def process_auto_attendance(self,from_date=None,to_date=None): #added from date to date in oder to access the date given in mark attendance in shift type front desk
+	def process_auto_attendance(self,from_date=None,to_date=None,working_holiday=None): #added from date to date in oder to access the date given in mark attendance in shift type front desk
 		#frappe.publish_realtime('msgprint', 'Starting process for '+self.name+' at-> '+str(datetime.now()))
+		now = datetime.now()
 		if from_date and to_date:
 			self.process_attendance_after=from_date
 			#self.name=name
 			shift_start_time =to_date+" "+ str(self.start_time)
-			self.last_sync_of_checkin = datetime.strptime(shift_start_time, "%Y-%m-%d %H:%M:%S")+timedelta(days=1,hours=2)
+			if(datetime.strptime(shift_start_time, "%Y-%m-%d %H:%M:%S")<=now):
+				self.last_sync_of_checkin = datetime.strptime(shift_start_time, "%Y-%m-%d %H:%M:%S")+timedelta(days=1,hours=2)
+			else:
+				self.last_sync_of_checkin = datetime.strptime(shift_start_time, "%Y-%m-%d %H:%M:%S")
 			# frappe.publish_realtime("msgprint",self.process_attendance_after1)
 			# added to set eligiable time for the shifts to process the attendance which is given in mark attendance in shift type front desk
 		if (
@@ -93,7 +97,7 @@ class override_ShiftType(Document):
 				out_time,
 				late_entry_duration,
 				overtime,
-			) = self.get_attendance(single_shift_logs,weekly_off_list)
+			) = self.get_attendance(single_shift_logs,weekly_off_list,working_holiday)
 			mark_attendance_and_link_log(
 				single_shift_logs,
 				attendance_status,
@@ -113,8 +117,7 @@ class override_ShiftType(Document):
 		# frappe.publish_realtime('msgprint', 'Ending process for '+self.name+' at-> '+str(datetime.now()))
 
 
-	def get_attendance(self, logs,weekly_off_list):
-		#frappe.publish_realtime('msgprint', 'Starting Get_attendance for '+logs[0].employee+' at-> '+str(datetime.now()))
+	def get_attendance(self, logs,weekly_off_list,working_holiday):
 		"""Return attendance_status, working_hours, late_entry, early_exit, in_time, out_time
 		for a set of logs belonging to a single shift.
 		Assumtion:
@@ -182,7 +185,7 @@ class override_ShiftType(Document):
 			overtime=out_time-logs[0].shift_end
 		if (out_time):
 			start_time_to_lunch_duration,lunch_duration= self.lunch_timing()
-			if(weekly_off_check==0 or weekly_off_check==1):
+			if(weekly_off_check==0 or weekly_off_check==1) and working_holiday=="0":
 				if(in_time<= (logs[0].shift_start+start_time_to_lunch_duration) and (logs[0].shift_start+start_time_to_lunch_duration+lunch_duration) <= out_time):
 					overtime=out_time-in_time-lunch_duration
 				else:
@@ -194,10 +197,10 @@ class override_ShiftType(Document):
 #if (lunch_start_datetime.time() > in_time_time) and (lunch_end_datetime.time() < out_time_time):
 
 		#change start
-		if(weekly_off_check == 1):
+		if(weekly_off_check == 1 and working_holiday=="0"):
 			return "Weekly Off", total_working_hours, 0, early_exit, in_time, out_time,0,overtime
 		
-		if(weekly_off_check==0):
+		if(weekly_off_check==0 and working_holiday=="0"):
 			return "Holiday", total_working_hours, 0, early_exit, in_time, out_time, 0,overtime
 		
 		if (len(logs)==1 or out_time-in_time<timedelta(minutes=1)):
@@ -313,11 +316,12 @@ class override_ShiftType(Document):
 
 
 @frappe.whitelist()
-def process_auto_attendance_for_all(from_date=None,to_date=None): #added from date to date in oder to access the date given in mark attendance in shift type
+def process_auto_attendance_for_all(from_date=None,to_date=None,working_holiday=None): #added from date to date in oder to access the date given in mark attendance in shift type
 	shift_args1={
 	#"name":doc.name,
 	"from_date":from_date,
 	"to_date":to_date,
+	"working_holiday":working_holiday,
 	}
 	# added in 10-7-23 for delete attendance
 	#frappe.db.sql("""delete from tabAttendance where status in ("Present", "Absent", "Half Day", "Weekly Off", "Holiday", "Late") and attendance_date between %s and %s""",(from_date,to_date))
@@ -325,7 +329,7 @@ def process_auto_attendance_for_all(from_date=None,to_date=None): #added from da
 	#frappe.enqueue_doc(doctype="Shift Type", name="Shift Type",method="test123",queue="long",timeout=3600,**shift_args1)
 	frappe.enqueue("custom_erpnext.shift_type.process_auto_attendance_intermediate_function",queue="long",**shift_args1)
 
-def process_auto_attendance_intermediate_function(from_date=None,to_date=None):
+def process_auto_attendance_intermediate_function(from_date=None,to_date=None,working_holiday=None):
 	shift_list = frappe.get_all("Shift Type", filters={"enable_auto_attendance": "1"}, pluck="name")
 	frappe.publish_realtime('msgprint', 'Attendance is Processing')
 	for shift in shift_list:
@@ -334,6 +338,7 @@ def process_auto_attendance_intermediate_function(from_date=None,to_date=None):
 		#"name":doc.name,
 		"from_date":from_date,
 		"to_date":to_date,
+		"working_holiday":working_holiday
 		}
 		doc.process_auto_attendance(**shift_args)
 	frappe.publish_realtime('msgprint', 'Attendance has been marked as per employee check-ins')
