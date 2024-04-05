@@ -136,7 +136,11 @@ override_doctype_class = {
 #		"custom_erpnext.tasks.monthly"
 #	]
 # }
-
+scheduler_events = {
+    "Daily Long": [
+        "custom_erpnext.custom_erpnext.doctype.Customized_earned_leave.allocate_earned_leaves"
+	]
+}
 # Testing
 # -------
 
