@@ -203,7 +203,7 @@ erpnext.EmployeeSelector = class EmployeeSelector {
 					},
 
 					callback: function(r) {
-						alert("Shift Assigned successfully !");
+						alert("Checkin Assigned successfully !");
 						erpnext.bulk_checkin_tool.load_employees(frm);
 
 					}
@@ -228,6 +228,9 @@ erpnext.EmployeeSelector = class EmployeeSelector {
 				<td style="width:20%; text-align:center;">\
 						<label><class="employee-check""/>Shift</label>\
 				</td>\
+				<td style="width:3%; text-align:center;">\
+				<label><class="employee-check""/></label>\
+				</td>\
 			</tr>\
 		</table>'
 		, )).appendTo(row); }
@@ -245,9 +248,12 @@ erpnext.EmployeeSelector = class EmployeeSelector {
 				<td style="width:20%; text-align:center;">\
 						<label><class="employee-check""/>%(employee2)s</label>\
 				</td>\
+				<td style="width:3%; text-align:center;">\
+				<label><class="employee-check""/>%(employee6)s</label>\
+				</td>\
 			</tr>\
 		</table>'
-		, {employee:m[0]+" : "+m[1],employee2:m[2]})).appendTo(row); //was: m.employee_name
+		, {employee6:i+1,employee:m[0]+" : "+m[1],employee2:m[2]})).appendTo(row); //was: m.employee_name
 		});
 
 

@@ -52,9 +52,9 @@
   },
   {
    "fieldname": "employee_id",
-   "fieldtype": "Link",
+   "fieldtype": "Table MultiSelect",
    "label": "Employee Id",
-   "options": "Employee"
+   "options": "Employee Info"
   },
   {
    "fieldname": "column_break_5",
@@ -136,7 +136,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-04-06 02:16:07.112538",
+ "modified": "2024-05-04 17:02:23.759119",
  "modified_by": "Administrator",
  "module": "Custom Erpnext",
  "name": "Attendance Adjustment Tool",

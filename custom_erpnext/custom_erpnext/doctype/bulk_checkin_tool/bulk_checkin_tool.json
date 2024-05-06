@@ -10,8 +10,9 @@
   "department",
   "designation",
   "select_shift",
-  "floor",
+  "employee_id",
   "column_break_6",
+  "floor",
   "facility_or_line",
   "section",
   "group",
@@ -102,12 +103,18 @@
    "fieldname": "checkin_time",
    "fieldtype": "Datetime",
    "label": "Checkin Time"
+  },
+  {
+   "fieldname": "employee_id",
+   "fieldtype": "Table MultiSelect",
+   "label": "Employee Id",
+   "options": "Employee Info"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-03-13 14:42:23.404042",
+ "modified": "2024-05-06 10:48:49.327903",
  "modified_by": "Administrator",
  "module": "Custom Erpnext",
  "name": "Bulk Checkin Tool",

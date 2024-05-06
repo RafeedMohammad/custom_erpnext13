@@ -60,11 +60,13 @@
 			{% } %}
 			{% if (!is_null(filters.employee)) { %}
 					<th class="text-left"><font size="+.5">Employee: {%= filters.employee %}</font></th>
+                    <th class="text-left"><font size="+.5">Department: {%= data[0][report_columns[8].fieldname] %}</font></th>
+                    <th class="text-left"><font size="+.5">Designation: {%= data[0][report_columns[9].fieldname] %}</font></th>
 			{% } %}
 		</tr>
 		<tr>
 
-			{% for (let i=0, l=report_columns.length; i<l; i++) { %}
+			{% for (let i=0, l=report_columns.length; i<l-2; i++) { %}
 				<th class="text-center">{%= report_columns[i].label %}</th>
 			{% } %}
 		</tr>
@@ -78,7 +80,7 @@
 			%}
 			<tr class="{%= row_class %}">
 				
-				{% for(let i=0, l=report_columns.length; i<l; i++) { %}
+				{% for(let i=0, l=report_columns.length; i<l-2; i++) { %}
 					<td class="text-center">
 						{% const fieldname = report_columns[i].fieldname; %}
 						{% if (!is_null(row[fieldname])) { %}

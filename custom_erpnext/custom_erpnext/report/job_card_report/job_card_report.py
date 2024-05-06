@@ -43,6 +43,8 @@ def get_columns():
 		_("Out Time") + ":Data/Attendance:120",
 		_("O.T.") + ":Data/Attendance:120",
 		_("Status") + ":Data/:120",
+		_("Department") + ":Data/:120",
+		_("Designation") + ":Data/:120",
 
 
 	]
@@ -90,7 +92,7 @@ def get_attendance(filters):
 	
 
 	result= frappe.db.sql("""select DISTINCT att.attendance_date, att.employee, att.shift,
-	att.in_time, att.late_entry_duration, att.out_time, att.rounded_ot, att.status, att.shift_start, att.shift_end, att.leave_type, emp.first_name, att.is_night
+	att.in_time, att.late_entry_duration, att.out_time, att.rounded_ot, att.status,emp.department,emp.designation, att.shift_start, att.shift_end, att.leave_type, emp.first_name, att.is_night
 	FROM tabAttendance as att
 	INNER JOIN tabEmployee as emp ON emp.name = att.employee  	
 	where %s
@@ -106,7 +108,7 @@ def get_attendance(filters):
 		
 		elif result[i][7]=='On Leave' :
 			result[i][3]=result[i][4]=result[i][5]="00:00"
-			result[i][7]= result[i][10]
+			result[i][7]= result[i][12]
 		
 		elif result[i][5] is None:
 			if result[i][3] !=None:
@@ -115,19 +117,19 @@ def get_attendance(filters):
 				result[i][3]=result[i][5]=None
 				result[i][6]=0
 			continue
-		elif result[i][9] is None:
+		elif result[i][11] is None:
 			continue
 		
 		else:
 			if (max_allowed_hour>10): 
 				pass
 			elif(max_allowed_minute>10):
-				if(result[i][5]>result[i][9]):
-					ot_difference=result[i][5]-result[i][9]
+				if(result[i][5]>result[i][11]):
+					ot_difference=result[i][5]-result[i][11]
 					minute1=int(str(ot_difference).split(":")[1])
 
 					if(ot_difference>timedelta(hours=max_allowed_hour,minutes=max_allowed_minute+10)):
-						result[i][5]=result[i][9]+timedelta(hours=max_allowed_hour,minutes=max_allowed_minute+(minute1%10))
+						result[i][5]=result[i][11]+timedelta(hours=max_allowed_hour,minutes=max_allowed_minute+(minute1%10))
 						result[i][6]=max_allowed_hour+(max_allowed_minute/60)
 
 					elif(ot_difference>=timedelta(hours=max_allowed_hour,minutes=max_allowed_minute-rounded_over_time2)):#rounding_time2
@@ -135,28 +137,28 @@ def get_attendance(filters):
 					elif(ot_difference<timedelta(hours=result[i][6],minutes=rounded_over_time1)):#rounding_time1
 						pass
 					elif(ot_difference<timedelta(hours=result[i][6],minutes=rounded_over_time1)):#rounding_time1
-						result[i][5]=result[i][9]+timedelta(hours=max_allowed_hour,minutes=(minute1%10))
+						result[i][5]=result[i][11]+timedelta(hours=max_allowed_hour,minutes=(minute1%10))
 
 
 
 
 			elif(max_allowed_minute<10):
-				if(result[i][5]>result[i][9]):
-					ot_difference=result[i][5]-result[i][9]
+				if(result[i][5]>result[i][11]):
+					ot_difference=result[i][5]-result[i][11]
 					minute1=int(str(ot_difference).split(":")[1])
 
 					if(ot_difference>timedelta(hours=max_allowed_hour,minutes=max_allowed_minute)):
-						result[i][5]=result[i][9]+timedelta(hours=max_allowed_hour,minutes=(minute1%10))
+						result[i][5]=result[i][11]+timedelta(hours=max_allowed_hour,minutes=(minute1%10))
 						result[i][6]=max_allowed_hour#+(max_allowed_minute/60)
 
 					elif(minute1>rounded_over_time1):	#rounding_time
-						result[i][5]=result[i][9]+timedelta(hours=result[i][6],minutes=(minute1%10))
+						result[i][5]=result[i][11]+timedelta(hours=result[i][6],minutes=(minute1%10))
 			result[i][5]=datetime.strftime(result[i][5],'%H:%M')
 
 			#for late
-			if(result[i][3]<result[i][8] and max_allowed_hour<10):
-				early_entry_diff_min=int(str(result[i][8]-result[i][3]).split(":")[1])%10
-				result[i][3]=result[i][8]-timedelta(minutes=early_entry_diff_min)
+			if(result[i][3]<result[i][10] and max_allowed_hour<10):
+				early_entry_diff_min=int(str(result[i][10]-result[i][3]).split(":")[1])%10
+				result[i][3]=result[i][10]-timedelta(minutes=early_entry_diff_min)
 			result[i][3]=datetime.strftime(result[i][3],'%H:%M')
 			
 			if ((result[i][7]=="Weekly Off" or result[i][7]=="Holiday" )and max_allowed_hour<10):

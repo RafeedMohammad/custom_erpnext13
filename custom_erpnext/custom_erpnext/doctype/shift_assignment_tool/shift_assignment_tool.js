@@ -267,6 +267,9 @@ erpnext.EmployeeSelector = class EmployeeSelector {
 				<td style="width:20%; text-align:center;">\
 						<label><class="employee-check""/>End Date</label>\
 				</td>\
+				<td style="width:3%; text-align:center;">\
+				<label><class="employee-check""/></label>\
+				</td>\
 			</tr>\
 		</table>'
 		, )).appendTo(row); }
@@ -290,9 +293,12 @@ erpnext.EmployeeSelector = class EmployeeSelector {
 				<td style="width:20%; text-align:center;">\
 						<label><class="employee-check""/>%(employee4)s</label>\
 				</td>\
+				<td style="width:3%; text-align:center;">\
+				<label><class="employee-check""/>%(employee6)s</label>\
+				</td>\
 			</tr>\
 		</table>'
-		, {employee:m[0]+" : "+m[1],employee2:m[2],employee3:m[3],employee4:m[4] })).appendTo(row); //was: m.employee_name
+		, {employee6:i+1,employee:m[0]+" : "+m[1],employee2:m[2],employee3:m[3],employee4:m[4] })).appendTo(row); //was: m.employee_name
 		});
 
 		mark_employee_toolbar.appendTo($(this.wrapper));

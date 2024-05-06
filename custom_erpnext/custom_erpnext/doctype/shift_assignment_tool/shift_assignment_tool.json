@@ -130,15 +130,15 @@
   {
    "default": "0",
    "fieldname": "employee_id",
-   "fieldtype": "Link",
+   "fieldtype": "Table MultiSelect",
    "label": "Employee Id",
-   "options": "Employee"
+   "options": "Employee Info"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-02-11 10:52:50.325310",
+ "modified": "2024-05-06 10:44:36.538897",
  "modified_by": "Administrator",
  "module": "Custom Erpnext",
  "name": "Shift Assignment Tool",

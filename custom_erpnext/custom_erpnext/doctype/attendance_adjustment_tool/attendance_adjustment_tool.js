@@ -213,7 +213,7 @@ erpnext.EmployeeSelector = class EmployeeSelector {
 					},
 
 					callback: function(r) {
-						alert("Shift Assigned successfully !");
+						alert("Attendance adjusted successfully !");
 						erpnext.attendance_adjustment_tool.load_employees(frm);
 
 					}

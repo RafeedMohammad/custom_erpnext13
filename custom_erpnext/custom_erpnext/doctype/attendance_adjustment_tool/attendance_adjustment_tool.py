@@ -24,11 +24,16 @@ def get_employees(date, shift = None, status=None,leave_types=None, department=N
 	# 		filters[field] = value
 
 	conditions="" 
+	data = json.loads(employee_id)
+
+	# Extract just the "employee" values
+	employees = [item["employee"] for item in data]
 
 
 	
 	#if company: conditions += " and emp.company= '%s'" %company
-	if employee_id: conditions += " and emp.employee= '%s'" % employee_id
+	if len(employees)>0: conditions += " where emp.employee in %s and emp.status='Active'" % employees
+	else:conditions +=" where emp.status = 'Active'"
 	if department: conditions += " and emp.department= '%s'" % department
 	if designation: conditions += " and emp.designation='%s'" % designation
 	if shift: conditions += " and att.shift='%s'" % shift
@@ -37,6 +42,11 @@ def get_employees(date, shift = None, status=None,leave_types=None, department=N
 	# if section: conditions += " and emp.section='%s'" % section
 	if floor: conditions += " and emp.floor='%s'" % floor
 	if facility_or_line: conditions += " and emp.facility_or_line='%s'" % facility_or_line
+	
+	if len(employees)>0:
+		conditions=conditions.replace("]", ")")
+		conditions=conditions.replace("[", "(")
+	# frappe.publish_realtime('msgprint', conditions)
 	
 	join_condition=""
 	if date: join_condition += "att.attendance_date='"+date+"'"
@@ -50,7 +60,7 @@ def get_employees(date, shift = None, status=None,leave_types=None, department=N
 
 	FROM tabEmployee emp
 	LEFT JOIN `tabAttendance` att ON emp.name = att.employee and %s
-	WHERE emp.status = "Active"
+	
 	 %s	
 	""" 
 		%(join_condition,conditions),

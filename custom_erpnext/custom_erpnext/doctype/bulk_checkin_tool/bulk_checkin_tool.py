@@ -33,15 +33,26 @@ def get_employees(date, shift = None , department=None, designation=None, floor=
 
 	
 	conditions="" 
+	data = json.loads(employee_id)
+
+	# Extract just the "employee" values
+	employees = [item["employee"] for item in data]
+
+
 	
 	#if company: conditions += " and emp.company= '%s'" %company
-	if employee_id: conditions += " and emp.employee= '%s'" % employee_id
+	if len(employees)>0: conditions += " where emp.employee in %s and emp.status='Active'" % employees
+	else:conditions +=" where emp.status = 'Active'"
 	if department: conditions += " and emp.department= '%s'" % department
 	if designation: conditions += " and emp.designation='%s'" % designation
 	if shift: conditions += " and ifnull(sa.shift_type,emp.default_shift)='%s'" % shift
 	if section: conditions += " and emp.section='%s'" % section
 	if floor: conditions += " and emp.floor='%s'" % floor
 	if facility_or_line: conditions += " and emp.facility_or_line='%s'" % facility_or_line
+	
+	if len(employees)>0:
+		conditions=conditions.replace("]", ")")
+		conditions=conditions.replace("[", "(")
 	
 	join_condition=""
 	if date: join_condition += "'"+date+"' between sa.start_date and sa.end_date and sa.docstatus=1 and sa.status='Active'"
@@ -57,8 +68,8 @@ def get_employees(date, shift = None , department=None, designation=None, floor=
 
 	FROM tabEmployee emp
 	LEFT JOIN `tabShift Assignment` sa ON emp.name = sa.employee and %s
-	WHERE emp.status = "Active"
-	 %s	
+
+		 %s	
 	""" 
 		%(join_condition,conditions),
 		as_list=1)
