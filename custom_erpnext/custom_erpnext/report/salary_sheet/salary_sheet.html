@@ -59,7 +59,7 @@
 	<h6>Department: {%= filters.employee %}</h6>
 {% } %} -->
 
-
+{% let u = 0 %}
 {% for(let m=0, k=data.length; m<k; m++) { %}
 
 	{% if (!is_null(data[m][report_columns[0].fieldname])) { %}
@@ -109,7 +109,7 @@
 					
 				
 				<tr class="{%= row_class %}" height="75px" >
-					<td> {%=j+1%}	</td>
+					<td> {%=u+1%}	</td>
 					{% for(let i=1, l=report_columns.length; i<l; i++) { %}
 						<td class="text-center">
 							{% const fieldname = report_columns[i].fieldname; %}
@@ -119,10 +119,11 @@
 						</td>
 					{% } %}
 				</tr>
+				{% u++ %}
 				{% } %}
 				{% if (data[j][report_columns[0].fieldname]=="Total") { %}
 				<tr class="{%= row_class %}">
-					<td> {%=j+1%}	</td>
+					<td>	</td>
 					{% for(let i=1, l=report_columns.length; i<l; i++) { %}
 						<td class="text-center">
 							{% const fieldname = report_columns[i].fieldname; %}
