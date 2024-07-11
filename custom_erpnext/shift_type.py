@@ -82,7 +82,7 @@ class override_ShiftType(Document):
 		if logs:
 			employee=logs[0].employee
 			company =frappe.db.get_value("Employee", employee, "company")
-			rounding_ot = frappe.db.get_value("Company", company, "rounding_overtime") 
+			rounding_ot,overtime_deduct = frappe.db.get_value("Company", company, ["rounding_overtime","overtime_deduct_for_night"]) 
 		
 		for key, group in itertools.groupby(
 			logs, key=lambda x: (x["employee"], x["shift_actual_start"])
@@ -97,7 +97,7 @@ class override_ShiftType(Document):
 				out_time,
 				late_entry_duration,
 				overtime,
-			) = self.get_attendance(single_shift_logs,weekly_off_list,working_holiday)
+			) = self.get_attendance(single_shift_logs,weekly_off_list,working_holiday,overtime_deduct)
 			mark_attendance_and_link_log(
 				single_shift_logs,
 				attendance_status,
@@ -117,7 +117,7 @@ class override_ShiftType(Document):
 		# frappe.publish_realtime('msgprint', 'Ending process for '+self.name+' at-> '+str(datetime.now()))
 
 
-	def get_attendance(self, logs,weekly_off_list,working_holiday):
+	def get_attendance(self, logs,weekly_off_list,working_holiday,overtime_deduct):
 		"""Return attendance_status, working_hours, late_entry, early_exit, in_time, out_time
 		for a set of logs belonging to a single shift.
 		Assumtion:
@@ -183,6 +183,10 @@ class override_ShiftType(Document):
 			and out_time > logs[0].shift_end #- timedelta(minutes=cint(self.early_exit_grace_period))
 		):
 			overtime=out_time-logs[0].shift_end
+
+			if (datetime.time(out_time)>datetime.time(datetime.strptime("03:00:00", "%H:%M:%S"))) and (datetime.time(out_time)<datetime.time(logs[0].shift_end)) and self.is_night=="No" and overtime_deduct==1:
+				overtime=out_time-logs[0].shift_end-timedelta(hours=1)
+			
 		if (out_time):
 			start_time_to_lunch_duration,lunch_duration= self.lunch_timing()
 			if(weekly_off_check==0 or weekly_off_check==1) and working_holiday=="0":

@@ -98,6 +98,27 @@ class override_SalarySlip(TransactionBase):
 			total_pay = 0
 			return total_pay, overtime_hours[0][0] or 0
 		
+	def calculate_extra_payment_nonworker(self,medical_amount): # chn added the function to give allowance to employees who are not eligable for overtime but worked on holidays.
+		allow_holiday_allowance = frappe.db.get_value("Company", self.company, "holiday_allowance")
+
+		if (allow_holiday_allowance==1):
+			extra_payment_rate = round((((self.base_pay - medical_amount) * 2/3 ) / (date_diff(self.end_date,self.start_date)+1)),4) #For payroll base_pay initiaziled as 0 then while creating salary slip it will fetch the base value for 875 line
+			# frappe.publish_realtime('msgprint', 'base '+str(self.base_pay)+ ' medical '+str(medical_amount)+' rate '+str(extra_payment_rate)+' holiday= '+str(allow_holiday_allowance))
+
+			holiday_working_hours = frappe.db.sql("""SELECT SUM(case when working_hours>5 then 9 else working_hours end),count(*) FROM `tabAttendance`  att INNER JOIN tabEmployee emp ON emp.name = att.employee 
+											WHERE emp.employee=%s and emp.ot_enable='No'  and att.status in ("Holiday","Weekly Off") and att.attendance_date between %s and %s""",
+			(self.employee, self.start_date, self.end_date))
+
+			if(holiday_working_hours[0][0] and extra_payment_rate):
+				total_pay = float(extra_payment_rate)*holiday_working_hours[0][0]
+				return total_pay or 0, holiday_working_hours[0][0] or 0
+			else:
+				total_pay = 0
+				return total_pay, holiday_working_hours[0][0] or 0
+		else:
+			return 0, 0
+
+		
 	def calculate_total_late_entry_duration(self):
 
 		#overtime_hours will return a tuple. Which will be accessible using overtime_hours[0][0]
@@ -743,7 +764,8 @@ class override_SalarySlip(TransactionBase):
 		# 	medical_amount=0
 		self.overtime_rate = round((((self.base_pay - medical_amount) * 2/3 ) / 104),4) #For payroll base_pay initiaziled as 0 then while creating salary slip it will fetch the base value for 875 line
 		self.total_overtime_pay, self.overtime_hours = self.calculate_overtime_amount()
-		self.gross_pay = self.get_component_totals("earnings", depends_on_payment_days=1) + self.arear + flt(self.total_overtime_pay)
+		self.holiday_allowance ,self.holiday_hours =self.calculate_extra_payment_nonworker(medical_amount)
+		self.gross_pay = self.get_component_totals("earnings", depends_on_payment_days=1) + self.arear + flt(self.total_overtime_pay)+flt(self.holiday_allowance)
 		self.base_gross_pay = flt(
 			flt(self.gross_pay) * flt(self.exchange_rate), self.precision("base_gross_pay")
 		)
@@ -844,9 +866,11 @@ class override_SalarySlip(TransactionBase):
 			order_by="from_date desc",
 			as_dict=True,
 		)
-		exchange_rate_usd=get_exchange_rate("USD","BDT",self.posting_date) or 1 #dollar to taka for qstml
-		if(employee.group=="Worker"):
-			salary_structure_assignment["base"]= salary_structure_assignment["base"]*exchange_rate_usd  #Worker in QSTML have base in dollar
+		worker_salary_dollar = frappe.db.get_value("Company", self.company, "workers_salary_in_dollar")  #chn special policy in salary for employees salary in dollar
+		if worker_salary_dollar==1:
+			exchange_rate_usd=get_exchange_rate("USD","BDT",self.posting_date) or 1 #chn dollar to taka for qstml
+			if(employee.group=="Worker"):
+				salary_structure_assignment["base"]= salary_structure_assignment["base"]*exchange_rate_usd  #chn Worker in QSTML have base in dollar
 		self.base_pay=salary_structure_assignment["base"]
 
 		if not salary_structure_assignment:

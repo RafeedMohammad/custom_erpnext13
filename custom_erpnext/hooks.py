@@ -101,6 +101,7 @@ override_doctype_class = {
     "Loan Repayment":"custom_erpnext.loan_repayment.override_LoanRepayment",
     "Loan" : "custom_erpnext.loan.Loan",
     "Department" : "custom_erpnext.department.Department",
+    "Leave Policy Assignment": "custom_erpnext.leave_policy_assignment.override_LeavePolicyAssignment"
 	#"Asset": "custom_erpnext.asset.override_Asset",
 }
 
