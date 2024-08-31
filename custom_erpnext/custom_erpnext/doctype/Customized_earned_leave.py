@@ -243,9 +243,10 @@ def update_previous_leave_allocation(employee_name, from_date, to_date, allocati
 
 
 def get_monthly_earned_leave(employee_name, from_date, to_date, annual_leaves, frequency, rounding):
+	total_working_days=0
 	total_working_days = frappe.db.sql("""select count(*) from `tabAttendance` where
 									employee = '%s' and status in ('Present', 'Late')
-									and attendance_date between '%s' and '%s'""" %(employee_name,from_date,to_date))
+									and attendance_date between '%s' and '%s'""" %(employee_name,from_date,to_date)) or 0
 	
 	earned_leaves = 0.0
 	#divide_by_frequency = {"Yearly": 1, "Half-Yearly": 6, "Quarterly": 4, "Monthly": 12}
@@ -260,8 +261,8 @@ def get_monthly_earned_leave(employee_name, from_date, to_date, annual_leaves, f
 			#else:
 			#	earned_leaves = round(earned_leaves) 
 	
-	if rounding == "0.5":
-		earned_leaves = round(total_working_days[0][0] / 18)
+	# if rounding == "0.5":
+	earned_leaves = round(total_working_days[0][0] / 18)
 
 
 	return earned_leaves

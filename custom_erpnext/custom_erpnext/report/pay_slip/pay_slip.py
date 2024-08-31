@@ -67,7 +67,7 @@ def execute(filters= None):
 			(hours_for_ot,hours_for_ot,ss.employee, ss.start_date, ss.end_date))
 			overtime_hours=ot_hours[0][0]
 			ot_amount=ot_hours[0][0]*float(ss.overtime_rate)
-			holiday_allowance=ss.holiday_allowance
+			holiday_allowance=ss.holiday_allowance or 0
 			# if ss.present_days!=0:
 				#lunch=(float(acctual_lunch)*ss.present_days/(ss.present_days+max(ss.late_days,ss.working_holidays)))#previously we count working_holidays in late_days 
 
