@@ -1,0 +1,133 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-09-22 16:43:01.917809",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "month",
+  "department",
+  "designation",
+  "select_shift",
+  "employee_id",
+  "column_break_5",
+  "year",
+  "floor",
+  "facility_or_line",
+  "section",
+  "group",
+  "company",
+  "employee_list_section",
+  "section_break_12",
+  "employees_html"
+ ],
+ "fields": [
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department"
+  },
+  {
+   "fieldname": "designation",
+   "fieldtype": "Link",
+   "label": "Designation",
+   "options": "Designation"
+  },
+  {
+   "fieldname": "select_shift",
+   "fieldtype": "Link",
+   "label": "Select Shift",
+   "options": "Shift Type"
+  },
+  {
+   "default": "0",
+   "fieldname": "employee_id",
+   "fieldtype": "Table MultiSelect",
+   "label": "Employee Id",
+   "options": "Employee Info"
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "floor",
+   "fieldtype": "Link",
+   "label": "Floor",
+   "options": "Floor"
+  },
+  {
+   "fieldname": "facility_or_line",
+   "fieldtype": "Link",
+   "label": "Facility or Line",
+   "options": "Facility or Line"
+  },
+  {
+   "fieldname": "section",
+   "fieldtype": "Link",
+   "label": "Section",
+   "options": "Section"
+  },
+  {
+   "fieldname": "group",
+   "fieldtype": "Link",
+   "label": "Group ",
+   "options": "Group"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "employee_list_section",
+   "fieldtype": "Section Break",
+   "label": "Employee List"
+  },
+  {
+   "fieldname": "section_break_12",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "employees_html",
+   "fieldtype": "HTML",
+   "label": "Employees HTML"
+  },
+  {
+   "fieldname": "month",
+   "fieldtype": "Select",
+   "label": "Month",
+   "options": "Jan\nFeb\nMar\nApr\nMay\nJun\nJul\nAug\nSep\nOct\nNov\nDec"
+  },
+  {
+   "fieldname": "year",
+   "fieldtype": "Data",
+   "label": "Year"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2024-10-01 12:10:28.804482",
+ "modified_by": "Administrator",
+ "module": "Custom Erpnext",
+ "name": "Arrear Tax Tool",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
