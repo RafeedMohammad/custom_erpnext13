@@ -94,7 +94,7 @@ def get_employees(date, shift = None , department=None, designation=None, floor=
 def mark_employee_new_shift_assignment(employee_list, shift, from_date, to_date, company=None):
 
 	employee_list = json.loads(employee_list)
-	frappe.publish_realtime('msgprint',str(employee_list))
+	# frappe.publish_realtime('msgprint',str(employee_list))
 	for employee in employee_list:
 
 		#company = frappe.db.get_value("Employee", employee["employee"], "Company", cache=True)
