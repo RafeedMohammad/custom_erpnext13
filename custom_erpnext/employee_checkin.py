@@ -38,10 +38,11 @@ class override_EmployeeCheckin(Document):
 			"Employee Checkin", {"employee": self.employee, "time": self.time, "name": ["!=", self.name]}
 		)
 		if doc:
-			doc_link = frappe.get_desk_link("Employee Checkin", doc)
-			frappe.throw(
-				_("This employee already has a log with the same timestamp.{0}").format("<Br>" + doc_link)
-			)
+			self.time=datetime.strptime(self.time, '%Y-%m-%d %H:%M:%S')+timedelta(seconds=10)
+			# doc_link = frappe.get_desk_link("Employee Checkin", doc)
+			# frappe.throw(
+			# 	_("This employee already has a log with the same timestamp.{0}").format("<Br>" + doc_link)
+			# )
 
 	def fetch_shift(self):
 		shift_actual_timings = get_actual_start_end_datetime_of_shift(
@@ -252,7 +253,9 @@ def mark_attendance_and_link_log(
 			#change_start
 			#insert_start=datetime.now()  
 			#frappe.publish_realtime('msgprint', 'Starting insertion attendance for duplicate '+logs[0].employee+" for "+str(attendance_date)+' at-> '+str(datetime.now()))		
-			previous_attendance_name=frappe.db.get_value("Attendance",{"attendance_date":attendance_date,"employee":employee},'name')
+			previous_attendance_name=frappe.db.get_value("Attendance",{"attendance_date":attendance_date,"employee":employee},['name','status'])
+			if 	previous_attendance_name[1]=="On Leave": #previous_attendance_name[1]=attendance_status
+				return None	
 			doc_dict = {
                 "doctype": "Attendance",
                 "employee": employee,
@@ -271,14 +274,14 @@ def mark_attendance_and_link_log(
 				"shift_end":shift_end,
 				"overtime":overtime	
             }
-			attendance=frappe.db.set_value('Attendance', previous_attendance_name, {'out_time': doc_dict['out_time'],'working_hours': doc_dict['working_hours'],
+			attendance=frappe.db.set_value('Attendance', previous_attendance_name[0], {'out_time': doc_dict['out_time'],'working_hours': doc_dict['working_hours'],
             'in_time': doc_dict['in_time'],'status': doc_dict['status'],'late_entry': doc_dict['late_entry'],'early_exit': doc_dict['early_exit'], 
 			'rounded_ot': doc_dict['rounded_ot'],'late_entry_duration':doc_dict['late_entry_duration'], 'shift_start':doc_dict['shift_start'],
 			'shift_end':doc_dict['shift_end'], 'shift':doc_dict['shift'], "overtime":doc_dict['overtime']}, update_modified=True)
 			#Changed Code - End
 
 			#Attendance document with updated values will be saved
-			attendance = frappe.get_doc('Attendance',previous_attendance_name).save()
+			attendance = frappe.get_doc('Attendance',previous_attendance_name[0]).save()
 
 			#-->skip_attendance_in_checkins(log_names,previous_attendance_name)#added previous_attendance
 			#skip_attendance_in_checkins(log_names)
