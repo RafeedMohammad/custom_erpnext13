@@ -36,6 +36,7 @@ def get_columns():
 		_("Employee No") + ":Data/:120",
 		_("Name") + ":Link/Employee:120",
 		_("Desingnation") + ":Data/:120",
+		_("Department") + ":Data/:120",
 		_("Shift") + ":Data/:120",
 		_("In Time") + ":Data/Attendance:120",
 		_("Late") + ":Data/Attendance:120",
@@ -58,7 +59,7 @@ def get_attendance(filters):
 	rounded_over_time2 = frappe.db.get_value('Company', filters.company, 'rounding_overtime_for_extra_30min')
 
 	conditions, filters = get_conditions(filters)
-	result= frappe.db.sql("""select DISTINCT tabEmployee.employee,  tabAttendance.employee_name, tabEmployee.designation,tabAttendance.shift,
+	result= frappe.db.sql("""select DISTINCT tabEmployee.employee,  tabAttendance.employee_name, tabEmployee.designation,tabAttendance.department,tabAttendance.shift,
 	tabAttendance.in_time, tabAttendance.late_entry_duration, tabAttendance.out_time, tabAttendance.rounded_ot, tabAttendance.status,
 	tabAttendance.shift_start,tabAttendance.shift_end,`tabAttendance`.leave_type
 	FROM tabAttendance
@@ -71,66 +72,66 @@ def get_attendance(filters):
 	
 	for i in range(0, len(result)):
 		
-		if result[i][8]=='Absent':
-			result[i][4]=result[i][5]=result[i][6]="00:00"
-		elif result[i][8]=='On Leave':
-			result[i][4]=result[i][5]=result[i][6]="00:00"
-			result[i][8]=result[i][11]
+		if result[i][9]=='Absent':
+			result[i][5]=result[i][6]=result[i][7]="00:00"
+		elif result[i][9]=='On Leave':
+			result[i][5]=result[i][6]=result[i][7]="00:00"
+			result[i][9]=result[i][12]
 
 
-		elif result[i][6] is None:
-			if result[i][4] !=None:
-				result[i][4]=datetime.strftime(result[i][4],'%H:%M')
-			if ((result[i][8]=="Weekly Off" or result[i][8]=="Holiday")and max_allowed_hour<10):
-					result[i][4]=result[i][6]=None
-					result[i][7]=0
+		elif result[i][7] is None:
+			if result[i][5] !=None:
+				result[i][5]=datetime.strftime(result[i][5],'%H:%M')
+			if ((result[i][9]=="Weekly Off" or result[i][9]=="Holiday")and max_allowed_hour<10):
+					result[i][5]=result[i][7]=None
+					result[i][8]=0
 			continue
-		elif result[i][10] is None:
+		elif result[i][11] is None:
 			continue
 		else:
 			if (max_allowed_hour>10): 
 				pass
 			elif(max_allowed_minute>10):
-				if(result[i][6]>result[i][10]):
-					overtime=result[i][6]-result[i][10]
+				if(result[i][7]>result[i][11]):
+					overtime=result[i][7]-result[i][11]
 					minute1=int(str(overtime).split(":")[1])
 
 					#result[i][3]=overtime
 					if(overtime>timedelta( hours=max_allowed_hour, minutes=max_allowed_minute+10)):
-						result[i][6]=result[i][10]+timedelta(hours=max_allowed_hour,minutes=max_allowed_minute+(minute1%10))
-						result[i][7]=max_allowed_hour+(max_allowed_minute/60)
+						result[i][7]=result[i][11]+timedelta(hours=max_allowed_hour,minutes=max_allowed_minute+(minute1%10))
+						result[i][8]=max_allowed_hour+(max_allowed_minute/60)
 
 					elif(overtime>=timedelta( hours=max_allowed_hour, minutes=max_allowed_minute-rounded_over_time2)):
-						result[i][7]=max_allowed_hour+(max_allowed_minute/60)
+						result[i][8]=max_allowed_hour+(max_allowed_minute/60)
 					elif(int(str(overtime).split(":")[1])<rounded_over_time1):
-						result[i][6]=result[i][10]+timedelta(hours=result[i][7],minutes=minute1%10)
+						result[i][7]=result[i][11]+timedelta(hours=result[i][8],minutes=minute1%10)
 			else:
-				if(result[i][6]>result[i][10]):
-					overtime=result[i][6]-result[i][10]
+				if(result[i][7]>result[i][11]):
+					overtime=result[i][7]-result[i][11]
 					minute1=int(str(overtime).split(":")[1])
 
 					#result[i][3]=overtime
 					if(overtime>timedelta( hours=max_allowed_hour)):
-						result[i][6]=(result[i][10])+timedelta(hours=max_allowed_hour,minutes=minute1%10)
-						result[i][7]=max_allowed_hour
+						result[i][7]=(result[i][11])+timedelta(hours=max_allowed_hour,minutes=minute1%10)
+						result[i][8]=max_allowed_hour
 
 					elif(minute1<rounded_over_time1):
-						result[i][6]=result[i][10]+timedelta(hours=result[i][7],minutes=minute1%10)
+						result[i][7]=result[i][11]+timedelta(hours=result[i][8],minutes=minute1%10)
 		
 									
 
-			result[i][6]=datetime.strftime(result[i][6],'%H:%M')
+			result[i][7]=datetime.strftime(result[i][7],'%H:%M')
 
-			if(result[i][4]<result[i][9] and max_allowed_hour<10):
-				early_entry_diff_min=int(str(result[i][9]-result[i][4]).split(":")[1])%10
-				result[i][4]=result[i][9]-timedelta(minutes=early_entry_diff_min)
+			if(result[i][5]<result[i][10] and max_allowed_hour<10):
+				early_entry_diff_min=int(str(result[i][10]-result[i][5]).split(":")[1])%10
+				result[i][5]=result[i][10]-timedelta(minutes=early_entry_diff_min)
 
-			if ((result[i][8]=="Weekly Off" or result[i][8]=="Holiday" )and max_allowed_hour<10):
-					result[i][4]=result[i][6]=None
-					result[i][7]=0
-		if not isinstance(result[i][4],str) :
-			if result[i][4]!=None:
-				result[i][4]=datetime.strftime(result[i][4],'%H:%M')
+			if ((result[i][9]=="Weekly Off" or result[i][9]=="Holiday" )and max_allowed_hour<10):
+					result[i][5]=result[i][7]=None
+					result[i][8]=0
+		if not isinstance(result[i][5],str) :
+			if result[i][5]!=None:
+				result[i][5]=datetime.strftime(result[i][5],'%H:%M')
 
 
 
