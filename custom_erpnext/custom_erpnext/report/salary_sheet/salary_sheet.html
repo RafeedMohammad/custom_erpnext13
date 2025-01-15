@@ -1,147 +1,139 @@
-{%
-	var report_columns = report.get_columns_for_print();
-	report_columns = report_columns.filter(col => !col.hidden);
-
-	if (report_columns.length > 50) {
-		frappe.throw(__("Too many columns. Export the report and print it using a spreadsheet application."));
-	}
-%}
-
-
-
 <style>
-    tr{
-        border: 1px solid black;
-		font-size: 7px;
-		margin-left: 0;
+    @page {
+        size: landscape;
+        margin: 5mm;  /* Set margins to fit the content */
     }
-	td{
-        border: 1px solid black;
-		font-size: 6.5px;
-		margin-left: 0;
-		font-weight: bold;
-    } 
-	.footer {
-		padding-top: 60%;
-		position: fixed;
-		left: 0;
-		bottom: 0;
-		width: 100%;
-		color: white;
-		text-align: center;
-		font-size: 11px;
-	}
-	.column {
-		float: left;
-		width: 25%;
-		/* padding-top: 10px; */
-		}
 
-    .row:after {
-		content: "";
-		display: table;
-		clear: both;
+    /* Reset body margin and padding */
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        font-size: 6px;
     }
-	.pagebreak {
+
+    /* Ensure table uses full width of the page */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    tr, th, td {
+        border: 1px solid black;
+        padding: 2px;
+    }
+
+    th {
+        font-size: 7px;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    td {
+        font-size: 6px;
+        text-align: center;
+        word-wrap: break-word; /* Wrap long text to avoid overflow */
+    }
+
+    .footer {
+        padding-top: 10mm;
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        color: black;
+        text-align: center;
+        font-size: 10px;
+    }
+
+    .pagebreak {
         clear: both;
         page-break-after: always;
     }
 </style>
 
+{% var report_columns = report.get_columns_for_print(); %}
+{% report_columns = report_columns.filter(col => !col.hidden); %}
 
-
-<!-- <h3 class="text-center">{%= filters.company %}</h3> -->
-<!-- <h4 class="text-center">Salary for the month of - {%= filters.month %}, {%= filters.year %}</h4> -->
-<!-- {% if (!is_null(filters.department)) { %}
-	<h6>Department: {%= filters.department %}</h6>
-{% } %} -->
-<!-- {% if (!is_null(filters.employee)) { %}
-	<h6>Department: {%= filters.employee %}</h6>
-{% } %} -->
+{% if (report_columns.length > 50) { %}
+    {% frappe.throw(__("Too many columns. Export the report and print it using a spreadsheet application.")); %}
+{% } %}
 
 {% let u = 0 %}
 {% for(let m=0, k=data.length; m<k; m++) { %}
 
-	{% if (!is_null(data[m][report_columns[0].fieldname])) { %}
-	{% if (data[m][report_columns[0].fieldname]!="Total") { %}
+    {% if (!is_null(data[m][report_columns[0].fieldname])) { %}
+    {% if (data[m][report_columns[0].fieldname] != "Total") { %}
 
-	<table class="table table-bordered">
-		
-		<thead>
-			<tr><th class="text-center" colspan="34"><font size="2%">Salary for the month of - {%= filters.month %}, {%= filters.year %}</font></th></tr>
-			
-			<tr>
-				{% if (!is_null(filters.department)) { %}
-						<th class="text-left" colspan="6"><font size="1%">Department: {%= filters.department %}</font></th>
-				{% } %}
-				{% if (!is_null(filters.group_name)) { %}
-						<th class="text-left" colspan="6"><font size="1%">Group: {%= filters.group_name %}</font></th>
-				{% } %}
-				{% if (!is_null(filters.employee)) { %}
-						<th class="text-left" colspan="6"><font size="1%">Employee: {%= filters.employee %}</font></th>
-				{% } %}
-				{% if (!is_null(filters.mode_of_payment)) { %}
-						<th class="text-left" colspan="6"><font size="1%">Salary In {%= filters.mode_of_payment %}</font></th>
-				{% } %}
-				{% if (!is_null(data[m][report_columns[0].fieldname])) { %}
-						<th class="text-left" colspan="6"><font size="1%">{%=data[m][report_columns[0].fieldname]%}</font></th>
-				{% } %}
-			</tr>
-			<tr>
-				<th>Sl No</th>
-				{% for (let i=1, l=report_columns.length-1; i<l; i++) { %}
-					<th class="text-center">{%= report_columns[i].label %}</th>
-				{% } %}
-				{% for (let i=report_columns.length-1, l=report_columns.length; i<l; i++) { %}
-					<th class="text-center">{%= report_columns[i].label %}</th>
-				{% } %}
-			</tr>
-		</thead>
-		<tbody>
-			{% for(let j=m+1, k=data.length; j<k; j++) { %}
-				<!-- {%
-					var row = data[j];
-					var row_class = data[j].parent_account ? "" : "financial-statements-important";
-					row_class += data[j].account_name ? "" : " financial-statements-blank-row";
-				%} -->
-				{% if (data[j][report_columns[0].fieldname]!="Total") { %}
-					
-					
-				
-				<tr class="{%= row_class %}" height="75px" >
-					<td> {%=u+1%}	</td>
-					{% for(let i=1, l=report_columns.length; i<l; i++) { %}
-						<td class="text-center">
-							{% const fieldname = report_columns[i].fieldname; %}
-							{% if (!is_null(row[fieldname])) { %}
-								{%= frappe.format(row[fieldname], report_columns[i], {}, row) %}
-							{% } %}
-						</td>
-					{% } %}
-				</tr>
-				{% u++ %}
-				{% } %}
-				{% if (data[j][report_columns[0].fieldname]=="Total") { %}
-				<tr class="{%= row_class %}">
-					<td>	</td>
-					{% for(let i=1, l=report_columns.length; i<l; i++) { %}
-						<td class="text-center">
-							{% const fieldname = report_columns[i].fieldname; %}
-							{% if (!is_null(row[fieldname])) { %}
-								{%= frappe.format(row[fieldname], report_columns[i], {}, row) %}
-							{% } %}
-						</td>
-					{% } %}
-				</tr>
-					
-					{%j=k%}
-				{% } %}
-			{% } %}
-		</tbody>
-		
-	</table>
-	<div class="pagebreak"> </div>
-	{% } %}
-	{% } %}
+    <table class="table table-bordered">
+        
+        <thead>
+            <tr><th colspan="34" style="text-align: center; font-size: 8px;">Salary for the month of - {%= filters.month %}, {%= filters.year %}</th></tr>
+            <tr>
+                {% if (!is_null(filters.department)) { %}
+                    <th colspan="6" style="text-align: left; font-size: 6px;">Department: {%= filters.department %}</th>
+                {% } %}
+                {% if (!is_null(filters.group_name)) { %}
+                    <th colspan="6" style="text-align: left; font-size: 6px;">Group: {%= filters.group_name %}</th>
+                {% } %}
+                {% if (!is_null(filters.employee)) { %}
+                    <th colspan="6" style="text-align: left; font-size: 6px;">Employee: {%= filters.employee %}</th>
+                {% } %}
+                {% if (!is_null(filters.mode_of_payment)) { %}
+                    <th colspan="6" style="text-align: left; font-size: 6px;">Salary In {%= filters.mode_of_payment %}</th>
+                {% } %}
+                {% if (!is_null(data[m][report_columns[0].fieldname])) { %}
+                    <th colspan="6" style="text-align: left; font-size: 6px;">{%= data[m][report_columns[0].fieldname] %}</th>
+                {% } %}
+            </tr>
+
+            <tr>
+                <th style="width: 30px;">Sl No</th>
+                {% for (let i=1, l=report_columns.length-1; i<l; i++) { %}
+                    <th style="width: 60px; font-size: 6px;">{%= report_columns[i].label %}</th>
+                {% } %}
+                {% for (let i=report_columns.length-1, l=report_columns.length; i<l; i++) { %}
+                    <th style="width: 60px; font-size: 6px;">{%= report_columns[i].label %}</th>
+                {% } %}
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for(let j=m+1, k=data.length; j<k; j++) { %}
+                {% if (data[j][report_columns[0].fieldname] != "Total") { %}
+                    <tr>
+                        <td> {%= u+1 %} </td>
+                        {% for(let i=1, l=report_columns.length; i<l; i++) { %}
+                            <td>
+                                {% const fieldname = report_columns[i].fieldname; %}
+                                {% if (!is_null(data[j][fieldname])) { %}
+                                    {%= frappe.format(data[j][fieldname], report_columns[i], {}, data[j]) %}
+                                {% } %}
+                            </td>
+                        {% } %}
+                    </tr>
+                    {% u++ %}
+                {% } %}
+                {% if (data[j][report_columns[0].fieldname] == "Total") { %}
+                    <tr>
+                        <td> </td>
+                        {% for(let i=1, l=report_columns.length; i<l; i++) { %}
+                            <td>
+                                {% const fieldname = report_columns[i].fieldname; %}
+                                {% if (!is_null(data[j][fieldname])) { %}
+                                    {%= frappe.format(data[j][fieldname], report_columns[i], {}, data[j]) %}
+                                {% } %}
+                            </td>
+                        {% } %}
+                    </tr>
+                    {% j = k %}
+                {% } %}
+            {% } %}
+        </tbody>
+    </table>
+
+    <div class="pagebreak"></div>
+
+    {% } %}
+    {% } %}
 {% } %}
-

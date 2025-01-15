@@ -1,4 +1,3 @@
-
 from datetime import datetime, timedelta
 import frappe
 from frappe.utils import flt
@@ -117,7 +116,7 @@ def get_data(filters= None):
 
 				ss.absent_days,
 				# ss.gross_pay,
-				round(float((salary_slip_basic+allowance)+round(acctual_basic-(acctual_basic* flt(ss.payment_days) / 30)) or 0),2),
+				round(float((salary_slip_basic+allowance) or 0),0),
 				round(float(overtime_hours or 0),1),
 				#ss.total_overtime_pay,
 				round(float(ot_amount or 0),0),
@@ -127,8 +126,8 @@ def get_data(filters= None):
 				ss.night_days,
 				get_night_allowance(ss.name),
 				ss.arear,
-				round(ss.gross_pay-float(ss.total_overtime_pay)-float(acctual_lunch)-float(holiday_allowance)+float(acctual_lunch)+float(ot_amount)+round(acctual_basic-(acctual_basic* flt(ss.payment_days) / 30)),0),
-				round(acctual_basic-(acctual_basic* flt(ss.payment_days) / 30)),
+				round(ss.gross_pay-float(ss.total_overtime_pay)-float(acctual_lunch)-float(holiday_allowance)+float(acctual_lunch)+float(ot_amount),0),
+				round(ss.absent_deduction or 0,0),
 				round(get_pf(ss.name),0),
 				round(get_late_amt(ss.name),0),
 				get_stamp(ss.name),
@@ -141,10 +140,7 @@ def get_data(filters= None):
 			# for d in ded_types:
 			# 	row.append(ss_ded_map.get(ss.name, {}).get(d))
 			
-			row += [round(ss.total_loan_repayment,0),
-		   			(round(ss.total_deduction,0)+round(ss.total_loan_repayment,0)+round(ss.income_tax,0)+round(acctual_basic-(acctual_basic* flt(ss.payment_days) / 30))),
-					round((ss.net_pay-float(ss.total_overtime_pay)-float(acctual_lunch)-float(holiday_allowance)+float(acctual_lunch)+float(ot_amount)),0),
-					  None]
+			row += [round(ss.total_loan_repayment,0),(round(ss.total_deduction,0)+round(ss.total_loan_repayment,0)+round(ss.income_tax,0)+round(ss.absent_deduction,0)), round((ss.net_pay-round(ss.absent_deduction,0)-float(ss.total_overtime_pay)-float(acctual_lunch)-float(holiday_allowance)+float(acctual_lunch)+float(ot_amount)),0), None]
 			
 
 			
@@ -225,7 +221,7 @@ def get_columns():
 		columns
 		# + [(d + ":Integer:10") for d in salary_components[_("Deduction")]]
 		+ [
-			_("Late Ded") + ":Integer:10",
+			_("Abs Ded") + ":Integer:10",
 			_("PF") + ":Integer:10",
 			_("Late amt") + ":Integer:10",
 			_("Sta mp") + ":Integer:10",

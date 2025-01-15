@@ -113,13 +113,14 @@
 			<td>Trn & Lunch: {{data[j].lunch_tran_allow}}</td>
 			<td>Attn. Bonus: {{data[j].attn_bon}}</td>  
 			<td>Stamp </td>   
+			<td>Abs Ded: {{data[j].absent_penalty}}</td>
 		</tr>
 		
 		<tr>
 			<td>&nbsp;</td>
 			<td colspan="3">&nbsp;</td>
 			<td colspan="2">&nbsp;</td>
-			<td colspan="2">Late Amt: {{data[j].late_ded}}</td>   
+			<td colspan="2">Late Amt: {{data[j].late_ded || 0}}</td>   
 		</tr>
 		
 		<tr>
