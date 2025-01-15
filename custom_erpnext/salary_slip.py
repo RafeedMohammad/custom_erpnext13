@@ -1412,7 +1412,7 @@ class override_SalarySlip(TransactionBase):
 
 			amount = (
 				flt(
-					(flt(row.default_amount) * flt(self.payment_days) / cint(self.total_working_days)),
+					(flt(row.default_amount) * flt(self.payment_days) / 30),#30 because it is govt rule in BD for absent deduction always calculate month as 30 days  #cint(self.total_working_days)),
 					row.precision("amount"),
 				)
 				+ additional_amount

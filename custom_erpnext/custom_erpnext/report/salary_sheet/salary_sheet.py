@@ -47,7 +47,7 @@ def get_data(filters= None):
 			# salary_slip_basic = get_salary_basic(ss.name)
 			if salary_slip_basic is None:
 				salary_slip_basic = 0
-			actual_allowance= (get_default_medical(ss.name) or 1450)+(acctual_basic/2)
+			actual_allowance= (get_default_medical(ss.name) or 2375)+(acctual_basic/2)
 			allowance = get_allowance(ss.name)
 			acctual_lunch=get_lunch_tr_allowance(ss.name)+get_lunch(ss.name)+get_convanse(ss.name)
 			if acctual_lunch is None:
@@ -77,8 +77,8 @@ def get_data(filters= None):
 			else:
 				ot_hours = frappe.db.sql("""SELECT SUM(case when rounded_ot>%s then %s else rounded_ot end) FROM `tabAttendance` where status not in ('Holiday','Weekly Off') and employee=%s AND attendance_date between %s and %s group by employee""",
 				(hours_for_ot,hours_for_ot,ss.employee, ss.start_date, ss.end_date))
-				overtime_hours=ot_hours[0][0]
-				ot_amount=ot_hours[0][0]*float(ss.overtime_rate)
+				overtime_hours = ot_hours[0][0] if ot_hours else 0  
+				ot_amount=(ot_hours[0][0] if ot_hours else 0  )*float(ss.overtime_rate)
 				holiday_allowance=ss.holiday_allowance or 0 
 				# if ss.present_days!=0:
 				# 	lunch=(float(acctual_lunch)*ss.present_days/(ss.present_days+max(ss.late_days,ss.working_holidays)))#previously we count working_holidays in late_days 
@@ -117,7 +117,7 @@ def get_data(filters= None):
 
 				ss.absent_days,
 				# ss.gross_pay,
-				round(float((salary_slip_basic+allowance) or 0),2),
+				round(float((salary_slip_basic+allowance)+round(acctual_basic-(acctual_basic* flt(ss.payment_days) / 30)) or 0),2),
 				round(float(overtime_hours or 0),1),
 				#ss.total_overtime_pay,
 				round(float(ot_amount or 0),0),
@@ -127,7 +127,8 @@ def get_data(filters= None):
 				ss.night_days,
 				get_night_allowance(ss.name),
 				ss.arear,
-				round(ss.gross_pay-float(ss.total_overtime_pay)-float(acctual_lunch)-float(holiday_allowance)+float(acctual_lunch)+float(ot_amount),0),
+				round(ss.gross_pay-float(ss.total_overtime_pay)-float(acctual_lunch)-float(holiday_allowance)+float(acctual_lunch)+float(ot_amount)+round(acctual_basic-(acctual_basic* flt(ss.payment_days) / 30)),0),
+				round(acctual_basic-(acctual_basic* flt(ss.payment_days) / 30)),
 				round(get_pf(ss.name),0),
 				round(get_late_amt(ss.name),0),
 				get_stamp(ss.name),
@@ -140,7 +141,10 @@ def get_data(filters= None):
 			# for d in ded_types:
 			# 	row.append(ss_ded_map.get(ss.name, {}).get(d))
 			
-			row += [round(ss.total_loan_repayment,0),(round(ss.total_deduction,0)+round(ss.total_loan_repayment,0)+round(ss.income_tax,0)), round((ss.net_pay-float(ss.total_overtime_pay)-float(acctual_lunch)-float(holiday_allowance)+float(acctual_lunch)+float(ot_amount)),0), None]
+			row += [round(ss.total_loan_repayment,0),
+		   			(round(ss.total_deduction,0)+round(ss.total_loan_repayment,0)+round(ss.income_tax,0)+round(acctual_basic-(acctual_basic* flt(ss.payment_days) / 30))),
+					round((ss.net_pay-float(ss.total_overtime_pay)-float(acctual_lunch)-float(holiday_allowance)+float(acctual_lunch)+float(ot_amount)),0),
+					  None]
 			
 
 			
@@ -221,6 +225,7 @@ def get_columns():
 		columns
 		# + [(d + ":Integer:10") for d in salary_components[_("Deduction")]]
 		+ [
+			_("Late Ded") + ":Integer:10",
 			_("PF") + ":Integer:10",
 			_("Late amt") + ":Integer:10",
 			_("Sta mp") + ":Integer:10",

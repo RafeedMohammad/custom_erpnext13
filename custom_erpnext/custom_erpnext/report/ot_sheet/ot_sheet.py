@@ -43,74 +43,99 @@ def execute(filters=None):
 	return columns, data
 
 
-
-
-
-def add_data(
-	employee_map, att_map, filters, conditions
-):
-	record = []
-	emp_att_map = {}
-	for emp in employee_map:
-		emp_det = employee_map.get(emp)
-		if not emp_det or emp not in att_map:
-			continue
-
-		row = []
-		if filters.group_by:
-			row += [" "]
-		row += [emp,emp_det.employee_name]
-
-		emp_status_map = []
-		total_ot=0
-		for day in range(filters["total_days_in_month"]):
-			ot = att_map.get(emp).get(day + 1)
-			if ot==None:
-				ot=0
-			total_ot=total_ot+ot
-			emp_status_map.append(ot)
-
-
-
-		if not filters.summarized_view:
-			row += emp_status_map
-
-		
-		if not filters.get("employee"):
-			filters.update({"employee": emp})
-			conditions += " and employee = %(employee)s"
-		elif not filters.get("employee") == emp:
-			filters.update({"employee": emp})
-
-		
-
-			
-		row+=[total_ot]
-		emp_att_map[emp] = emp_status_map
-		record.append(row)
-		#record.append(total_ot)
-
-	return record, emp_att_map
-
-
 def get_columns(filters):
+    columns = []
 
-	columns = []
+    if filters.group_by:
+        columns = [_(filters.group_by) + ":Link/Branch:120"]
 
-	if filters.group_by:
-		columns = [_(filters.group_by) + ":Link/Branch:120"]
+    # Add department as the first column
+    columns += [_("Department") + ":Link/Department:120", _("Employee") + ":Data:120", _("Employee Name") + ":Data/:120"]
 
-	columns += [_("Employee") + ":Data:120",_("Employee Name") + ":Data/:120"]
-	days = []
-	for day in range(filters["total_days_in_month"]):
-		date = str(filters.year) + "-" + str(filters.month) + "-" + str(day + 1)
-		day_name = day_abbr[getdate(date).weekday()]
-		days.append(cstr(day + 1) + " " + day_name + "::65")
-	if not filters.summarized_view:
-		columns += days
-	columns += [_("Total")+"::65"]
+    # Get all days in the month, check for valid number of days
+    try:
+        days = []
+        for day in range(filters["total_days_in_month"]):
+            date = str(filters.year) + "-" + str(filters.month) + "-" + str(day + 1)
+            day_name = day_abbr[getdate(date).weekday()]
+            days.append(cstr(day + 1) + " " + day_name + "::65")
 
-	return columns, days
+        if not filters.summarized_view:
+            columns += days
+        
+        # Add Total OT column at the end
+        # columns += [_("Total") + "::65"]
+    except KeyError:
+        frappe.throw(_("Missing required filter parameters (month/year)"))
+    
+    return columns, days
+
+
+
+def add_data(employee_map, att_map, filters, conditions):
+    record = []
+    emp_att_map = {}
+
+    # Create a map for departments
+    department_map = {}
+
+    # Group employees by department
+    for emp in employee_map:
+        emp_det = employee_map.get(emp)
+        if not emp_det or emp not in att_map:
+            continue
+
+        # Group employees by department
+        department = emp_det.department
+        if department not in department_map:
+            department_map[department] = []
+
+        row = []
+        if filters.group_by:
+            row += [" "]
+
+        # Add employee details
+        row += [emp, emp_det.employee_name]
+
+        emp_status_map = []
+        total_ot = 0
+        for day in range(filters["total_days_in_month"]):
+            ot = att_map.get(emp).get(day + 1)
+            if ot == None:
+                ot = 0
+            total_ot += ot
+            emp_status_map.append(ot)
+
+        # For non-summarized view, add the attendance for each day
+        if not filters.summarized_view:
+            row += emp_status_map
+
+        # Add total OT for the employee
+        row += [total_ot]
+
+        # Ensure the row length matches the expected number of columns
+        if len(row) != len(get_columns(filters)[0]):
+            frappe.throw(_("Mismatch between row data and columns. Row length: {} vs Columns length: {}.".format(len(row), len(get_columns(filters)[0]))))
+
+        # Add employee row to the corresponding department
+        department_map[department].append(row)
+        emp_att_map[emp] = emp_status_map
+
+    # Now construct the final record list where each department's employees are grouped together
+    header_row = [_("Department")] + [_("Employee"), _("Employee Name")] + [f"{day+1} {day_abbr[day % 7]}" for day in range(filters["total_days_in_month"])] + [_("Total")]
+    
+    # record.append(header_row)  # Add the header row
+
+    # Add each department and its employees
+    for department in department_map:
+        # First, add a department row with no employee data
+        record.append([department] + [""] * (len(header_row) - 1))  # Add department name only, with placeholders for employees
+
+        # Add employees under this department
+        for emp_row in department_map[department]:
+            record.append([""] + emp_row[0:])  # Add department and employee data
+
+    return record, emp_att_map
 
 
 def get_attendance_list(conditions, filters):
@@ -120,7 +145,8 @@ def get_attendance_list(conditions, filters):
 	else:
 		hours_for_ot=float(type)
 		conditions += " and status not in ('Holiday','Weekly Off')"
-
+	departments = frappe.db.get_list("Department", pluck="name", order_by="name")
+	# for department in departments:
 	attendance_list = frappe.db.sql(
 		"""select employee, day(attendance_date) as day_of_month,
 	CASE when rounded_ot>%s then %s else rounded_ot end as ot,
