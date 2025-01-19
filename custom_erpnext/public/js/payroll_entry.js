@@ -100,7 +100,7 @@ frappe.ui.form.on('Payroll Entry', {
 		} else if (frm.doc.salary_slips_created) {
 			frm.add_custom_button(__("Submit Salary Slip"), function () {
 				submit_salary_slip(frm);
-			}).addClass("btn-primary");
+			}).addClass("btn-secondary");
 		}
 
 		if (frm.doc.salary_slips_created) {

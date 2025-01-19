@@ -132,6 +132,7 @@ def get_data(filters= None):
 				round(get_late_amt(ss.name),0),
 				get_stamp(ss.name),
 				round(ss.income_tax,0),
+				round(ss.other_deduction,0),
 
 				
 				
@@ -140,7 +141,7 @@ def get_data(filters= None):
 			# for d in ded_types:
 			# 	row.append(ss_ded_map.get(ss.name, {}).get(d))
 			
-			row += [round(ss.total_loan_repayment,0),(round(ss.total_deduction,0)+round(ss.total_loan_repayment,0)+round(ss.income_tax,0)+round(ss.absent_deduction,0)), round((ss.net_pay-round(ss.absent_deduction,0)-float(ss.total_overtime_pay)-float(acctual_lunch)-float(holiday_allowance)+float(acctual_lunch)+float(ot_amount)),0), None]
+			row += [round(ss.total_loan_repayment,0),(round(ss.total_deduction,0)+round(ss.total_loan_repayment,0)), round((ss.net_pay-float(ss.total_overtime_pay)-float(acctual_lunch)-float(holiday_allowance)+float(acctual_lunch)+float(ot_amount)),0), None]
 			
 
 			
@@ -226,6 +227,7 @@ def get_columns():
 			_("Late amt") + ":Integer:10",
 			_("Sta mp") + ":Integer:10",
 			_("Tax") + ":Integer:10",
+			_("other Ded") + ":Integer:10",
 			_("Advance") + ":Integer:10",
 			_("Total Deduc tion") + ":Integer:20",
 			_("Net Pay") + ":Integer:20",
@@ -313,6 +315,9 @@ def get_conditions(from_date,to_date,filters,department):
 	if filters.get("group_name"): conditions += " and ss.group='%s'" % filters["group_name"]
 	if filters.get("grade"): conditions += " and ss.grade='%s'" % filters["grade"]
 	if filters.get("mode_of_payment"): conditions += " and ss.mode_of_payment='%s'" % filters["mode_of_payment"]
+	if filters.get("employee_type"):
+		if (filters["employee_type"]=="New Join"):
+			conditions += " and ss.date_of_joining between ss.start_date and ss.end_date"
 
 
 	return conditions, filters

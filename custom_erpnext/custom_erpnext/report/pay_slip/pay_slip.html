@@ -83,7 +83,7 @@
 			<td colspan="2">Absent: {{data[j].a}}</td>
 			<td>O.T. Rate: {{data[j].ot_rate}}</td>
 			<td>O.T. Hr: {{data[j].ot_hr}} </td>
-			<td colspan="2">Providend Fund: {{data[j].pf}} </td>    
+			<td colspan="2">Providend Fund: {{data[j].pf ||0}} </td>    
 		</tr>
 	
 	
@@ -94,8 +94,8 @@
 			<td>ML: {{data[j].ml}}</td>
 			<td>O.T. Amount:{{data[j].ot_amt}}</td>
 			<td>Arear: {{data[j].arrear}}</td>  
-			<td>Others 0</td>
-			<td>Advance: {{data[j].advance}}</td>
+			<!-- <td>Others 0</td> -->
+			<td colspan="2">Advance: {{data[j].advance}}</td>
 		</tr>
 		
 		<tr>
@@ -104,7 +104,8 @@
 			<td colspan="2">Late: {{data[j].late_days}} </td>
 			<td>Night Day: {{data[j].night_days}} </td>
 			<td>Night Allowance: {{data[j].night_amt}}</td>  
-			<td colspan="2">Income Tax: {{data[j].income_tax}}</td>    
+			<td>Tax: {{data[j].income_tax}}</td>  
+			<td>Oth Ded: {{data[j].other_ded}}</td>   
 		</tr>
 		
 		<tr>

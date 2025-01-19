@@ -111,6 +111,7 @@ def execute(filters= None):
 			round(ss.gross_pay-float(ss.total_overtime_pay)-float(acctual_lunch)-float(holiday_allowance)+float(acctual_lunch)+float(ot_amount),0),
 			ss.income_tax ,
 			round(ss.absent_deduction or 0,0),
+			ss.other_deduction,
 
 			
 			
@@ -119,7 +120,7 @@ def execute(filters= None):
 		for d in ded_types:
 			row.append(ss_ded_map.get(ss.name, {}).get(d))
 		
-		row += [round(ss.total_loan_repayment,0),(round(ss.total_deduction,0)+round(ss.total_loan_repayment,0)+round(ss.income_tax,0)+round(ss.absent_deduction,0)), round((ss.net_pay-round(ss.absent_deduction,0)-float(ss.total_overtime_pay)-float(acctual_lunch)-float(holiday_allowance)+float(acctual_lunch)+float(ot_amount)),0), None]
+		row += [round(ss.total_loan_repayment,0),(round(ss.total_deduction,0)+round(ss.total_loan_repayment,0)), round((ss.net_pay-float(ss.total_overtime_pay)-float(acctual_lunch)-float(holiday_allowance)+float(acctual_lunch)+float(ot_amount)),0), None]
 		
 
 		data.append(row)
@@ -164,6 +165,7 @@ def get_columns(salary_slips):
 		_("Gross Payable") + ":Integer:20",
 		_("Income Tax") + ":Integer:20",
 		_("Absent Penalty") + ":Integer:20",
+		_("Other ded") + ":Integer:20",
 
 
 

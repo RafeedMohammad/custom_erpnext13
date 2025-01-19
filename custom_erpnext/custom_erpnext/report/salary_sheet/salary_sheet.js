@@ -134,9 +134,17 @@ frappe.query_reports["Salary Sheet"] = {
 			   },
 			   {
 				"fieldname":"mode_of_payment",
-				"label":__("Salary in"),
+				"label":__("Bank/Cash"),
 				"fieldtype":"Select",
 				"options":["Bank","Cash",""],
+				"default": "",
+				"width": "100px"
+			},
+			{
+				"fieldname":"employee_type",
+				"label":__("Employee Type"),
+				"fieldtype":"Select",
+				"options":["New Join",""],
 				"default": "",
 				"width": "100px"
 			},

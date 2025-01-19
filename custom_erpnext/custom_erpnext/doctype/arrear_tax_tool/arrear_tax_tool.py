@@ -35,7 +35,6 @@ def get_employees(month=None,year=None, department=None, designation=None, floor
 
 	# # Extract just the "employee" values
 	employees = [item["employee"] for item in data]
-	# frappe.publish_realtime('msgprint',str(from_date))
 
 	if len(employees)>0: conditions += " where ss.employee in %s and " % employees
 	else:conditions +=" where "
@@ -55,7 +54,7 @@ def get_employees(month=None,year=None, department=None, designation=None, floor
 
 	employee_list = frappe.db.sql(
 	"""
-	select ss.employee, ss.employee_name, ss.income_tax ,ss.arear,ss.posting_date,ss.name
+	select ss.employee, ss.employee_name, ss.income_tax ,ss.arear,ss.other_deduction,ss.posting_date,ss.name
 
 	FROM `tabSalary Slip` ss  %s
 
@@ -70,19 +69,22 @@ def get_employees(month=None,year=None, department=None, designation=None, floor
 def update_salary_slip(employee_list):
 
 	employee_list = json.loads(employee_list)
+	# frappe.publish_realtime('msgprint',str(employee_list))
+
 
 	for employee in employee_list:
 
 		doc_dict = {
                 'arear':employee['arear'].strip(' ') or 0,
 				'income_tax':employee['tax']or 0,
+				'other_deduction':employee['other_deduction']or 0,
             }
 
 		#company = frappe.db.get_value("Employee", employee["employee"], "Company", cache=True)
-		salary_slip	=	frappe.db.set_value('Salary Slip', employee['employee'][5], {
-			'arear':doc_dict['arear'], "income_tax":doc_dict['income_tax']}, update_modified=True)
+		salary_slip	=	frappe.db.set_value('Salary Slip', employee['employee'][6], {
+			'arear':doc_dict['arear'], "income_tax":doc_dict['income_tax'],"other_deduction":doc_dict['other_deduction']}, update_modified=True)
 			#Changed Code - End
 
 			#Attendance document with updated values will be saved
-		salary_slip = frappe.get_doc('Salary Slip',employee['employee'][5]).save()
+		salary_slip = frappe.get_doc('Salary Slip',employee['employee'][6]).save()
 

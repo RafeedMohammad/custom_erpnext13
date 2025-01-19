@@ -778,7 +778,7 @@ class override_SalarySlip(TransactionBase):
 		self.set_net_pay()
 
 	def set_net_pay(self):
-		self.total_deduction = self.get_component_totals("deductions")+self.income_tax
+		self.total_deduction = self.get_component_totals("deductions")+self.income_tax+self.absent_deduction+self.other_deduction
 		self.base_total_deduction = flt(
 			flt(self.total_deduction) * flt(self.exchange_rate), self.precision("base_total_deduction")
 		)
