@@ -50,6 +50,25 @@
         clear: both;
         page-break-after: always;
     }
+    table tr {
+    height: 50px; /* Adjust as needed */
+}
+
+/* Increase height of the 4th column */
+.vertical-column {
+    writing-mode: vertical-rl;
+    text-align: center;
+    white-space: nowrap;
+    padding-top: 20px;  /* Increase padding to extend vertical height */
+    padding-bottom: 20px; /* Optional: Adjust bottom padding if needed */
+}
+
+/* If you want to increase padding across all rows */
+table td {
+    padding-top: 20px;
+    padding-bottom: 20px; /* Adjust to increase row height */
+}
+
 </style>
 
 {% var report_columns = report.get_columns_for_print(); %}
@@ -90,7 +109,7 @@
             <tr>
                 <th style="width: 30px;">Sl No</th>
                 {% for (let i=1, l=report_columns.length-1; i<l; i++) { %}
-                    <th style="width: 60px; font-size: 6px;">{%= report_columns[i].label %}</th>
+                    <th class="{% if i == 3 %}vertical-column{% endif %}" style="width: 60px; font-size: 6px;">{%= report_columns[i].label %}</th>
                 {% } %}
                 {% for (let i=report_columns.length-1, l=report_columns.length; i<l; i++) { %}
                     <th style="width: 60px; font-size: 6px;">{%= report_columns[i].label %}</th>
@@ -104,21 +123,21 @@
                     <tr>
                         <td> {%= u+1 %} </td>
                         {% for(let i=1, l=report_columns.length; i<l; i++) { %}
-                            <td>
-                                {% const fieldname = report_columns[i].fieldname; %}
-                                {% if (!is_null(data[j][fieldname])) { %}
-                                    {%= frappe.format(data[j][fieldname], report_columns[i], {}, data[j]) %}
-                                {% } %}
-                            </td>
+                        <td class="{% if i == 3 %}vertical-column{% endif %}">
+                            {% const fieldname = report_columns[i].fieldname; %}
+                            {% if (!is_null(data[j][fieldname])) { %}
+                                {%= frappe.format(data[j][fieldname], report_columns[i], {}, data[j]) %}
+                            {% } %}
+                        </td>
                         {% } %}
                     </tr>
                     {% u++ %}
                 {% } %}
                 {% if (data[j][report_columns[0].fieldname] == "Total") { %}
-                    <tr>
+                    <tr style="height: 10px;">
                         <td> </td>
                         {% for(let i=1, l=report_columns.length; i<l; i++) { %}
-                            <td>
+                            <td class="total-row">
                                 {% const fieldname = report_columns[i].fieldname; %}
                                 {% if (!is_null(data[j][fieldname])) { %}
                                     {%= frappe.format(data[j][fieldname], report_columns[i], {}, data[j]) %}

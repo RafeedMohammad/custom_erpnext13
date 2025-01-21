@@ -207,6 +207,7 @@ erpnext.EmployeeSelector = class EmployeeSelector {
 						"to_date": frm.doc.to_date,
 						"company":frm.doc.company
 					},
+					freeze: true,
 
 					callback: function(r) {
 						alert("Shift Assigned successfully !");

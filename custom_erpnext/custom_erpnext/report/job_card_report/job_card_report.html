@@ -2,7 +2,7 @@
 	var report_columns = report.get_columns_for_print();
 	report_columns = report_columns.filter(col => !col.hidden);
 
-	if (report_columns.length > 10) {
+	if (report_columns.length > 20) {
 		frappe.throw(__("Too many columns. Export the report and print it using a spreadsheet application."));
 	}
 %}
@@ -47,10 +47,10 @@
 		
 		<tr>
             {% if (!is_null(filters.from_date)) { %}
-					<th class="text-left"><font size="+.5">From Date: {%= filters.from_date %}</font></th>
+					<th class="text-left" colspan="3"><font size="+.5">From Date: {%= filters.from_date %}</font></th>
 			{% } %}
             {% if (!is_null(filters.to_date)) { %}
-					<th class="text-left"><font size="+.5">To Date: {%= filters.to_date %}</font></th>
+					<th class="text-left" colspan="3"><font size="+.5">To Date: {%= filters.to_date %}</font></th>
 			{% } %}
 			{% if (!is_null(filters.department)) { %}
 					<th class="text-left"><font size="+.5">Department: {%= filters.department %}</font></th>
@@ -58,15 +58,24 @@
 			{% if (!is_null(filters.group_name)) { %}
 					<th class="text-left"><font size="+.5">Group: {%= filters.group_name %}</font></th>
 			{% } %}
+        </tr>
+        <tr>
 			{% if (!is_null(filters.employee)) { %}
-					<th class="text-left"><font size="+.5">Employee: {%= filters.employee %}</font></th>
-                    <th class="text-left"><font size="+.5">Department: {%= data[0][report_columns[8].fieldname] %}</font></th>
-                    <th class="text-left"><font size="+.5">Designation: {%= data[0][report_columns[9].fieldname] %}</font></th>
+					<th class="text-left" colspan="3"><font size="+.5">Employee: {%= filters.employee %} </font></th>
+                    <th class="text-left" colspan="4"><font size="+.5">Name: {%= data[0][report_columns[11].fieldname] %}</font></th>
+                    <th class="text-left" collapse="5"><font size="+.5">Joining Date: {%= data[0][report_columns[10].fieldname] %}</font></th>
+
+			{% } %}
+		</tr>
+        <tr>
+			{% if (!is_null(filters.employee)) { %}
+                    <th class="text-left" colspan="3"><font size="+.5">Department: {%= data[0][report_columns[8].fieldname] %}</font></th>
+                    <th class="text-left" colspan="3"><font size="+.5">Designation: {%= data[0][report_columns[9].fieldname] %}</font></th>
 			{% } %}
 		</tr>
 		<tr>
 
-			{% for (let i=0, l=report_columns.length; i<l-2; i++) { %}
+			{% for (let i=0, l=report_columns.length; i<l-5; i++) { %}
 				<th class="text-center">{%= report_columns[i].label %}</th>
 			{% } %}
 		</tr>
@@ -80,7 +89,7 @@
 			%}
 			<tr class="{%= row_class %}">
 				
-				{% for(let i=0, l=report_columns.length; i<l-2; i++) { %}
+				{% for(let i=0, l=report_columns.length; i<l-5; i++) { %}
 					<td class="text-center">
 						{% const fieldname = report_columns[i].fieldname; %}
 						{% if (!is_null(row[fieldname])) { %}
