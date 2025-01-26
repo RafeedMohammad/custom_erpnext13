@@ -199,7 +199,12 @@ erpnext.EmployeeSelector = class EmployeeSelector {
 					method: "custom_erpnext.custom_erpnext.doctype.bulk_checkin_tool.bulk_checkin_tool.mark_employee_attendance2",
 					args:{
 						"employee_list":employees_to_shift,
-						"checkin_time": frm.doc.checkin_time,
+						// "checkin_time": frm.doc.checkin_time,
+						"start_date": frm.doc.start_date,
+						"end_date": frm.doc.end_date,
+						"in_time":frm.doc.in_time,
+						"out_time":frm.doc.out_time,
+
 					},
 
 					callback: function(r) {

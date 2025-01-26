@@ -12,7 +12,7 @@ import datetime
 import frappe
 from frappe.model.document import Document
 from frappe.utils import getdate
-from datetime import datetime
+from datetime import datetime,date, time
 
 from random import randrange
 from datetime import timedelta
@@ -91,29 +91,67 @@ def get_employees(date, shift = None , department=None, designation=None, floor=
 
 
 @frappe.whitelist()
-def mark_employee_attendance2(employee_list,checkin_time=None):
-	checkin_time1=datetime.strptime(str(checkin_time), "%Y-%m-%d %H:%M:%S") 
+def mark_employee_attendance2(employee_list,start_date=None,end_date=None,in_time=None,out_time=None):
+	# checkin_time1=datetime.strptime(str(checkin_time), "%Y-%m-%d %H:%M:%S") 
+	#checkin_time1=datetime.strptime(str(checkin_time), "%Y-%m-%d") 
+	# checkin_time1= datetime.strptime(str(start_date), "%Y-%m-%d" )+datetime.strptime(str(in_time), "%H:%M:%S")
 	
+	if end_date is None:
+		end_date = start_date
 	employee_list = json.loads(employee_list)
-	for employee in employee_list:
 
-		#company = frappe.db.get_value("Employee", employee["employee"], "Company", cache=True)
-		
 
-		bulk_checkin_tool_doc = frappe.get_doc(
-			dict(
-				doctype = "Employee Checkin",
-				employee = employee[0],
-				employee_name=employee[1],
-				#company = company,
-				time=random_date(checkin_time1-timedelta(minutes=10),checkin_time1+timedelta(minutes=10))
+    # Ensure start_date and end_date are in the correct format
+	start_date_obj = datetime.strptime(start_date, "%Y-%m-%d").date()
+	end_date_obj = datetime.strptime(end_date, "%Y-%m-%d").date()
+
+    # Iterate through each date in the range
+	while start_date_obj <= end_date_obj:
+		if in_time is not None:
+			checkin_time_in = datetime.combine(
+				start_date_obj, datetime.strptime(in_time, "%H:%M:%S").time()
 			)
-		)
-		
-		bulk_checkin_tool_doc.insert()
-		bulk_checkin_tool_doc.save()
+		if out_time is not None:
+			checkin_time_out = datetime.combine(
+				start_date_obj, datetime.strptime(out_time, "%H:%M:%S").time()
+			)
 
-	
+		
+		for employee in employee_list:
+
+			#company = frappe.db.get_value("Employee", employee["employee"], "Company", cache=True)
+			if in_time is not None:
+
+				bulk_checkin_tool_doc = frappe.get_doc(
+					dict(
+						doctype = "Employee Checkin",
+						employee = employee[0],
+						employee_name=employee[1],
+						#company = company,
+						time=random_date(checkin_time_in-timedelta(minutes=10),checkin_time_in+timedelta(minutes=10))
+					)
+				)
+				
+				bulk_checkin_tool_doc.insert()
+				bulk_checkin_tool_doc.save()
+
+			if out_time is not None:
+				bulk_checkin_tool_doc = frappe.get_doc(  # for out time
+					dict(
+						doctype = "Employee Checkin",
+						employee = employee[0],
+						employee_name=employee[1],
+						#company = company,
+						time=random_date(checkin_time_out-timedelta(minutes=10),checkin_time_out+timedelta(minutes=10))
+					)
+				)
+			
+				bulk_checkin_tool_doc.insert()
+				bulk_checkin_tool_doc.save()
+
+		# datetime.strptime(start_date, "%Y-%m-%d").date() += timedelta(days=1)
+		start_date_obj += timedelta(days=1)
+		
 
 
 def random_date(start, end):

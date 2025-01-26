@@ -21,7 +21,12 @@
   "section_break_11",
   "employees_html",
   "section_break_13",
-  "checkin_time"
+  "checkin_time",
+  "start_date",
+  "in_time",
+  "column_break_19",
+  "end_date",
+  "out_time"
  ],
  "fields": [
   {
@@ -101,7 +106,8 @@
   },
   {
    "fieldname": "checkin_time",
-   "fieldtype": "Datetime",
+   "fieldtype": "Date",
+   "hidden": 1,
    "label": "Checkin Time"
   },
   {
@@ -109,12 +115,38 @@
    "fieldtype": "Table MultiSelect",
    "label": "Employee Id",
    "options": "Employee Info"
+  },
+  {
+   "fieldname": "in_time",
+   "fieldtype": "Time",
+   "label": "In_time"
+  },
+  {
+   "fieldname": "out_time",
+   "fieldtype": "Time",
+   "label": "Out_time"
+  },
+  {
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Start Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "end_date",
+   "fieldtype": "Date",
+   "label": "End Date"
+  },
+  {
+   "fieldname": "column_break_19",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-05-06 10:48:49.327903",
+ "modified": "2025-01-26 19:13:51.055428",
  "modified_by": "Administrator",
  "module": "Custom Erpnext",
  "name": "Bulk Checkin Tool",
