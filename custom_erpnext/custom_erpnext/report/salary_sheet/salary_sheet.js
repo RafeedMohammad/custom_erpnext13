@@ -144,7 +144,7 @@ frappe.query_reports["Salary Sheet"] = {
 				"fieldname":"employee_type",
 				"label":__("Employee Type"),
 				"fieldtype":"Select",
-				"options":["New Join",""],
+				"options":["New Join","","Left"],
 				"default": "",
 				"width": "100px"
 			},

@@ -31,17 +31,8 @@
     }
 	p{
 		font-size: 12.5px;
-	}
-	.footer {
-		padding-top: 60%;
-		position: fixed;
-		left: 0;
-		bottom: 0;
 		width: 100%;
-		color: white;
-		text-align: center;
-		font-size: 11px;
-		}
+	}
 		.column {
 			float: left;
 			width: 25%;
@@ -53,22 +44,23 @@
 		display: table;
 		clear: both;
 		}
+		.pagebreak {
+			clear: both;
+			page-break-after: always;
+		}
 
 </style>
 
-
+<div style="height: 300px;width: 100%;padding-top: 1px;">
 
 <h3 class="text-center">{%= filters.company %}</h3>
 <h5 class="text-center">Salary for the month of - {%= filters.month %}, {%= filters.year %}</h5>
 <h3 class="text-center">{%= filters.date %}</h3>
 <h3 class="text-center">{%= filters.status %}</h3>
 
-<p>Emp_No: {{data[j].employee}}  &#160; &nbsp; &ensp; &ensp; &ensp; &ensp; &#160; &nbsp; &ensp; &ensp; &ensp; &ensp; Name: {{data[j].employee_name}} </p>
-<p>Designation: {{data[j].designation}} &ensp; &ensp; Department: {{data[j].department}} &ensp; &ensp; Joining Date: {{data[j].date_of_joining}}</p>
-
-<table class="table table-bordered" style="width:100%">
-	<thead>
-	</thead>
+<p>Emp_No: {{data[j].employee}}  &#160; &nbsp; &ensp; &ensp; &#160; &nbsp;Name: {{data[j].employee_name}}  &#160; &nbsp; &#160; &nbsp;Joining Date: {{data[j].date_of_joining}}</p>
+<p>Designation: {{data[j].designation}} &ensp; &ensp;&ensp; &ensp;  Department: {{data[j].department}} </p>
+<table class="table table-bordered" style="width:100%;margin-top: -4px;">
 	<tbody>
 		<tr>
 			<th>Statement of Salary</th>
@@ -111,8 +103,8 @@
 		<tr>
 			<td>&nbsp;</td>
 			<td colspan="3">A. & LWP Amnt: {{data[j].absent_penalty}}</td>
-			<td>Trn & Lunch: {{data[j].lunch_tran_allow}}</td>
-			<td>Attn. Bonus: {{data[j].attn_bon}}</td>  
+			<td>Lunch: {{data[j].lunch}}</td>
+			<td>Travel: {{data[j].travel}}</td>
 			<td>Stamp </td>   
 			<td>Abs Ded: {{data[j].absent_penalty}}</td>
 		</tr>
@@ -120,7 +112,7 @@
 		<tr>
 			<td>&nbsp;</td>
 			<td colspan="3">&nbsp;</td>
-			<td colspan="2">&nbsp;</td>
+			<td colspan="2">Attn. Bonus: {{data[j].attn_bon}}</td> 
 			<td colspan="2">Late Amt: {{data[j].late_ded || 0}}</td>   
 		</tr>
 		
@@ -129,7 +121,7 @@
 			<td colspan="2">Gross Payable: {{data[j].gross_payable}}</td>
 			<td colspan="2">Net Payable:{{data[j].net_pay}} </td>   
 		</tr>
-		<tr>
+		<!-- <tr>
 			<td>&nbsp;</td>
 		</tr>
 		<tr>
@@ -138,7 +130,7 @@
 			<td colspan="2"><span style="text-decoration: overline;">Checked By(A/c)</span></td>
 			<td colspan="2"><span style="text-decoration: overline;">Approved By</span></td>
 
-		</tr>
+		</tr> -->
 	
 		{% for(let j=0, k=data.length; j<k; j++) { %}
 			<!-- {%
@@ -150,9 +142,13 @@
 		{% } %}
 	</tbody>
 </table>
-
-{% } %}
 <p class="text-right text-muted">
 	Printed On {%= frappe.datetime.str_to_user(frappe.datetime.get_datetime_as_string()) %}
 </p>
+
+
+</div>
+<div class="pagebreak"></div>
+{% } %}
+
 

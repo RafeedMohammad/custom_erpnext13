@@ -636,7 +636,7 @@ def remove_payrolled_employees(emp_list, start_date, end_date):
 				"employee": employee_details.employee,
 				"start_date": start_date,
 				"end_date": end_date,
-				"docstatus": 1,
+				"docstatus": ["in", [0, 1]],
 			},
 		):
 			new_emp_list.append(employee_details)

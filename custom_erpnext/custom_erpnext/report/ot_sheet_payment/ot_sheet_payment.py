@@ -10,65 +10,87 @@ def execute(filters= None):
 	
 	from_date = get_first_day(filters["month"] + "-" + filters["year"])
 	to_date = get_last_day(filters["month"] + "-" + filters["year"])
+	data=[]
 	if not filters:
 		filters = {}
+	departments = frappe.db.get_list("Department", pluck="name", order_by="name")
+	for department in departments:
+		salary_slips = get_salary_slip(from_date,to_date,filters,department)
 
-	salary_slips = get_salary_slip(from_date,to_date,filters)
-	columns = get_columns(salary_slips)
-	doj_map = get_employee_doj_map()
-	# ss_ded_map = get_ss_ded_map(salary_slips)
+		columns = get_columns(salary_slips)
+		doj_map = get_employee_doj_map()
+		# ss_ded_map = get_ss_ded_map(salary_slips)
+		if len(salary_slips) >= 1:
+			data.append({"department": department})
 
-	data = []
-
-
-
-	for ss in salary_slips:
-		allowance = 0
-		acctual_basic,salary_slip_basic = get_basic(ss.name)
-		if acctual_basic is None:
-			acctual_basic = 0
-		# salary_slip_basic = get_salary_basic(ss.name)
-		if salary_slip_basic is None:
-			salary_slip_basic = 0
-
-		
-		overtime_hours=ss.overtime_hours
+		# data = []
+		result=[]
 
 
-		buyer2_ot_hours= frappe.db.sql("""SELECT SUM(case when rounded_ot>%s then %s else rounded_ot end) FROM `tabAttendance` where status not in ('Holiday','Weekly Off') and employee=%s AND attendance_date between %s and %s group by employee""",
-		(filters.buyer,filters.buyer,ss.employee, ss.start_date, ss.end_date))
 
-		if buyer2_ot_hours:
-			buyer2_ot_hours = buyer2_ot_hours[0][0]
-		else:
-			buyer2_ot_hours = 0
-		remain_ot=float(overtime_hours)-buyer2_ot_hours
-		remain_ot_amount=remain_ot*float(ss.overtime_rate)
+		for ss in salary_slips:
+			allowance = 0
+			acctual_basic,salary_slip_basic = get_basic(ss.name)
+			if acctual_basic is None:
+				acctual_basic = 0
+			# salary_slip_basic = get_salary_basic(ss.name)
+			if salary_slip_basic is None:
+				salary_slip_basic = 0
 
-		row = [
-			#ss.name,
-			ss.employee,
-			ss.employee_name,
-			doj_map.get(ss.employee),
-			# ss.branch,
-			# ss.department,
-			ss.designation,
-			# ss.company,
-			# ss.start_date,
-			# ss.end_date,
-			round(acctual_basic,0),
-			round(float(overtime_hours or 0),1),
-			buyer2_ot_hours,
-			remain_ot,
-			round(remain_ot_amount,1)
-			#ss.total_overtime_pay,
-			# round(float(ot_amount or 0),0),
-			# get_lunch_tr_allowance(ss.name),		
-		]
-		
-		row += [None]
-		
-		data.append(row)
+			
+			overtime_hours=ss.overtime_hours
+
+
+			buyer2_ot_hours= frappe.db.sql("""SELECT SUM(case when rounded_ot>%s then %s else rounded_ot end) FROM `tabAttendance` where status not in ('Holiday','Weekly Off') and employee=%s AND attendance_date between %s and %s group by employee""",
+			(filters.buyer,filters.buyer,ss.employee, ss.start_date, ss.end_date))
+
+			if buyer2_ot_hours:
+				buyer2_ot_hours = buyer2_ot_hours[0][0]
+			else:
+				buyer2_ot_hours = 0
+			remain_ot=float(overtime_hours)-buyer2_ot_hours
+			remain_ot_amount=remain_ot*float(ss.overtime_rate)
+
+			row = [
+				None,
+				#ss.name,
+				ss.employee,
+				ss.employee_name,
+				doj_map.get(ss.employee),
+				# ss.branch,
+				# ss.department,
+				ss.designation,
+				# ss.company,
+				# ss.start_date,
+				# ss.end_date,
+				round(acctual_basic,0),
+				round(float(overtime_hours or 0),1),
+				buyer2_ot_hours,
+				remain_ot,
+				round(remain_ot_amount,1)
+				#ss.total_overtime_pay,
+				# round(float(ot_amount or 0),0),
+				# get_lunch_tr_allowance(ss.name),		
+			]
+			
+			for i in range(len(row)): 
+				if i>4 and i<len(row)-1: # Use the length of 'row' to avoid accessing out of bounds
+					result.append(0)  # Initialize result with 0s or use an already initialized result list
+					result[i] = result[i] + row[i]
+				else:
+					result.append(None)
+			
+			data.append(row)
+			# for index, p in enumerate(products):
+  			# 	if index == len(products) - 1:
+			# 		result[0]="Total"
+			# 	data.append(result)
+		for index, ss in enumerate(salary_slips):
+			if index == len(salary_slips) - 1:
+				result[0]="Total"
+				result[1]="Total"
+				result[2]=len(salary_slips)
+				data.append(result)
 
 	return columns, data
 	
@@ -77,6 +99,7 @@ def execute(filters= None):
 def get_columns(salary_slips):
 	columns = [
 		# _("Salary Slip ID") + ":Link/Salary Slip:150",
+		_("Department") + "::150",
 		_("Employee") + "::80",
 		_("Employee Name") + "::40",
 		_("Joining_Date") + "::12",
@@ -115,27 +138,32 @@ def get_employee_doj_map():
 	)
 
 
-def get_salary_slip(from_date,to_date,filters):
-	conditions, filters = get_conditions(from_date,to_date,filters)
+def get_salary_slip(from_date,to_date,filters,department):
+	conditions, filters = get_conditions(from_date,to_date,filters,department)
 	
 
 	filters.update({"from_date": filters.get("from_date"), "to_date": filters.get("to_date")})
-	conditions, filters = get_conditions(from_date,to_date,filters)
+	conditions, filters = get_conditions(from_date,to_date,filters,department)
 	
 
-	salary_slips = frappe.db.sql("""select * from `tabSalary Slip` as ss WHERE %s ORDER BY employee
-	""" 
+	salary_slips = frappe.db.sql("""
+    SELECT ss.* 
+    FROM `tabSalary Slip` AS ss
+    JOIN `tabEmployee` AS e ON ss.employee = e.name
+    WHERE e.ot_enable = 'Yes' and %s
+    ORDER BY ss.department, ss.employee"""
 	%conditions, filters, as_dict=1)
 
 
 	return salary_slips or []
 
 
-def get_conditions(from_date,to_date,filters):
+def get_conditions(from_date,to_date,filters,department):
 	conditions="" 
 	doc_status = {"Draft": 0, "Submitted": 1, "Cancelled": 2}
 	if filters.get("docstatus"):
-		conditions += "docstatus = {0}".format(doc_status[filters.get("docstatus")])
+		conditions += "ss.docstatus = {0}".format(doc_status[filters.get("docstatus")])
+	if department: conditions += " and ss.department= '%s'" % department
 
 
 	if from_date: conditions += " and ss.start_date>= '%s'" % from_date

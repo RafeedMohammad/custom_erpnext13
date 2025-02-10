@@ -87,8 +87,8 @@ table td {
     <table class="table table-bordered">
         
         <thead>
-            <tr><th colspan="35" style="text-align: center; font-size: 8px;">Salary for the month of - {%= filters.month %}, {%= filters.year %}</th></tr>
-            <tr>
+            <tr style="height: 10px;"><th colspan="36" style="text-align: center; font-size: 8px;">Salary for the month of - {%= filters.month %}, {%= filters.year %}</th></tr>
+            <tr style="height: 10px;">
                 {% if (!is_null(filters.department)) { %}
                     <th colspan="6" style="text-align: left; font-size: 6px;">Department: {%= filters.department %}</th>
                 {% } %}

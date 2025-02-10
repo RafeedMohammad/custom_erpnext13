@@ -82,7 +82,7 @@ class override_ShiftType(Document):
 		if logs:
 			employee=logs[0].employee
 			company =frappe.db.get_value("Employee", employee, "company")
-			rounding_ot,overtime_deduct = frappe.db.get_value("Company", company, ["rounding_overtime","overtime_deduct_for_night"]) 
+			rounding_ot,overtime_deduct,holiday_ot_from_shift_start = frappe.db.get_value("Company", company, ["rounding_overtime","overtime_deduct_for_night","holiday_ot_from_shift_start"]) 
 		
 		for key, group in itertools.groupby(
 			logs, key=lambda x: (x["employee"], x["shift_actual_start"])
@@ -97,7 +97,7 @@ class override_ShiftType(Document):
 				out_time,
 				late_entry_duration,
 				overtime,
-			) = self.get_attendance(single_shift_logs,weekly_off_list,working_holiday,overtime_deduct)
+			) = self.get_attendance(single_shift_logs,weekly_off_list,working_holiday,overtime_deduct,holiday_ot_from_shift_start)
 			mark_attendance_and_link_log(
 				single_shift_logs,
 				attendance_status,
@@ -117,7 +117,7 @@ class override_ShiftType(Document):
 		# frappe.publish_realtime('msgprint', 'Ending process for '+self.name+' at-> '+str(datetime.now()))
 
 
-	def get_attendance(self, logs,weekly_off_list,working_holiday,overtime_deduct):
+	def get_attendance(self, logs,weekly_off_list,working_holiday,overtime_deduct,holiday_ot_from_shift_start):
 		"""Return attendance_status, working_hours, late_entry, early_exit, in_time, out_time
 		for a set of logs belonging to a single shift.
 		Assumtion:
@@ -190,22 +190,33 @@ class override_ShiftType(Document):
 		if (out_time):
 			start_time_to_lunch_duration,lunch_duration= self.lunch_timing()
 			if(weekly_off_check==0 or weekly_off_check==1) and working_holiday=="0":
-				if(in_time<= (logs[0].shift_start+start_time_to_lunch_duration) and (logs[0].shift_start+start_time_to_lunch_duration+lunch_duration) <= out_time):
-					overtime=out_time-in_time-lunch_duration
+				if holiday_ot_from_shift_start==0:
+					if(in_time<= (logs[0].shift_start+start_time_to_lunch_duration) and (logs[0].shift_start+start_time_to_lunch_duration+lunch_duration) <= out_time):
+						overtime=out_time-in_time-lunch_duration
+						late_entry_duration=0
+					else:
+						overtime=out_time-in_time
+						late_entry_duration=0
+					if(overtime>=timedelta(days=1)):
+						overtime=timedelta(days=1)-timedelta(minutes=1)
+						late_entry_duration=0
 				else:
-					overtime=out_time-in_time
-				if(overtime>=timedelta(days=1)):
-					overtime=timedelta(days=1)-timedelta(minutes=1)
+					if(in_time<= (logs[0].shift_start+start_time_to_lunch_duration) and (logs[0].shift_start+start_time_to_lunch_duration+lunch_duration) <= out_time):
+						overtime=out_time-in_time-lunch_duration
+					else:
+						overtime=out_time-in_time
+					if(overtime>=timedelta(days=1)):
+						overtime=timedelta(days=1)-timedelta(minutes=1)
 
 
 #if (lunch_start_datetime.time() > in_time_time) and (lunch_end_datetime.time() < out_time_time):
 
 		#change start
 		if(weekly_off_check == 1 and working_holiday=="0"):
-			return "Weekly Off", total_working_hours, 0, early_exit, in_time, out_time,0,overtime
+			return "Weekly Off", total_working_hours, 0, early_exit, in_time, out_time,late_entry_duration,overtime
 		
 		if(weekly_off_check==0 and working_holiday=="0"):
-			return "Holiday", total_working_hours, 0, early_exit, in_time, out_time, 0,overtime
+			return "Holiday", total_working_hours, 0, early_exit, in_time, out_time, late_entry_duration,overtime
 		
 		if (len(logs)==1 or out_time-in_time<timedelta(minutes=1)):
 			return "Present", total_working_hours, late_entry, early_exit, in_time, out_time, late_entry_duration,overtime

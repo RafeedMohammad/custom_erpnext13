@@ -351,7 +351,7 @@ def check_effective_date(employee_name, from_date, to_date, frequency, based_on_
 			return True
 		elif frequency == "Yearly" and rd.months % 12:
 			return True
-		elif frequency == "18_Days" and total_working_days[0][0] % 18 == 0:
+		elif frequency == "18_Days" and total_working_days[0][0] % 18 == 0 or total_working_days[0][0]/18>1:
 			return True
 		
 

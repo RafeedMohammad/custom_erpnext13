@@ -26,6 +26,8 @@ def get_data(filters= None):
 	departments = frappe.db.get_list("Department", pluck="name", order_by="name")
 	for department in departments:
 		salary_slips = get_salary_slip(from_date,to_date,filters,department)
+		if len(salary_slips)==None:
+			continue
 		#columns, ded_types = get_columns(salary_slips)
 		# columns=get_columns(salary_slips)
 		doj_map = get_employee_doj_map()
@@ -300,7 +302,7 @@ def get_conditions(from_date,to_date,filters,department):
 	conditions="" 
 	doc_status = {"Draft": 0, "Submitted": 1, "Cancelled": 2}
 	if filters.get("docstatus"):
-		conditions += "docstatus = {0}".format(doc_status[filters.get("docstatus")])
+		conditions += "ss.docstatus = {0}".format(doc_status[filters.get("docstatus")])
 
 	if department: conditions += " and ss.department= '%s'" % department
 
@@ -320,6 +322,10 @@ def get_conditions(from_date,to_date,filters,department):
 	if filters.get("employee_type"):
 		if (filters["employee_type"]=="New Join"):
 			conditions += " and ss.date_of_joining between ss.start_date and ss.end_date"
+		# if (filters["employee_type"]==""):
+		# 	conditions += " and e.status='Active' "
+		# if (filters["employee_type"]=="Left"):
+		# 	conditions += " and e.status='Left'"
 
 
 	return conditions, filters

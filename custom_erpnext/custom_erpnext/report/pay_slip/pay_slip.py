@@ -104,7 +104,9 @@ def execute(filters= None):
 			round(float(ot_amount or 0),0),
 			get_attendance_bonus(ss.name),
 			# get_lunch_tr_allowance(ss.name),
-			float(acctual_lunch),
+			# float(acctual_lunch),
+			get_lunch(ss.name),
+			get_convanse(ss.name),
 			ss.night_days,
 			get_night_allowance(ss.name),
 			ss.arear ,
@@ -158,7 +160,8 @@ def get_columns(salary_slips):
 		_("OT Rate") + ":%.2Float:7",
 		_("OT Amt") + "::10",
 		_("Attn Bon") + ":Integer:5",
-		_("Lunch Tran Allow") + ":Integer:20",
+		_("Lunch") + ":Integer:20",
+		_("Travel") + ":Integer:20",
 		_("Night Days") + ":Integer:5",
 		_("Night Amt") + ":Integer:20",
 		_("Arrear") + ":Integer:10",
@@ -229,7 +232,7 @@ def get_salary_slip(from_date,to_date,filters):
 	conditions, filters = get_conditions(from_date,to_date,filters)
 	
 
-	salary_slips = frappe.db.sql("""select * from `tabSalary Slip` as ss WHERE %s ORDER BY employee
+	salary_slips = frappe.db.sql("""select * from `tabSalary Slip` as ss WHERE %s ORDER BY department,employee
 	""" 
 	%conditions, filters, as_dict=1)
 
