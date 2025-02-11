@@ -140,7 +140,7 @@ class override_SalarySlip(TransactionBase):
 
 		#set the filter according to the name of the field
 	def calculate_working_holidays_count(self):
-		working_holidays = frappe.db.sql("""SELECT COUNT(*) FROM `tabAttendance` WHERE status in ('Holiday','Weekly Off') and out_time and employee = %s AND attendance_date between %s and %s""",
+		working_holidays = frappe.db.sql("""SELECT COUNT(*) FROM `tabAttendance` WHERE status in ('Holiday','Weekly Off') and in_time and employee = %s AND attendance_date between %s and %s""",
 		(self.employee, self.start_date, self.end_date)
 		)
 		return working_holidays[0][0]
@@ -1417,7 +1417,7 @@ class override_SalarySlip(TransactionBase):
 				)
 				+ additional_amount
 			)
-			self.absent_deduction=(flt(amount)* flt(self.absent_days)/30)# here extract absent deduction from basic as per govt rule of 30 days
+			self.absent_deduction=(flt(amount)* flt(self.absent_days+self.leave_without_pay)/30)# here extract absent deduction from basic as per govt rule of 30 days
 
 		elif (
 			not self.payment_days

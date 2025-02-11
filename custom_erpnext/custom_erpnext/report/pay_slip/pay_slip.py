@@ -147,7 +147,7 @@ def get_columns(salary_slips):
 		_("Allowance") + "::10",
 		_("Gross") + "::10",
 		_("P") + ":Integer:5",
-		_("W/H") + ":Integer:5",
+		_("W H") + ":Integer:5",
 		_("CL") + ":Integer:5",
 		_("EL") + ":Integer:5",
 		_("ML") + ":Integer:5",

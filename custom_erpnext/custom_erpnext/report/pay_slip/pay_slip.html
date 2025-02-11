@@ -92,7 +92,7 @@
 		
 		<tr>
 			<td>Others: {{data[j].allowance}} </td>
-			<td>SL & LWP: {{data[j].sl}}</td>
+			<td>SL: {{data[j].sl}}</td>
 			<td colspan="2">Late: {{data[j].late_days}} </td>
 			<td>Night Day: {{data[j].night_days}} </td>
 			<td>Night Allowance: {{data[j].night_amt}}</td>  
@@ -102,16 +102,16 @@
 		
 		<tr>
 			<td>&nbsp;</td>
-			<td colspan="3">A. & LWP Amnt: {{data[j].absent_penalty}}</td>
+			<td>W/H: {{data[j].w_h}}</td>
+			<td colspan="2"> LWP/OL: {{data[j].ll_lwp}}</td>
 			<td>Lunch: {{data[j].lunch}}</td>
 			<td>Travel: {{data[j].travel}}</td>
-			<td>Stamp </td>   
-			<td>Abs Ded: {{data[j].absent_penalty}}</td>
+			<td colspan="2">Stamp: {{data[j].stamp ||0}} </td>   
 		</tr>
 		
 		<tr>
 			<td>&nbsp;</td>
-			<td colspan="3">&nbsp;</td>
+			<td colspan="3">Abs & LWP Ded: {{data[j].absent_penalty}}</td>
 			<td colspan="2">Attn. Bonus: {{data[j].attn_bon}}</td> 
 			<td colspan="2">Late Amt: {{data[j].late_ded || 0}}</td>   
 		</tr>

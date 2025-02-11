@@ -135,6 +135,7 @@ class override_ShiftType(Document):
 
 		late_entry_duration=0
 		overtime=timedelta(0)
+		working_holiday="0"
 
 		in_date1 = datetime.strptime(str(logs[0].shift_start).split(" ")[0], "%Y-%m-%d")
 		weekly_off_check=None
@@ -202,9 +203,9 @@ class override_ShiftType(Document):
 						late_entry_duration=0
 				else:
 					if(in_time<= (logs[0].shift_start+start_time_to_lunch_duration) and (logs[0].shift_start+start_time_to_lunch_duration+lunch_duration) <= out_time):
-						overtime=out_time-in_time-lunch_duration
+						overtime=out_time-logs[0].shift_start-lunch_duration
 					else:
-						overtime=out_time-in_time
+						overtime=out_time-logs[0].shift_start
 					if(overtime>=timedelta(days=1)):
 						overtime=timedelta(days=1)-timedelta(minutes=1)
 
