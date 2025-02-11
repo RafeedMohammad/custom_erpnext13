@@ -1412,7 +1412,7 @@ class override_SalarySlip(TransactionBase):
 
 			amount = (
 				flt(
-					(flt(row.default_amount) * flt(self.payment_days+self.absent_days) / cint(self.total_working_days)),
+					(flt(row.default_amount) * flt(self.payment_days+self.absent_days+self.leave_without_pay) / cint(self.total_working_days)),# added absent& lwp days for calculate total salary
 					row.precision("amount"),
 				)
 				+ additional_amount
