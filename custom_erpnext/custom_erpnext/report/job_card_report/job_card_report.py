@@ -95,11 +95,15 @@ def get_attendance(filters):
 
 	result= frappe.db.sql("""select DISTINCT att.attendance_date, att.employee, att.shift,
 	att.in_time, att.late_entry_duration, att.out_time, att.rounded_ot, att.status,
-	emp.department,emp.designation,emp.date_of_joining,emp.employee_name,att.is_night,
+	emp.department,emp.designation,emp.date_of_joining,emp.employee_name,
+	CASE 
+            WHEN att.in_time IS NOT NULL THEN att.is_night 
+            ELSE NULL 
+        END AS is_night,
 	att.shift_start, att.shift_end, att.leave_type
 	FROM tabAttendance as att
 	INNER JOIN tabEmployee as emp ON emp.name = att.employee  	
-	where %s
+	where %s and att.docstatus = 1
 	ORDER BY att.attendance_date""" 
 	% conditions, as_list=1)
 
