@@ -177,28 +177,46 @@ def add_attendance(events, start, end, conditions=None):
 def mark_attendance(
 	employee, attendance_date, status, shift=None, leave_type=None, ignore_validate=False
 ):
-	if not frappe.db.exists(
-		"Attendance",
-		{"employee": employee, "attendance_date": attendance_date, "docstatus": ("!=", "2")},
-	):
-		company = frappe.db.get_value("Employee", employee, "company")
-		attendance = frappe.get_doc(
-			{
-				"doctype": "Attendance",
-				"employee": employee,
-				"attendance_date": attendance_date,
-				"status": status,
-				"company": company,
-				"shift": shift,
-				"leave_type": leave_type,
-				"late_entry_duration":0,
-				"overtime":0
-			}
-		)
-		attendance.flags.ignore_validate = ignore_validate
-		attendance.insert()
-		attendance.submit()
-		return attendance.name
+    existing_attendance = frappe.db.get_value(
+        "Attendance",
+        {"employee": employee, "attendance_date": attendance_date, "docstatus": ("!=", 2)},
+        "name"  # Fetch the document name
+    )
+    # frappe.publish_realtime("msgprint",str(existing_attendance))
+
+    if existing_attendance:
+		# added this funtionality to change the status of attendance if the holiday list changes.
+        attendance = frappe.get_doc("Attendance", existing_attendance)
+        # Update status if it's different
+        if attendance.status != status and attendance.status in ("Absent", "Weekly Off", "Holiday"):
+            attendance.status = status
+            #attendance.shift = shift
+            #attendance.leave_type = leave_type
+            attendance.flags.ignore_validate = ignore_validate
+            attendance.save()
+            attendance.submit()
+
+        return attendance.name
+    else:
+        # Create new attendance record
+        company = frappe.db.get_value("Employee", employee, "company")
+        attendance = frappe.get_doc(
+            {
+                "doctype": "Attendance",
+                "employee": employee,
+                "attendance_date": attendance_date,
+                "status": status,
+                "company": company,
+                "shift": shift,
+                "leave_type": leave_type,
+                "late_entry_duration": 0,
+                "overtime": 0
+            }
+        )
+        attendance.flags.ignore_validate = ignore_validate
+        attendance.insert()
+        attendance.submit()
+        return attendance.name
 
 
 @frappe.whitelist()

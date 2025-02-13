@@ -73,8 +73,8 @@ class override_ShiftType(Document):
 			"shift_actual_end": ("<", self.last_sync_of_checkin),
 			"shift": self.name,
 		}
-		weekly_off_list=frappe.db.sql("""select holiday_date,weekly_off from tabHoliday where parent=%s and holiday_date between %s and %s""",
-				(self.holiday_list,self.process_attendance_after,self.last_sync_of_checkin))
+		# weekly_off_list=frappe.db.sql("""select holiday_date,weekly_off from tabHoliday where parent=%s and holiday_date between %s and %s""",
+		# 		(self.holiday_list,self.process_attendance_after,self.last_sync_of_checkin))
 
 		logs = frappe.db.get_list(
 			"Employee Checkin", fields="*", filters=filters, order_by="employee,time"
@@ -97,7 +97,7 @@ class override_ShiftType(Document):
 				out_time,
 				late_entry_duration,
 				overtime,
-			) = self.get_attendance(single_shift_logs,weekly_off_list,working_holiday,overtime_deduct,holiday_ot_from_shift_start)
+			) = self.get_attendance(single_shift_logs,working_holiday,overtime_deduct,holiday_ot_from_shift_start)
 			mark_attendance_and_link_log(
 				single_shift_logs,
 				attendance_status,
@@ -117,7 +117,7 @@ class override_ShiftType(Document):
 		# frappe.publish_realtime('msgprint', 'Ending process for '+self.name+' at-> '+str(datetime.now()))
 
 
-	def get_attendance(self, logs,weekly_off_list,working_holiday,overtime_deduct,holiday_ot_from_shift_start):
+	def get_attendance(self, logs,working_holiday,overtime_deduct,holiday_ot_from_shift_start):
 		"""Return attendance_status, working_hours, late_entry, early_exit, in_time, out_time
 		for a set of logs belonging to a single shift.
 		Assumtion:
@@ -132,6 +132,16 @@ class override_ShiftType(Document):
 		# total_working_hours, in_time, out_time, weekly_off_check = calculate_working_hours(
 		# 	logs, self.determine_check_in_and_check_out, self.working_hours_calculation_based_on, self.holiday_list, self.lunch_start, self.lunch_end, self.start_time, self.end_time##Change - Added parameter: self.holiday_list
 		# )
+		holiday_list_name = frappe.db.get_value("Employee", logs[0].employee, "holiday_list")	
+		#added this to priotize the holiday_list given to a employee	
+		if not holiday_list_name:
+			# holiday_list_name = get_holiday_list_for_employee(employee, False)
+			holiday_list_name = self.holiday_list
+		# frappe.publish_realtime("msgprint",str(logs[0].employee))
+
+		weekly_off_list=frappe.db.sql("""select holiday_date,weekly_off from tabHoliday where parent=%s and holiday_date between %s and %s""",
+				(holiday_list_name,self.process_attendance_after,self.last_sync_of_checkin))
+
 
 		late_entry_duration=0
 		overtime=timedelta(0)
@@ -268,14 +278,14 @@ class override_ShiftType(Document):
 		else:
 			return
 
-		holiday_list_name = self.holiday_list
+		# holiday_list_name = self.holiday_list
+		holiday_list_name = frappe.db.get_value("Employee", employee, "holiday_list")
+		#added this to priotize the holiday_list given to a employee	
+		if not holiday_list_name:
+			holiday_list_name = self.holiday_list
 
 		start_time = get_time(self.start_time)
 		
-		if not holiday_list_name:
-			holiday_list_name = get_holiday_list_for_employee(employee, False)
-
-
 		for date in daterange(getdate(start_date), getdate(end_date)):
 			check_if_weekly_off = frappe.db.get_value('Holiday', {'parent': holiday_list_name, 'holiday_date':date}, 'weekly_off')
 			check_if_holiday=is_holiday(holiday_list_name, date)
@@ -284,7 +294,9 @@ class override_ShiftType(Document):
 				#Dev: Can be changed because if it's a weekly holiday, the status is shown as 'W'
 				if(check_if_weekly_off==1):
 					attendance = mark_attendance(employee, date, "Weekly Off", self.name)
+					return
 				attendance = mark_attendance(employee, date, "Holiday", self.name)
+				return
 				
 		
 		# dates = get_filtered_date_list(employee, start_date, end_date, holiday_list=holiday_list_name)
