@@ -21,10 +21,12 @@ class override_ShiftAssignment(Document):
 		validate_active_employee(self.employee)
 		self.validate_overlapping_dates()
 		if self.docstatus== 1:
-			self.update_checkin("start_date", "end_date")
+			self.on_submit()
 
 		if self.end_date:
 			self.validate_from_to_dates("start_date", "end_date")
+	def on_submit(self):
+		self.update_checkin("start_date", "end_date")
 
 	def validate_overlapping_dates(self):
 		if not self.name:
@@ -91,7 +93,6 @@ class override_ShiftAssignment(Document):
 		fields=['name'])
 		# frappe.publish_realtime('msgprint',"23")
 
-		# Print the filtered sales invoices
 		for checkin in checkins:
 			checkin_doc = frappe.get_doc('Employee Checkin', checkin['name'])
 			checkin_doc.save()

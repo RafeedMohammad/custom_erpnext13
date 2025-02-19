@@ -147,6 +147,31 @@ frappe.query_reports["OT Sheet Payment"] = {
 			"wildcard_filter": 0
 
 		},
+		{
+			"fieldname":"mode_of_payment",
+			"label":__("Bank/Cash"),
+			"fieldtype":"Select",
+			"options":["Bank","Cash",""],
+			"default": "",
+			"width": "100px"
+		},
+		{
+			"fieldname": "bank",
+			"fieldtype": "Link",
+			"label": "Bank Name",
+			"mandatory": 0,
+			"options": "Bank",
+			"wildcard_filter": 0,
+			"depends_on": "eval:doc.mode_of_payment == 'Bank'"
+		   },
+		   {
+			"fieldname":"employee_type",
+			"label":__("Employee Type"),
+			"fieldtype":"Select",
+			"options":["Active","New Join","Left",""],
+			"default": "Active",
+			"width": "100px"
+		},
 		
 
 		// {

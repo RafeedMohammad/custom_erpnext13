@@ -30,7 +30,7 @@ def get_data(filters= None):
 			continue
 		#columns, ded_types = get_columns(salary_slips)
 		# columns=get_columns(salary_slips)
-		doj_map = get_employee_doj_map()
+		
 		ss_ded_map = get_ss_ded_map(salary_slips)
 
 		
@@ -92,7 +92,7 @@ def get_data(filters= None):
 				#ss.name,
 				ss.employee,
 				ss.employee_name,
-				doj_map.get(ss.employee),
+				ss.date_of_joining,
 				# ss.branch,
 				# ss.department,
 				ss.designation,
@@ -246,22 +246,6 @@ def get_columns():
 
 
 
-
-
-
-def get_employee_doj_map():
-	return frappe._dict(
-		frappe.db.sql(
-			"""
-				SELECT
-					employee,
-					date_of_joining
-				FROM `tabEmployee`
-				"""
-		)
-	)
-
-
 def get_salary_slip(from_date,to_date,filters,department):
 	conditions, filters = get_conditions(from_date,to_date,filters,department)
 	
@@ -270,7 +254,7 @@ def get_salary_slip(from_date,to_date,filters,department):
 	conditions, filters = get_conditions(from_date,to_date,filters,department)
 	
 
-	salary_slips = frappe.db.sql("""select * from `tabSalary Slip` as ss WHERE %s ORDER BY department,employee
+	salary_slips = frappe.db.sql("""select ss.*,e.status,e.relieving_date from `tabSalary Slip` as ss inner join tabEmployee as e on ss.employee=e.name WHERE %s ORDER BY ss.department,employee
 	""" 
 	%conditions, filters, as_dict=1)
 
@@ -323,10 +307,10 @@ def get_conditions(from_date,to_date,filters,department):
 	if filters.get("employee_type"):
 		if (filters["employee_type"]=="New Join"):
 			conditions += " and ss.date_of_joining between ss.start_date and ss.end_date"
-		# if (filters["employee_type"]==""):
-		# 	conditions += " and e.status='Active' "
-		# if (filters["employee_type"]=="Left"):
-		# 	conditions += " and e.status='Left'"
+		if (filters["employee_type"]=="Active"):
+			conditions += " and e.status='Active' "
+		if (filters["employee_type"]=="Left"):
+			conditions += " and e.status='Left' and e.relieving_date between ss.start_date and ss.end_date"
 
 
 	return conditions, filters

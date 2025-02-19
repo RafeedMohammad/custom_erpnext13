@@ -147,7 +147,7 @@ def get_salary_slip(from_date,to_date,filters,department):
 	
 
 	salary_slips = frappe.db.sql("""
-    SELECT ss.* 
+    SELECT ss.* ,e.status,e.relieving_date
     FROM `tabSalary Slip` AS ss
     JOIN `tabEmployee` AS e ON ss.employee = e.name
     WHERE e.ot_enable = 'Yes' and %s
@@ -178,7 +178,16 @@ def get_conditions(from_date,to_date,filters,department):
 	if filters.get("facility_or_line"): conditions += " and ss.facility_or_line='%s'" % filters["facility_or_line"]
 	if filters.get("group_name"): conditions += " and ss.group='%s'" % filters["group_name"]
 	if filters.get("grade"): conditions += " and ss.grade='%s'" % filters["grade"]
+	if filters.get("mode_of_payment"): conditions += " and ss.mode_of_payment='%s'" % filters["mode_of_payment"]
+	if filters.get("bank"): conditions += " and ss.bank_name='%s'" % filters["bank"]
 	# if filters.get("sub_department"): conditions += " and ss.sub_department like '%s'" % filters["sub_department"]
+	if filters.get("employee_type"):
+		if (filters["employee_type"]=="New Join"):
+			conditions += " and ss.date_of_joining between ss.start_date and ss.end_date"
+		if (filters["employee_type"]=="Active"):
+			conditions += " and e.status='Active' "
+		if (filters["employee_type"]=="Left"):
+			conditions += " and e.status='Left' and e.relieving_date between ss.start_date and ss.end_date"
 
 
 	return conditions, filters
