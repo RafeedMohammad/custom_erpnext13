@@ -170,8 +170,17 @@ def add_data(
 			# 					status = "Holiday"
 			# 				total_h += 1
 
+			# abbr = status_map.get(status, "")
 			abbr = status_map.get(status, "")
+			if status == "On Leave" and att_map.get(emp).get(day + 1):
+				leave_type = frappe.db.get_value(
+					"Attendance",
+					{"employee": emp, "attendance_date": f"{filters.year}-{filters.month}-{day + 1}"},
+					"leave_type",
+				)
+				abbr = leave_type if leave_type else "OL"
 			emp_status_map.append(abbr)
+						# emp_status_map.append(abbr)
 
 			if filters.summarized_view:
 				if status == "Present" or status == "Work From Home":

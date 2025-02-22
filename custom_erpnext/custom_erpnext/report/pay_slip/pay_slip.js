@@ -141,6 +141,23 @@ frappe.query_reports["Pay Slip"] = {
 				"width": "100px"
 			},
 			   
+			{
+				"fieldname": "bank",
+				"fieldtype": "Link",
+				"label": "Bank Name",
+				"mandatory": 0,
+				"options": "Bank",
+				"wildcard_filter": 0,
+				"depends_on": "eval:doc.mode_of_payment == 'Bank'"
+			   },
+			{
+				"fieldname":"employee_type",
+				"label":__("Employee Type"),
+				"fieldtype":"Select",
+				"options":["Active","New Join","Left",""],
+				"default": "Active",
+				"width": "100px"
+			},
 
 			// {
 			// 	"fieldname": "shift",

@@ -254,7 +254,7 @@ def get_salary_slip(from_date,to_date,filters,department):
 	conditions, filters = get_conditions(from_date,to_date,filters,department)
 	
 
-	salary_slips = frappe.db.sql("""select ss.*,e.status,e.relieving_date from `tabSalary Slip` as ss inner join tabEmployee as e on ss.employee=e.name WHERE %s ORDER BY ss.department,employee
+	salary_slips = frappe.db.sql("""select ss.*,e.status,e.relieving_date,e.lunch_rate,e.travel_rate,e.night_rate from `tabSalary Slip` as ss inner join tabEmployee as e on ss.employee=e.name WHERE %s ORDER BY ss.department,employee
 	""" 
 	%conditions, filters, as_dict=1)
 
