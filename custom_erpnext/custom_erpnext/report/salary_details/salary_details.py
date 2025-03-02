@@ -18,6 +18,7 @@ def get_columns():
 	 return [
 		_("Employee") + ":Data:200",
         _("Employee Name") + ":Data:200",
+		# _("Status") + ":Data:200",
         _("Base") + ":Currency:100",
         _("Basic") + ":Currency:100",
         _("Hrent") + ":Currency:100",
@@ -27,28 +28,32 @@ def get_columns():
 def get_data(filters):
 	conditions, filters = get_conditions(filters)
 	result = frappe.db.sql("""
-    SELECT 
-			ssa.employee,
-            ssa.employee_name,
-            ssa.base,
-            ((ssa.base - SUM(CASE WHEN sd.abbr = 'DM' THEN sd.amount ELSE 0 END)) / 1.5) AS basic,
-            (((ssa.base - SUM(CASE WHEN sd.abbr = 'DM' THEN sd.amount ELSE 0 END)) / 1.5)/2)  AS hrent,
-			SUM(CASE WHEN sd.abbr = 'DM' THEN sd.amount ELSE 0 END) AS medical
+   SELECT 
+    ssa.employee,
+    ssa.employee_name,
+    ssa.base,
+    ((ssa.base - SUM(CASE WHEN sd.abbr = 'DM' THEN sd.amount ELSE 0 END)) / 1.5) AS basic,
+    (((ssa.base - SUM(CASE WHEN sd.abbr = 'DM' THEN sd.amount ELSE 0 END)) / 1.5) / 2) AS hrent,
+    SUM(CASE WHEN sd.abbr = 'DM' THEN sd.amount ELSE 0 END) AS medical
+FROM
+    `tabSalary Structure Assignment` ssa
+JOIN
+    `tabSalary Detail` sd ON sd.parent = ssa.salary_structure
+JOIN 
+    `tabEmployee` emp ON emp.name=ssa.employee
+WHERE
+    ssa.salary_structure IS NOT NULL 
+    AND ssa.from_date = (
+        SELECT MAX(from_date) 
+        FROM `tabSalary Structure Assignment` 
+        WHERE employee = ssa.employee
+    )
+    AND %s and emp.status="Active"
+GROUP BY
+    ssa.employee, ssa.employee_name, emp.status, ssa.base
+ORDER BY 
+    ssa.employee;
 
-        FROM
-            `tabSalary Structure Assignment` ssa
-        
-        JOIN
-            `tabSalary Detail` sd ON sd.parent = ssa.salary_structure
-        WHERE
-            ssa.salary_structure IS NOT NULL AND ssa.from_date = (SELECT MAX(from_date) 
-                         FROM `tabSalary Structure Assignment` 
-                         WHERE employee = ssa.employee)
-						and %s
-        GROUP BY
-            ssa.employee, ssa.base
-        ORDER BY 
-            ssa.from_date DESC
 """% conditions, as_dict=True)
 
 	# for i in range(0,len(result)):
@@ -66,7 +71,7 @@ def get_data(filters):
 
 def get_conditions(filters):
 	conditions="" 
-	if filters.get("company"): conditions += "company= '%s'" % filters["company"]
+	if filters.get("company"): conditions += "ssa.company= '%s'" % filters["company"]
 	# if (filters.get("employee")): 
 	# 	valu = list(map(str.strip, (filters.get("employee")).split(','))) 
 	# # frappe.publish_realtime('msgprint', valu)		
@@ -81,7 +86,7 @@ def get_conditions(filters):
 	# if filters.get("employee1"): conditions += ",'%s'" % filters["employee1"]
 	# if filters.get("employee2"): conditions += "'%s'" % filters["employee2"]
 	# if filters.get("employee"): conditions += ")"
-	if filters.get("employee"): conditions += " and employee in %s'" % filters["employee"]
+	if filters.get("employee"): conditions += " and ssa.employee in %s'" % filters["employee"]
 
 
 	if filters.get("department"): conditions += " and ssa.department= '%s'" % filters["department"]

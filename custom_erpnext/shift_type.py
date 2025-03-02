@@ -52,13 +52,15 @@ class override_ShiftType(Document):
 		now = datetime.now()
 		if from_date and to_date:
 			self.process_attendance_after=from_date
-			#self.name=name
+			Shift_actual_start_time=from_date+" "+ str(self.start_time)
+			Shift_actual_start_time_datetime=datetime.strptime(Shift_actual_start_time, "%Y-%m-%d %H:%M:%S")-timedelta(minutes=self.begin_check_in_before_shift_start_time)
+			#self.name=name begin_check_in_before_shift_start_time
 			shift_start_time =to_date+" "+ str(self.start_time)
 			if(datetime.strptime(shift_start_time, "%Y-%m-%d %H:%M:%S")<=now):
 				self.last_sync_of_checkin = datetime.strptime(shift_start_time, "%Y-%m-%d %H:%M:%S")+timedelta(days=1,hours=2)
 			else:
 				self.last_sync_of_checkin = datetime.strptime(shift_start_time, "%Y-%m-%d %H:%M:%S")
-			# frappe.publish_realtime("msgprint",self.process_attendance_after1)
+			# frappe.publish_realtime("msgprint",str(self.name)+" "+str(Shift_actual_start_time_datetime))
 			# added to set eligiable time for the shifts to process the attendance which is given in mark attendance in shift type front desk
 		if (
 			not cint(self.enable_auto_attendance)
@@ -69,7 +71,7 @@ class override_ShiftType(Document):
 		filters = {
 			"skip_auto_attendance": "0",
 			#"attendance": ("is", "not set"),
-			"time": (">=", self.process_attendance_after),
+			"time": (">=", Shift_actual_start_time_datetime),
 			"shift_actual_end": ("<", self.last_sync_of_checkin),
 			"shift": self.name,
 		}
@@ -82,7 +84,7 @@ class override_ShiftType(Document):
 		if logs:
 			employee=logs[0].employee
 			company =frappe.db.get_value("Employee", employee, "company")
-			rounding_ot,overtime_deduct,holiday_ot_from_shift_start = frappe.db.get_value("Company", company, ["rounding_overtime","overtime_deduct_for_night","holiday_ot_from_shift_start"]) 
+			rounding_overtime_for_extra_30min,rounding_ot,overtime_deduct,holiday_ot_from_shift_start = frappe.db.get_value("Company", company, ["rounding_overtime_for_extra_30min","rounding_overtime","overtime_deduct_for_night","holiday_ot_from_shift_start"]) 
 		
 		for key, group in itertools.groupby(
 			logs, key=lambda x: (x["employee"], x["shift_actual_start"])
@@ -111,6 +113,7 @@ class override_ShiftType(Document):
 				late_entry_duration,
 				overtime,
 				rounding_ot,
+				rounding_overtime_for_extra_30min,
 			)
 		for employee in self.get_assigned_employee(self.process_attendance_after, True):
 			self.mark_absent_for_dates_with_no_attendance(employee)

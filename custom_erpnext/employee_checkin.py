@@ -133,7 +133,8 @@ def mark_attendance_and_link_log(
 	shift=None,
 	late_entry_duration=None,
 	overtime=None,
-	rounding_ot=None
+	rounding_ot=None,
+	rounding_overtime_for_extra_30min=None
 	
 ):
 	#frappe.publish_realtime('msgprint', 'Starting mark_attendance of '+logs[0].employee+" for "+str(attendance_date))
@@ -171,15 +172,17 @@ def mark_attendance_and_link_log(
 	
 	else:
 		#overtime_hour=rounding_ot
-		overtime_hour_fraction  = ((overtime.total_seconds())%3600)//60
-		if rounding_ot<0:
+		overtime_hour_fraction  = ((overtime.total_seconds())%3600)//60 #extra minute after hours
+		if rounding_ot<0:# it means if company give overtime after doing a period of ot like after 30 min they will give .5 else 0
 		#for the company which has ot_rules as Queen South
 			if overtime_hour_fraction >= abs(rounding_ot):			
 				overtime_hour = (overtime.total_seconds()//3600)+.5
 				overtime=overtime-timedelta(minutes=overtime_hour_fraction//30)
 			else:			
 				overtime_hour = (overtime.total_seconds()//3600)
-				overtime=overtime-timedelta(minutes=overtime_hour_fraction//30)
+				overtime=overtime-timedelta(minutes=overtime_hour_fraction//60)
+			if (abs(rounding_ot)-rounding_overtime_for_extra_30min <= overtime_hour_fraction <= abs(rounding_ot)-1) or (59-rounding_overtime_for_extra_30min <= overtime_hour_fraction <= 59):
+				overtime_hour = overtime_hour+.5
 		else:
 			if overtime_hour_fraction >= rounding_ot:			
 				overtime_hour = (overtime.total_seconds()//3600)+1

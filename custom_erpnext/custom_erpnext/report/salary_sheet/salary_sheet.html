@@ -15,22 +15,30 @@
     /* Ensure table uses full width of the page */
     table {
         width: 100%;
+        margin-left: 0;
+        padding-left: 0;
         border-collapse: collapse;
     }
 
     tr, th, td {
         border: 1px solid black;
         padding: 2px;
+        margin-left: 0;
+        padding-left: 0;
     }
 
     th {
+        margin-left: 0;
+        padding-left: 0;
         font-size: 7px;
         font-weight: bold;
         text-align: center;
     }
 
     td {
-        font-size: 6px;
+        margin-left: 0;
+        padding-left: 0;
+        font-size: 6.5px;
         text-align: center;
         word-wrap: break-word; /* Wrap long text to avoid overflow */
     }
@@ -51,6 +59,8 @@
         page-break-after: always;
     }
     table tr {
+        margin-left: 0;
+        padding-left: 0;
     height: 50px; /* Adjust as needed */
 }
 
@@ -121,7 +131,7 @@ table td {
             {% for(let j=m+1, k=data.length; j<k; j++) { %}
                 {% if (data[j][report_columns[0].fieldname] != "Total") { %}
                     <tr>
-                        <td> {%= u+1 %} </td>
+                        <td style="padding-left: 0; margin-left: 0;"> {%= u+1 %} </td>
                         {% for(let i=1, l=report_columns.length; i<l; i++) { %}
                         <td class="{% if i == 3 %}vertical-column{% endif %}">
                             {% const fieldname = report_columns[i].fieldname; %}

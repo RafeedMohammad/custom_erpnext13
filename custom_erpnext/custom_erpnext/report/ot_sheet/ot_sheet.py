@@ -64,7 +64,7 @@ def get_columns(filters):
             columns += days
         
         # Add Total OT column at the end
-        # columns += [_("Total") + "::65"]
+        columns += [_("Total") + "::65"]
     except KeyError:
         frappe.throw(_("Missing required filter parameters (month/year)"))
     
@@ -111,7 +111,7 @@ def add_data(employee_map, att_map, filters, conditions):
             row += emp_status_map
 
         # Add total OT for the employee
-        row += [total_ot]
+        row += [total_ot,""]
 
         # Ensure the row length matches the expected number of columns
         if len(row) != len(get_columns(filters)[0]):

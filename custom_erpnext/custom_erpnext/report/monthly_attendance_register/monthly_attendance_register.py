@@ -61,7 +61,10 @@ def execute(filters=None):
 	leave_types = None
 	if filters.summarized_view:
 		leave_types = frappe.get_all("Leave Type", pluck="name")
-		columns.extend([leave_type + ":Float:120" for leave_type in leave_types])
+		columns.extend([
+        {"label": _(leave_type), "fieldtype": "Float", "width": 120, "precision": 2}
+        for leave_type in leave_types
+    ])
 		# columns.extend([_("Total Late Entries") + ":Float:120", _("Total Early Exits") + ":Float:120"])
 
 	if filters.group_by:
@@ -268,13 +271,13 @@ def get_columns(filters):
 
 	if filters.summarized_view:
 		columns += [
-			_("Total Present") + ":Float:120",
-			_("Total Late") + ":Float:120",
-			_("Total Leaves") + ":Float:120",
-			_("Total Absent") + ":Float:120",
-			_("Total Holidays") + ":Float:120",
-			_("Unmarked Days") + ":Float:120",
-		]
+        {"label": _("Total Present"), "fieldtype": "Float", "width": 120, "precision": 1},
+        {"label": _("Total Late"), "fieldtype": "Float", "width": 120, "precision": 1},
+        {"label": _("Total Leaves"), "fieldtype": "Float", "width": 120, "precision": 1},
+        {"label": _("Total Absent"), "fieldtype": "Float", "width": 120, "precision": 1},
+        {"label": _("Total Holidays"), "fieldtype": "Float", "width": 120, "precision": 1},
+        {"label": _("Unmarked Days"), "fieldtype": "Float", "width": 120, "precision": 1},
+    ]
 	return columns, days
 
 
