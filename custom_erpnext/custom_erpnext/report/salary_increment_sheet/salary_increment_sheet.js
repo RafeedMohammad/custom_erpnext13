@@ -2,7 +2,7 @@
 // For license information, please see license.txt
 /* eslint-disable */
 
-frappe.query_reports["Salary Details"] = {
+frappe.query_reports["Salary Increment Sheet"] = {
 	"filters": [
 		{
 			"fieldname": "month",
@@ -31,28 +31,28 @@ frappe.query_reports["Salary Details"] = {
 			"options": "Company",
 			"wildcard_filter": 0
 		},
-		{
-			"fieldname": "employee",
-			// "fieldtype": "Link",
-			"label": "Employee",
-			"mandatory": 0,
-			"fieldtype": "MultiSelectList",
-			// "default":"Tah 120",
-			"options": "Employee",
-			"wildcard_filter": 0,
-			"get_data": function(txt) {
-				return frappe.db.get_link_options("Employee", txt);
-			 }
-		},
-		{
-			"fieldname": "department",
-			"fieldtype": "Link",
-			"label": "Department",
-			"mandatory": 0,
-			// "default":"Admin (GSD) - QSTML",
-			"options": "Department",
-			"wildcard_filter": 0,
-		},
+		// {
+		// 	"fieldname": "employee",
+		// 	// "fieldtype": "Link",
+		// 	"label": "Employee",
+		// 	"mandatory": 0,
+		// 	"fieldtype": "MultiSelectList",
+		// 	// "default":"Tah 120",
+		// 	"options": "Employee",
+		// 	"wildcard_filter": 0,
+		// 	"get_data": function(txt) {
+		// 		return frappe.db.get_link_options("Employee", txt);
+		// 	 }
+		// },
+		// {
+		// 	"fieldname": "department",
+		// 	"fieldtype": "Link",
+		// 	"label": "Department",
+		// 	"mandatory": 0,
+		// 	// "default":"Admin (GSD) - QSTML",
+		// 	"options": "Department",
+		// 	"wildcard_filter": 0,
+		// },
 		
 			
 	]

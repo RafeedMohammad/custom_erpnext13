@@ -92,6 +92,14 @@ frappe.query_reports["Yearly Attendance Details"] = {
 				"wildcard_filter": 0
 
 			   },
+			   {
+				"fieldname":"employee_status",
+				"label":__("Employee Status"),
+				"fieldtype":"Select",
+				"options":["Active","Innactive","Left",""],
+				"default": "Active",
+				"width": "100px"
+			},
 			   
 
 	]

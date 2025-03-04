@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import frappe
 from frappe import _
+from frappe.utils import add_days, cstr, date_diff, get_first_day, get_last_day, getdate
 
 
 def execute(filters= None):
@@ -18,6 +19,7 @@ def get_columns():
 	 return [
 		_("Employee") + ":Data:200",
         _("Employee Name") + ":Data:200",
+		_("Last Increment Date")+ ":Date:200",
 		# _("Status") + ":Data:200",
         _("Base") + ":Currency:100",
         _("Basic") + ":Currency:100",
@@ -25,12 +27,21 @@ def get_columns():
 		_("Medical") + ":Currency:100"
     ]
 
-def get_data(filters):
-	conditions, filters = get_conditions(filters)
+def get_data(filters,from_date=None,to_date=None):
+	conditions, filters = get_conditions(filters,from_date=None,to_date=None)
+	con=""
+	if filters.get("month") and filters.get("year"):
+		from_date = get_first_day(filters.get("month") + "-" + filters.get("year"))
+		to_date = get_last_day(filters.get("month") + "-" + filters.get("year"))
+		# filters.update({"from_date": filters.get("from_date"), "to_date": filters.get("to_date")})
+		# conditions, filters = get_conditions(filters,from_date=None,to_date=None)
+		con+=" and ssa.from_date BETWEEN '"+str(from_date)+"' and '"+str(to_date)+"'"
+	
 	result = frappe.db.sql("""
    SELECT 
     ssa.employee,
     ssa.employee_name,
+	ssa.from_date as last_increment_date,
     ssa.base,
     ((ssa.base - SUM(CASE WHEN sd.abbr = 'DM' THEN sd.amount ELSE 0 END)) / 1.5) AS basic,
     (((ssa.base - SUM(CASE WHEN sd.abbr = 'DM' THEN sd.amount ELSE 0 END)) / 1.5) / 2) AS hrent,
@@ -47,6 +58,7 @@ WHERE
         SELECT MAX(from_date) 
         FROM `tabSalary Structure Assignment` 
         WHERE employee = ssa.employee
+		 %s
     )
     AND %s and emp.status="Active"
 GROUP BY
@@ -54,7 +66,7 @@ GROUP BY
 ORDER BY 
     ssa.employee;
 
-"""% conditions, as_dict=True)
+"""% (con,conditions), as_dict=True)
 
 	# for i in range(0,len(result)):
 	# 	if result[i][2] is None:
@@ -69,9 +81,10 @@ ORDER BY
 	return result
 	
 
-def get_conditions(filters):
+def get_conditions(filters,from_date=None,to_date=None):
 	conditions="" 
 	if filters.get("company"): conditions += "ssa.company= '%s'" % filters["company"]
+	# if from_date:conditions += " and ssa.from_date BETWEEN '{0}' AND '{1}'".format(from_date.strftime('%Y-%m-%d'), to_date.strftime('%Y-%m-%d'))
 	# if (filters.get("employee")): 
 	# 	valu = list(map(str.strip, (filters.get("employee")).split(','))) 
 	# # frappe.publish_realtime('msgprint', valu)		
@@ -97,3 +110,7 @@ def get_conditions(filters):
 	
 	return conditions, filters
 
+@frappe.whitelist()
+def get_year_options():
+    current_year = datetime.now().year
+    return "\n".join(str(year) for year in range(current_year, current_year - 3, -1))

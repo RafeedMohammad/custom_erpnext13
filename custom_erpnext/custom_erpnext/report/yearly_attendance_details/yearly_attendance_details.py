@@ -21,7 +21,7 @@ def get_columns():
         _("Department") + ":Data:90",
         _("Designation") + ":Data:90",
         _("Joining") + ":Date:90",
-        _("Duration (Days)") + ":Int:90",
+        _("Duration (Days)") + ":Data:90",
         # _("Status") + ":Data:90",
         _("Present") + ":Int:120",
         _("Absent") + ":Int:90",
@@ -97,5 +97,6 @@ def get_conditions(filters):
     if filters.get("floor"): conditions += " and emp.floor='%s'" % filters["floor"]
     if filters.get("facility_or_line"): conditions += " and emp.facility_or_line='%s'" % filters["facility_or_line"]
     if filters.get("group_name"): conditions += " and emp.group='%s'" % filters["group_name"]
+    if filters.get("employee_status"): conditions += " and emp.status='%s'" % filters["employee_status"]
 
     return conditions, filters
