@@ -81,7 +81,7 @@ def execute(filters= None):
 			]
 			
 			for i in range(len(row)): 
-				if i>4 and i<len(row)-1: # Use the length of 'row' to avoid accessing out of bounds
+				if i>4 and i<len(row): # Use the length of 'row' to avoid accessing out of bounds
 					result.append(0)  # Initialize result with 0s or use an already initialized result list
 					result[i] = result[i] + row[i]
 				else:

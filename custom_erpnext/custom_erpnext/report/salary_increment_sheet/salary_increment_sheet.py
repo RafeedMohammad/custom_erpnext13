@@ -53,65 +53,75 @@ def get_data(filters,from_date=None,to_date=None):
 		con+=" where from_date BETWEEN '"+str(from_date)+"' and '"+str(to_date)+"'"
 	
 	result = frappe.db.sql("""
-        WITH LatestSalary AS (
-            SELECT 
-                employee,
-                MAX(from_date) AS latest_from_date
-            FROM `tabSalary Structure Assignment`
-			%s
-            GROUP BY employee
-        ),
-        PreviousSalary AS (
-            SELECT 
-                ssa.employee,
-                MAX(ssa.from_date) AS prev_from_date
-            FROM `tabSalary Structure Assignment` ssa
-            WHERE ssa.from_date < (
-                SELECT latest_from_date 
-                FROM LatestSalary ls 
-                WHERE ls.employee = ssa.employee
-            )
-            GROUP BY ssa.employee
-        )
-        SELECT 
-            emp.name AS employee,
-            emp.employee_name,
-			emp.department as dept,
-			emp.designation,
-			emp.date_of_joining as joining_date,
-DATEDIFF('%s', emp.date_of_joining) AS total_service_length,
+  WITH LatestSalary AS (
+    SELECT 
+        employee,
+        MAX(from_date) AS latest_from_date
+    FROM `tabSalary Structure Assignment`
+    %s
+    GROUP BY employee
+),
+PreviousSalary AS (
+    SELECT 
+        ssa.employee,
+        MAX(ssa.from_date) AS prev_from_date
+    FROM `tabSalary Structure Assignment` ssa
+    WHERE ssa.from_date < (
+        SELECT latest_from_date 
+        FROM LatestSalary ls 
+        WHERE ls.employee = ssa.employee
+    )
+    GROUP BY ssa.employee
+),
+LatestDM AS (
+    SELECT parent, SUM(amount) AS dm_amount
+    FROM `tabSalary Detail`
+    WHERE abbr = 'DM'
+    GROUP BY parent
+),
+PreviousDM AS (
+    SELECT parent, SUM(amount) AS dm_amount
+    FROM `tabSalary Detail`
+    WHERE abbr = 'DM'
+    GROUP BY parent
+)
+SELECT 
+    emp.name AS employee,
+    emp.employee_name,
+    emp.department as dept,
+    emp.designation,
+    emp.date_of_joining as joining_date,
+    DATEDIFF('%s', emp.date_of_joining) AS total_service_length,
 
-						
-			prev_ssa.from_date AS previous_increment_date,
-            prev_ssa.base AS gross_salary_prev,
-            ((prev_ssa.base - COALESCE(SUM(CASE WHEN prev_sd.abbr = 'DM' THEN prev_sd.amount ELSE 0 END), 0)) / 1.5) AS basic_prev,
-            (((prev_ssa.base - COALESCE(SUM(CASE WHEN prev_sd.abbr = 'DM' THEN prev_sd.amount ELSE 0 END), 0)) / 1.5) / 2) AS hrent_prev,
-            COALESCE(SUM(CASE WHEN prev_sd.abbr = 'DM' THEN prev_sd.amount ELSE 0 END), 0) AS medical_prev,
+    prev_ssa.from_date AS previous_increment_date,
+    prev_ssa.base AS gross_salary_prev,
+    ((prev_ssa.base - COALESCE(prev_dm.dm_amount, 0)) / 1.5) AS basic_prev,
+    (((prev_ssa.base - COALESCE(prev_dm.dm_amount, 0)) / 1.5) / 2) AS hrent_prev,
+    COALESCE(prev_dm.dm_amount, 0) AS medical_prev,
 
-           ((((latest_ssa.base - COALESCE(SUM(CASE WHEN latest_sd.abbr = 'DM' THEN latest_sd.amount ELSE 0 END), 0)) / 1.5)- ((prev_ssa.base - COALESCE(SUM(CASE WHEN prev_sd.abbr = 'DM' THEN prev_sd.amount ELSE 0 END), 0)) / 1.5))/
-            ((prev_ssa.base - COALESCE(SUM(CASE WHEN prev_sd.abbr = 'DM' THEN prev_sd.amount ELSE 0 END), 0)) / 1.5))*100 AS increment_percent,
-			
-            (((latest_ssa.base - COALESCE(SUM(CASE WHEN latest_sd.abbr = 'DM' THEN latest_sd.amount ELSE 0 END), 0)) / 1.5) 
-			- ((prev_ssa.base - COALESCE(SUM(CASE WHEN prev_sd.abbr = 'DM' THEN prev_sd.amount ELSE 0 END), 0)) / 1.5) ) AS increment_taka,
-						
-			latest_ssa.from_date AS curr_increment_date,
-            latest_ssa.base AS gross_salary_new,
-            ((latest_ssa.base - COALESCE(SUM(CASE WHEN latest_sd.abbr = 'DM' THEN latest_sd.amount ELSE 0 END), 0)) / 1.5) AS basic_new,
-            (((latest_ssa.base - COALESCE(SUM(CASE WHEN latest_sd.abbr = 'DM' THEN latest_sd.amount ELSE 0 END), 0)) / 1.5) / 2) AS hrent_new,
-            COALESCE(SUM(CASE WHEN latest_sd.abbr = 'DM' THEN latest_sd.amount ELSE 0 END), 0) AS medical_new
-        FROM
-            `tabEmployee` emp
-        LEFT JOIN LatestSalary ls ON emp.name = ls.employee
-        LEFT JOIN `tabSalary Structure Assignment` latest_ssa ON emp.name = latest_ssa.employee AND latest_ssa.from_date = ls.latest_from_date
-        LEFT JOIN PreviousSalary ps ON emp.name = ps.employee
-        LEFT JOIN `tabSalary Structure Assignment` prev_ssa ON emp.name = prev_ssa.employee AND prev_ssa.from_date = ps.prev_from_date
-        LEFT JOIN `tabSalary Detail` latest_sd ON latest_sd.parent = latest_ssa.salary_structure
-        LEFT JOIN `tabSalary Detail` prev_sd ON prev_sd.parent = prev_ssa.salary_structure
-        WHERE emp.status = 'Active' and
-        %s
-        GROUP BY emp.name, emp.employee_name, latest_ssa.from_date, prev_ssa.from_date, latest_ssa.base, prev_ssa.base
-        ORDER BY emp.name;
+    ((((latest_ssa.base - COALESCE(latest_dm.dm_amount, 0)) / 1.5) - 
+      ((prev_ssa.base - COALESCE(prev_dm.dm_amount, 0)) / 1.5)) /
+      ((prev_ssa.base - COALESCE(prev_dm.dm_amount, 0)) / 1.5)) * 100 AS increment_percent,
 
+    (((latest_ssa.base - COALESCE(latest_dm.dm_amount, 0)) / 1.5) - 
+     ((prev_ssa.base - COALESCE(prev_dm.dm_amount, 0)) / 1.5)) AS increment_taka,
+
+    latest_ssa.from_date AS curr_increment_date,
+    latest_ssa.base AS gross_salary_new,
+    ((latest_ssa.base - COALESCE(latest_dm.dm_amount, 0)) / 1.5) AS basic_new,
+    (((latest_ssa.base - COALESCE(latest_dm.dm_amount, 0)) / 1.5) / 2) AS hrent_new,
+    COALESCE(latest_dm.dm_amount, 0) AS medical_new
+FROM `tabEmployee` emp
+LEFT JOIN LatestSalary ls ON emp.name = ls.employee
+LEFT JOIN `tabSalary Structure Assignment` latest_ssa 
+    ON emp.name = latest_ssa.employee AND latest_ssa.from_date = ls.latest_from_date
+LEFT JOIN PreviousSalary ps ON emp.name = ps.employee
+LEFT JOIN `tabSalary Structure Assignment` prev_ssa 
+    ON emp.name = prev_ssa.employee AND prev_ssa.from_date = ps.prev_from_date
+LEFT JOIN LatestDM latest_dm ON latest_dm.parent = latest_ssa.salary_structure
+LEFT JOIN PreviousDM prev_dm ON prev_dm.parent = prev_ssa.salary_structure
+WHERE emp.status = 'Active' AND %s
+ORDER BY emp.name;
 
 """% (con,from_date or date.today(),conditions), as_dict=True)
 
