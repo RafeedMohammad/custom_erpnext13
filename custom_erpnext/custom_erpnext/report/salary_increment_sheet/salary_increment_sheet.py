@@ -31,8 +31,8 @@ def get_columns():
         _("Hrent Prev") + ":Int:100",
         _("Medical Prev") + ":Int:100",
 
-		_("Increment percent") + ":Int:100",
-		_("Increment Taka") + ":Int:100",
+		_("Incre-ment percent") + ":Int:100",
+		_("Incre-ment Taka") + ":Int:100",
 
 
         _("Curr Increment Date") + ":Date:100",
@@ -101,10 +101,10 @@ SELECT
 
     ((((latest_ssa.base - COALESCE(latest_dm.dm_amount, 0)) / 1.5) - 
       ((prev_ssa.base - COALESCE(prev_dm.dm_amount, 0)) / 1.5)) /
-      ((prev_ssa.base - COALESCE(prev_dm.dm_amount, 0)) / 1.5)) * 100 AS increment_percent,
+      ((prev_ssa.base - COALESCE(prev_dm.dm_amount, 0)) / 1.5)) * 100 AS incre_ment_percent,
 
     (((latest_ssa.base - COALESCE(latest_dm.dm_amount, 0)) / 1.5) - 
-     ((prev_ssa.base - COALESCE(prev_dm.dm_amount, 0)) / 1.5)) AS increment_taka,
+     ((prev_ssa.base - COALESCE(prev_dm.dm_amount, 0)) / 1.5)) AS incre_ment_taka,
 
     latest_ssa.from_date AS curr_increment_date,
     latest_ssa.base AS gross_salary_new,

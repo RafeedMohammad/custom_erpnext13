@@ -22,15 +22,15 @@ frappe.query_reports["Salary Details"] = {
 
 		},
         
-		{
-			"fieldname": "company",
-			"fieldtype": "Link",
-			"label": "Company",
-			"mandatory": 0,
-			"default": frappe.defaults.get_user_default("Company"),
-			"options": "Company",
-			"wildcard_filter": 0
-		},
+		// {
+		// 	"fieldname": "company",
+		// 	"fieldtype": "Link",
+		// 	"label": "Company",
+		// 	"mandatory": 0,
+		// 	"default": frappe.defaults.get_user_default("Company"),
+		// 	"options": "Company",
+		// 	"wildcard_filter": 0
+		// },
 		{
 			"fieldname": "employee",
 			// "fieldtype": "Link",

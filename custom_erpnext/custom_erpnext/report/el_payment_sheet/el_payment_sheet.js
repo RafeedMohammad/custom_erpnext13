@@ -2,23 +2,30 @@
 // For license information, please see license.txt
 /* eslint-disable */
 
-frappe.query_reports["Yearly Attendance Details"] = {
+frappe.query_reports["EL Payment Sheet"] = {
 	"filters": [
-        {
-			"fieldname":"from_date",
-			"label": __("From"),
-			"fieldtype": "Date",
-			"default": frappe.datetime.add_months(frappe.datetime.get_today(),-12),
-			"reqd": 1,
-			"width": "100px"
-		},
+        // {
+		// 	"fieldname":"from_date",
+		// 	"label": __("From"),
+		// 	"fieldtype": "Date",
+		// 	"default": frappe.datetime.add_months(frappe.datetime.get_today(),-12),
+		// 	"reqd": 1,
+		// 	"width": "100px"
+		// },
+		// {
+		// 	"fieldname":"to_date",
+		// 	"label": __("To"),
+		// 	"fieldtype": "Date",
+		// 	"default": frappe.datetime.get_today(),
+		// 	"reqd": 1,
+		// 	"width": "100px"
+		// },
 		{
-			"fieldname":"to_date",
-			"label": __("To"),
-			"fieldtype": "Date",
-			"default": frappe.datetime.get_today(),
+			"fieldname":"year",
+			"label": __("Year"),
+			"fieldtype": "Select",
 			"reqd": 1,
-			"width": "100px"
+
 		},
 			{
 				"fieldname": "company",
@@ -103,4 +110,18 @@ frappe.query_reports["Yearly Attendance Details"] = {
 			   
 
 	]
+	,
+	onload: function() {
+		return  frappe.call({
+			method: "custom_erpnext.custom_erpnext.report.salary_details.salary_details.get_year_options",
+			callback: function(r) {
+				var year_filter = frappe.query_report.get_filter('year');
+				year_filter.df.options = r.message;
+				year_filter.df.default = r.message[0];
+
+				year_filter.refresh();
+				year_filter.set_input(year_filter.df.default);
+			}
+		});
+	}
 };

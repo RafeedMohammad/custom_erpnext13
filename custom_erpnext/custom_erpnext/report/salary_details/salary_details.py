@@ -60,7 +60,7 @@ WHERE
         WHERE employee = ssa.employee
 		 %s
     )
-    AND %s and emp.status="Active"
+    AND emp.status="Active" %s
 GROUP BY
     ssa.employee, ssa.employee_name, emp.status, ssa.base
 ORDER BY 
@@ -83,7 +83,7 @@ ORDER BY
 
 def get_conditions(filters,from_date=None,to_date=None):
 	conditions="" 
-	if filters.get("company"): conditions += "ssa.company= '%s'" % filters["company"]
+	# if filters.get("company"): conditions += "ssa.company= '%s'" % filters["company"]
 	# if from_date:conditions += " and ssa.from_date BETWEEN '{0}' AND '{1}'".format(from_date.strftime('%Y-%m-%d'), to_date.strftime('%Y-%m-%d'))
 	# if (filters.get("employee")): 
 	# 	valu = list(map(str.strip, (filters.get("employee")).split(','))) 

@@ -20,9 +20,7 @@
 
 <style>
     tr{
-        border: 1px solid black;
 		font-size: 11.5px;
-		margin-left: 0;
     }
 	td{
         border: 1px solid black;
@@ -30,7 +28,7 @@
 		margin-left: 0;
     }
 	p{
-		font-size: 12.5px;
+		font-size: 7.5px;
 		width: 100%;
 	}
 		.column {
@@ -51,22 +49,29 @@
 
 </style>
 
-<div style="height: 300px;width: 100%;padding-top: 1px;">
-
-<h3 class="text-center">{%= filters.company %}</h3>
-<h5 class="text-center">Salary for the month of - {%= filters.month %}, {%= filters.year %}</h5>
-<h3 class="text-center">{%= filters.date %}</h3>
-<h3 class="text-center">{%= filters.status %}</h3>
-
-<p>Emp_No: {{data[j].employee}}  &#160; &nbsp; &ensp; &ensp; &#160; &nbsp;Name: {{data[j].employee_name}}  &#160; &nbsp; &#160; &nbsp;Joining Date: {{data[j].date_of_joining}}</p>
-<p>Designation: {{data[j].designation}} &ensp; &ensp;&ensp; &ensp;  Department: {{data[j].department}} </p>
-<table class="table table-bordered" style="width:100%;margin-top: -4px;">
+<table class="table table-bordered" 
+       style="max-height: 9cm; width: 20cm;">
 	<tbody>
+		<tr style="border-bottom: none;">
+			<th colspan="8" style="text-align: center;font-weight: bold;font-size: 13px;">{%= filters.company %}</th>
+		</tr>
+		<tr style="border-bottom: none;">
+			<th colspan="8" style="text-align: center;font-weight: bold;font-size: 12px;">Salary for the month of - {%= filters.month %}, {%= filters.year %}</th>
+		</tr>
+		<tr style="border-bottom: none;margin: 0; padding: 0;font-weight: normal;">
+			<th colspan="1" style="border: none;text-align: center;">Emp_No: {{data[j].employee}}</th>
+			<th colspan="5" style="border: none;text-align: center;">Name: {{data[j].employee_name}}</th>
+			<th colspan="2" style="border: none;text-align: center;">Joining Date: {{data[j].date_of_joining}}</th>
+		</tr>
+		<tr style="border-bottom: none;margin: 0; padding: 0; font-size: -1;">
+			<th colspan="4" style="border: none;text-align: center;">Designation: {{data[j].designation}}</th>
+			<th colspan="4" style="border: none;text-align: center;">Department: {{data[j].department}}</th>
+		</tr>
 		<tr>
-			<th>Statement of Salary</th>
-			<th colspan="3">Attendance</th>
-			<th colspan="2">O.T & Allowance</th>
-			<th colspan="2">Adjustment</th>
+			<th style="text-align: center;">Statement of Salary</th>
+			<th style="text-align: center;" colspan="3">Attendance</th>
+			<th style="text-align: center;" colspan="2">O.T & Allowance</th>
+			<th style="text-align: center;" colspan="2">Adjustment</th>
 		</tr>
 	
 		<tr>
@@ -147,7 +152,6 @@
 </p>
 
 
-</div>
 <div class="pagebreak"></div>
 {% } %}
 
