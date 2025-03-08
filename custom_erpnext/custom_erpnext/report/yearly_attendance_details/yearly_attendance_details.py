@@ -18,6 +18,8 @@ def execute(filters=None):
 def get_columns():
     return [
         _("Employee") + ":Data:90",
+        _("Employee Name") + ":Data:90",
+        
         _("Department") + ":Data:90",
         _("Designation") + ":Data:90",
         _("Joining") + ":Date:90",
@@ -33,6 +35,7 @@ def get_data(filters):
     # Main attendance data query
     result = frappe.db.sql("""
         SELECT emp.name AS Employee,
+                emp.employee_name AS Employee_Name,
                emp.department AS Department,
                emp.designation AS Designation,
                emp.date_of_joining AS Joining,

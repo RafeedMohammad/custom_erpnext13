@@ -92,7 +92,7 @@ def get_result(filters,department):
 def get_conditions(filters,department):
     conditions="" 
     from_date = get_first_day( "01"+ "-" + filters["year"])
-    to_date = get_first_day( "12"+ "-" + filters["year"])
+    to_date = get_last_day( "12"+ "-" + filters["year"])
     # if filters.get("from_date"): conditions += " att.attendance_date>= '%s'" % filters["from_date"]
     if filters.get("year"): conditions += " att.attendance_date between '%s' and '%s' and emp.date_of_joining<='%s'" % (from_date,to_date,to_date)
     if department: conditions += " and emp.department= '%s'" % department

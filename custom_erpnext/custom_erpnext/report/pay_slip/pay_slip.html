@@ -21,6 +21,7 @@
 <style>
     tr{
 		font-size: 11.5px;
+		width: 100%;
     }
 	td{
         border: 1px solid black;
@@ -48,15 +49,16 @@
 		}
 
 </style>
+<div style="height: .25cm;"></div>
 
 <table class="table table-bordered" 
-       style="max-height: 9cm; width: 20cm;">
+       style="max-height: 9cm; width: 20cm; width: 100%;">
 	<tbody>
 		<tr style="border-bottom: none;">
 			<th colspan="8" style="text-align: center;font-weight: bold;font-size: 13px;">{%= filters.company %}</th>
 		</tr>
 		<tr style="border-bottom: none;">
-			<th colspan="8" style="text-align: center;font-weight: bold;font-size: 12px;">Salary for the month of - {%= filters.month %}, {%= filters.year %}</th>
+			<th colspan="8" style="text-align: center;font-weight: bold;font-size: 12px;">Pay-Slip for the month of - {%= filters.month %}, {%= filters.year %}</th>
 		</tr>
 		<tr style="border-bottom: none;margin: 0; padding: 0;font-weight: normal;">
 			<th colspan="1" style="border: none;text-align: center;">Emp_No: {{data[j].employee}}</th>
@@ -147,11 +149,6 @@
 		{% } %}
 	</tbody>
 </table>
-<p class="text-right text-muted">
-	Printed On {%= frappe.datetime.str_to_user(frappe.datetime.get_datetime_as_string()) %}
-</p>
-
-
 <div class="pagebreak"></div>
 {% } %}
 
