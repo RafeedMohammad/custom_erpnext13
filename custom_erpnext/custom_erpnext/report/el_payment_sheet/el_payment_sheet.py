@@ -29,12 +29,29 @@ def get_columns():
 		_("Per Day Payment for EL")+ ":Data:90",
         {"label": _("EL Entitled Days"), "fieldtype": "Float", "width": 120, "precision": 2},
         _("Gross EL Payment")+ ":Data:90",
-        _("EL Availed")+":Int:120",
+        _("EL Availed")+":Data:120",
         {"label": _("EL Balance"), "fieldtype": "Float", "width": 120, "precision": 2},
 		_("Net EL Payment")+ ":Int:90",
         
         
         _("EL Payment Saved by Availed") + ":Int:120",
+
+        _("CL")+":Data:120",
+        _("SL")+":Data:120",
+
+        _("Jan")+":Data:120",
+        _("Feb")+":Data:120",
+        _("Mar")+":Data:120",
+        _("Apr")+":Data:120",
+        _("May")+":Data:120",
+        _("Jun")+":Data:120",
+        _("Jul")+":Data:120",
+        _("Aug")+":Data:120",
+        _("Sep")+":Data:120",
+        _("Oct")+":Data:120",
+        _("Nov")+":Data:120",
+        _("Dec")+":Data:120",
+
         _("Late") + ":Int:120",
         
     ]
@@ -73,13 +90,29 @@ def get_result(filters,department):
             ROUND(COUNT(CASE WHEN att.status IN ('Present', 'Late') THEN 1 END) / 18, 2) - COUNT(CASE WHEN att.status = 'On Leave' AND att.leave_type = 'EL' THEN 1 END) AS EL_Balance,
             ROUND((ROUND(COUNT(CASE WHEN att.status IN ('Present', 'Late') THEN 1 END) / 18, 2) - COUNT(CASE WHEN att.status = 'On Leave' AND att.leave_type = 'EL' THEN 1 END)) * ROUND(ssa.base/30, 0)) AS Net_EL_Payment,
             ROUND(ROUND(ssa.base/30, 0) * COUNT(CASE WHEN att.status = 'On Leave' AND att.leave_type = 'EL' THEN 1 END), 0) AS EL_Payment_Saved_by_Availed,
+            COUNT(CASE WHEN att.status = 'On Leave' AND att.leave_type = 'CL' THEN 1 END) AS cl,
+            COUNT(CASE WHEN att.status = 'On Leave' AND att.leave_type = 'SL' THEN 1 END) AS sl,
+
+            SUM(CASE WHEN MONTH(att.attendance_date) = 1 and att.status = 'Present' THEN 1 ELSE 0 END) AS Jan,
+            SUM(CASE WHEN MONTH(att.attendance_date) = 2 and att.status = 'Present' THEN 1 ELSE 0 END) AS Feb,
+            SUM(CASE WHEN MONTH(att.attendance_date) = 3 and att.status = 'Present' THEN 1 ELSE 0 END) AS Mar,
+            SUM(CASE WHEN MONTH(att.attendance_date) = 4 and att.status = 'Present' THEN 1 ELSE 0 END) AS Apr,
+            SUM(CASE WHEN MONTH(att.attendance_date) = 5 and att.status = 'Present' THEN 1 ELSE 0 END) AS May,
+            SUM(CASE WHEN MONTH(att.attendance_date) = 6 and att.status = 'Present' THEN 1 ELSE 0 END) AS Jun,
+            SUM(CASE WHEN MONTH(att.attendance_date) = 7 and att.status = 'Present' THEN 1 ELSE 0 END) AS Jul,
+            SUM(CASE WHEN MONTH(att.attendance_date) = 8 and att.status = 'Present' THEN 1 ELSE 0 END) AS Aug,
+            SUM(CASE WHEN MONTH(att.attendance_date) = 9 and att.status = 'Present' THEN 1 ELSE 0 END) AS Sep,
+            SUM(CASE WHEN MONTH(att.attendance_date) = 10 and att.status = 'Present' THEN 1 ELSE 0 END) AS Oct,
+            SUM(CASE WHEN MONTH(att.attendance_date) = 11 and att.status = 'Present' THEN 1 ELSE 0 END) AS Nov,
+            SUM(CASE WHEN MONTH(att.attendance_date) = 12 and att.status = 'Present' THEN 1 ELSE 0 END),
+
             COUNT(CASE WHEN att.status = 'Late' THEN 1 END) AS Late
         FROM tabEmployee emp
         LEFT JOIN tabAttendance att ON emp.name = att.employee
         LEFT JOIN `tabSalary Structure Assignment` ssa 
             ON emp.name = ssa.employee 
             AND ssa.from_date = (SELECT MAX(from_date) FROM `tabSalary Structure Assignment` WHERE employee = emp.name)
-        WHERE %s
+        WHERE %s and att.docstatus=1
         GROUP BY emp.name, emp.department, emp.designation, emp.date_of_joining, emp.status, ssa.base
         ORDER BY emp.name
 """ % (conditions), as_list=1)
