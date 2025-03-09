@@ -2,7 +2,7 @@
 	var report_columns = report.get_columns_for_print();
 	report_columns = report_columns.filter(col => !col.hidden);
 
-	if (report_columns.length > 25) {
+	if (report_columns.length > 55) {
 		frappe.throw(__("Too many columns. Export the report and print it using a spreadsheet application."));
 	}
 %}
@@ -33,66 +33,50 @@
 <h3 class="text-center">{%= filters.status %}</h3> -->
 
 
-
-{% for(let m=0, k=data.length; m<k; m++) { %}
-
-    {% if (!is_null(data[m][report_columns[0].fieldname])) { %}
-    {% if (data[m][report_columns[0].fieldname] != "Total") { %}
-
 <table class="table table-bordered">
 	<thead>
-		<tr><th style="padding-top: 10px;" class="text-center" colspan="15"><font size="+1">{%= __(report.report_name) %} for the year {%= filters.year %}</font></th></tr>
+		<tr><th style="padding-top: 10px;" class="text-center" colspan="30"><font size="+1">{%= __(report.report_name) %} for the year {%= filters.year %}</font></th></tr>
 		
 		<tr>
-            {% if (!is_null(data[m][report_columns[0].fieldname])) { %}
-                    <th colspan="3" style="text-align: left;">{%= data[m][report_columns[0].fieldname] %}</th>
-                {% } %}
 			{% if (!is_null(filters.department)) { %}
 					<th class="text-left" colspan="6"><font size="+.5">Department: {%= filters.department %}</font></th>
 			{% } %}
+			{% if (!is_null(filters.employee)) { %}
+					<th class="text-left" colspan="6"><font size="+.5">Employee: {%= filters.employee %}</font></th>
+			{% } %}
+			{% if (!is_null(filters.designation)) { %}
+					<th class="text-left" colspan="6"><font size="+.5">Designation: {%= filters.designation %}</font></th>
+			{% } %}
+
 			
 		</tr>
 		<tr>
             <th>Sl No</th>
-			{% for (let i=1, l=report_columns.length; i<l; i++) { %}
+			{% for (let i=0, l=report_columns.length; i<l; i++) { %}
 				<th class="text-center">{%= report_columns[i].label %}</th>
 			{% } %}
-		</tr>
+		</tr>		
+		
 	</thead>
 	<tbody>
-		{% for(let j=m+1, k=data.length; j<k; j++) { %}
+		{% for(let j=0, k=data.length; j<k; j++) { %}
 			{%
 				var row = data[j];
 				var row_class = data[j].parent_account ? "" : "financial-statements-important";
 				row_class += data[j].account_name ? "" : " financial-statements-blank-row";
 			%}
-			{% if (is_null(data[j][report_columns[0].fieldname])) { %}
-
-				<tr class="{%= row_class %}">
-					<td> {%= u+1 %} </td>
-					{% for(let i=1, l=report_columns.length; i<l; i++) { %}
-						<td class="text-center">
-							{% const fieldname = report_columns[i].fieldname; %}
-							{% if (!is_null(row[fieldname])) { %}
-								{%= frappe.format(row[fieldname], report_columns[i], {}, row) %}
-							{% } %}
-						</td>
-					{% } %}
-				</tr>
-				
-				{% u++ %}
-			{% } %}
-			{% if (!is_null(data[j][report_columns[0].fieldname])) { %}
-                    {% j = k %}
-            {% } %}
+			<tr class="{%= row_class %}">
+				<td> {%=j+1%}	</td>
+				{% for(let i=0, l=report_columns.length; i<l; i++) { %}
+					<td class="text-center">
+						{% const fieldname = report_columns[i].fieldname; %}
+						{% if (!is_null(row[fieldname])) { %}
+							{%= frappe.format(row[fieldname], report_columns[i], {}, row) %}
+						{% } %}
+					</td>
+				{% } %}
+			</tr>
 		{% } %}
 	</tbody>
 </table>
-
-<div class="pagebreak"></div>
-
-
-{% } %}
-{% } %}
-{% } %}
 

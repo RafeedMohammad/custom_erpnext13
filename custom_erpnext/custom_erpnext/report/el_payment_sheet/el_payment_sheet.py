@@ -7,20 +7,18 @@ def execute(filters=None):
     if not filters:
         filters = {}
 
-    columns = get_columns()
+    columns = get_columns(filters)
     data = get_data(filters)
 
     return columns, data
 
-def get_columns():
+def get_columns(filters):
     return [
-        _("Department") + ":Data:90",
-
         _("Employee") + ":Data:90",
         _("Employee Name") + ":Data:90",
         
-        # _("Department") + ":Data:90",
         _("Designation") + ":Data:90",
+        _("Department") + ":Data:90",
         _("Joining_Date") + ":Date:90",
         
         _("Gross") + ":Data:90",
@@ -39,47 +37,33 @@ def get_columns():
         _("CL")+":Data:120",
         _("SL")+":Data:120",
 
-        _("Jan")+":Data:120",
-        _("Feb")+":Data:120",
-        _("Mar")+":Data:120",
-        _("Apr")+":Data:120",
-        _("May")+":Data:120",
-        _("Jun")+":Data:120",
-        _("Jul")+":Data:120",
-        _("Aug")+":Data:120",
-        _("Sep")+":Data:120",
-        _("Oct")+":Data:120",
-        _("Nov")+":Data:120",
-        _("Dec")+":Data:120",
+        _("Jan-"+str(filters["year"])[2:])+":Data:120",
+        _("Feb-"+str(filters["year"])[2:])+":Data:120",
+        _("Mar-"+str(filters["year"])[2:])+":Data:120",
+        _("Apr-"+str(filters["year"])[2:])+":Data:120",
+        _("May-"+str(filters["year"])[2:])+":Data:120",
+        _("Jun-"+str(filters["year"])[2:])+":Data:120",
+        _("Jul-"+str(filters["year"])[2:])+":Data:120",
+        _("Aug-"+str(filters["year"])[2:])+":Data:120",
+        _("Sep-"+str(filters["year"])[2:])+":Data:120",
+        _("Oct-"+str(filters["year"])[2:])+":Data:120",
+        _("Nov-"+str(filters["year"])[2:])+":Data:120",
+        _("Dec-"+str(filters["year"])[2:])+":Data:120",
 
         _("Late") + ":Int:120",
         
     ]
 
 def get_data(filters):
-    data = []
-    departments = frappe.db.get_list("Department", pluck="name", order_by="name")
-    for department in departments:
-        el_data = get_result(filters,department)
-        if len(el_data)==None:
-            continue
-
-        if len(el_data) >= 1:
-            data.append({"department": department})
-        for eldata in el_data:
-            data.append(eldata)
-    return data
-
-def get_result(filters,department):
-    conditions, filters = get_conditions(filters,department)
+    conditions, filters = get_conditions(filters)
 
     result = frappe.db.sql(
     """
     SELECT 
-            NULL AS department,
             emp.name AS Employee,
             emp.employee_name AS Employee_name,
             emp.designation AS Designation,
+            emp.department As Department,
             emp.date_of_joining AS Joining_Date,
             ssa.base AS Gross_Salary,
             COUNT(CASE WHEN att.status IN ('Present','Late') THEN 1 END) AS total_present_days,
@@ -122,17 +106,16 @@ def get_result(filters,department):
 
     return result
 
-def get_conditions(filters,department):
+def get_conditions(filters):
     conditions="" 
     from_date = get_first_day( "01"+ "-" + filters["year"])
     to_date = get_last_day( "12"+ "-" + filters["year"])
     # if filters.get("from_date"): conditions += " att.attendance_date>= '%s'" % filters["from_date"]
     if filters.get("year"): conditions += " att.attendance_date between '%s' and '%s' and emp.date_of_joining<='%s'" % (from_date,to_date,to_date)
-    if department: conditions += " and emp.department= '%s'" % department
     if filters.get("employee"): conditions += " and att.employee= '%s'" % filters["employee"]
     if filters.get("company"): conditions += " and att.company= '%s'" % filters["company"]
     if filters.get("department"): conditions += " and att.department= '%s'" % filters["department"]
-    if filters.get("designation"): conditions += " and tabEmployee.designation='%s'" % filters["designation"]
+    if filters.get("designation"): conditions += " and emp.designation='%s'" % filters["designation"]
     if filters.get("shift"): conditions += " and att.shift='%s'" % filters["shift"]
     if filters.get("section"): conditions += " and emp.section='%s'" % filters["section"]
     if filters.get("floor"): conditions += " and emp.floor='%s'" % filters["floor"]
