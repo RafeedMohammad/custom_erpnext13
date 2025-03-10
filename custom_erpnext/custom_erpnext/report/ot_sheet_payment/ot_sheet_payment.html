@@ -101,6 +101,12 @@ table td {
 				{% if (!is_null(filters.employee)) { %}
 						<th class="text-left" colspan="3"><font size="2%">Employee: {%= filters.employee %}</font></th>
 				{% } %}
+                {% if (!is_null(filters.mode_of_payment)) { %}
+                    <th colspan="3" style="text-align: left;"><font size="2%">Payment In {%= filters.mode_of_payment %}</font></th>
+                {% } %}
+                {% if (!is_null(filters.bank)) { %}
+                    <th colspan="3" style="text-align: left;"><font size="2%">Bank: {%= filters.bank %}</font></th>
+                {% } %}
 			</tr>
 			<tr style="height: 10px;">
 				<th>Sl No</th>
