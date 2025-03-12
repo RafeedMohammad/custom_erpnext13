@@ -15,13 +15,13 @@ def execute(filters=None):
 
 def get_columns():
 	return [
-		_("Employee") + ":Link/Employee:120",
+		_("Employee") + ":Data/:120",
 		_("Department") + ":Data/:120",
 		_("From Date") + ":Date/:120",
 		_("To Date") + ":Date/:120",
 		# _("Shift") + ":Data/Attendance:120",
 		# _("Status") + ":Data/:120",	
-		_("Total Absent") + ":Link/query-report:120",
+		_("Total Absent") + ":Data/:120",
 		# _("View") + ":Link/Report"
 
 	]

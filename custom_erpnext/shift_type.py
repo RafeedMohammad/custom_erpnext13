@@ -18,6 +18,7 @@ from frappe.utils import cint, get_datetime, getdate
 from erpnext.hr.doctype.employee.employee import get_holiday_list_for_employee
 
 from erpnext.hr.doctype.shift_type.shift_type import ShiftType
+from frappe import _
 
 
 #from erpnext.hr.doctype.attendance.attendance import mark_attendance
@@ -354,6 +355,8 @@ def process_auto_attendance_for_all(from_date=None,to_date=None,working_holiday=
 	"to_date":to_date,
 	"working_holiday":working_holiday,
 	}
+	# check_late_entry_for_shift_type(from_date,to_date) #building this function to remove attendance late_entry>10 hours
+
 	# added in 10-7-23 for delete attendance
 	#frappe.db.sql("""delete from tabAttendance where status in ("Present", "Absent", "Half Day", "Weekly Off", "Holiday", "Late") and attendance_date between %s and %s""",(from_date,to_date))
 	#frappe.enqueue(method="test123",queue="long",**shift_args1)
@@ -412,3 +415,30 @@ def get_filtered_date_list(
 	)
 
 	return [getdate(date[0]) for date in dates]
+
+
+# def check_late_entry_for_shift_type(from_date, to_date):
+#     # Get all attendance records within the date range
+#     attendances = frappe.get_all("Attendance", filters={
+#         "attendance_date": ["between", [from_date, to_date]]
+#     }, fields=["name", "late_entry_duration", "attendance_date", "docstatus"])
+
+#     for attendance in attendances:
+#         # Extract the total number of hours from the late_entry_duration timedelta object
+#         late_entry_hours = 0
+#         if isinstance(attendance.late_entry_duration, timedelta):
+#             # Convert late_entry_duration to total hours
+#             late_entry_hours = attendance.late_entry_duration.total_seconds() / 3600
+        
+#         # Check if late_entry_duration exceeds 12 hours
+#         if late_entry_hours > 12:
+#             # Check if the record is submitted (docstatus = 1)
+#             if attendance.docstatus == 1:  # Submitted record
+#                 # Cancel the attendance record before deletion
+#                 doc = frappe.get_doc("Attendance", attendance.name)
+#                 doc.cancel()  # This will set docstatus to 2 (cancelled)
+#                 frappe.msgprint(_("Attendance record with late entry duration exceeding 12 hours has been canceled for date: ") + str(attendance.attendance_date))
+            
+#             # Now delete the attendance record (even if canceled)
+#             # frappe.delete_doc("Attendance", attendance.name)
+#             # frappe.msgprint(_("Attendance record with late entry duration exceeding 12 hours has been deleted for date: ") + str(attendance.attendance_date))

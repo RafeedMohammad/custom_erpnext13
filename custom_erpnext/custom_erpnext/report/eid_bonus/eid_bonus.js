@@ -17,7 +17,7 @@ frappe.query_reports["Eid Bonus"] = {
 			"fieldname":"occasion",
 			"label":__("Occasion"),
 			"fieldtype":"Select",
-			"options":["EID-UL-FITR","EID-UL-AZHA"],
+			"options":["EID-UL-FITR","EID-UL-AZHA","Advance Salary (Basic)"],
 			"default": "Active",
 			"width": "100px"
 		},

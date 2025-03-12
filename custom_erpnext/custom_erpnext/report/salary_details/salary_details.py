@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta,date
 import frappe
 from frappe import _
 from frappe.utils import add_days, cstr, date_diff, get_first_day, get_last_day, getdate
@@ -19,6 +19,8 @@ def get_columns():
 	 return [
 		_("Employee") + ":Data:200",
         _("Employee Name") + ":Data:200",
+		_("Joining Date") + ":Data:100",
+		_("Total Service Length") + ":Data:100",
 		_("Last Increment Date")+ ":Date:200",
 		# _("Status") + ":Data:200",
         _("Base") + ":Currency:100",
@@ -41,6 +43,9 @@ def get_data(filters,from_date=None,to_date=None):
    SELECT 
     ssa.employee,
     ssa.employee_name,
+	emp.date_of_joining as joining_date,
+    CONCAT( FLOOR(TIMESTAMPDIFF(YEAR, emp.date_of_joining, '%s'))," Years ", MOD(TIMESTAMPDIFF(MONTH, emp.date_of_joining, '%s'),12)," Month") AS total_service_length,
+
 	ssa.from_date as last_increment_date,
     ssa.base,
     ((ssa.base - SUM(CASE WHEN sd.abbr = 'DM' THEN sd.amount ELSE 0 END)) / 1.5) AS basic,
@@ -66,7 +71,7 @@ GROUP BY
 ORDER BY 
     ssa.employee;
 
-"""% (con,conditions), as_dict=True)
+"""% (from_date or date.today(),from_date or date.today(),con,conditions), as_list=True)
 
 	# for i in range(0,len(result)):
 	# 	if result[i][2] is None:
@@ -113,4 +118,4 @@ def get_conditions(filters,from_date=None,to_date=None):
 @frappe.whitelist()
 def get_year_options():
     current_year = datetime.now().year
-    return "\n".join(str(year) for year in range(current_year, current_year - 3, -1))
+    return "\n".join(str(year) for year in range(current_year, current_year - 5, -1))

@@ -39,7 +39,7 @@ def get_data(filters):
                emp.department AS Department,
                emp.designation AS Designation,
                emp.date_of_joining AS Joining,
-               DATEDIFF('%s', emp.date_of_joining) AS Duration1,
+                CONCAT( FLOOR(TIMESTAMPDIFF(YEAR, emp.date_of_joining, '%s'))," Years ", MOD(TIMESTAMPDIFF(MONTH, emp.date_of_joining, '%s'),12)," Month") AS total_service_length,
                COUNT(CASE WHEN att.status = 'Present' THEN 1 END) AS Present,
                COUNT(CASE WHEN att.status = 'Absent' THEN 1 END) AS Absent
         FROM tabEmployee emp
@@ -47,7 +47,7 @@ def get_data(filters):
         %s
         GROUP BY emp.name, emp.department, emp.designation, emp.date_of_joining, emp.status
         ORDER BY emp.name
-    """% (filters["to_date"],conditions), as_list=1)
+    """% (filters["to_date"],filters["to_date"],conditions), as_list=1)
 
     # Fetch all leave types dynamically
     leave_types = frappe.get_all("Leave Type", pluck="name")
@@ -76,7 +76,7 @@ def get_data(filters):
         employee = row[0]
         data_row = [
             row[0], row[1], row[2], row[3], 
-            row[4], row[5], row[6]
+            row[4], row[5], row[6],row[7]
         ]
 
         # Append leave counts

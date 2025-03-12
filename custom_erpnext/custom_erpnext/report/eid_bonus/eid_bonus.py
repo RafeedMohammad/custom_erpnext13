@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime,date
 import frappe
 from frappe import _
 from frappe.utils import getdate
@@ -20,6 +20,7 @@ def get_columns():
         _("Employee Name") + ":Data:200",
         _("Designation") + ":Data:90",
         _("Joining_Date") + ":Data:200",
+        _("Service Length") + ":Data:200",
         _("Base") + ":Int:100",
         _("Stamp") + ":Int:100",
         _("Basic") + ":Int:100",
@@ -46,12 +47,12 @@ def get_data(filters):
 
         for row in bonus_data:
             data.append(row)
-            total_base += row[5] or 0  # Sum Base column
-            total_stamp += row[6] or 0  # Sum Stamp column
-            total_basic += row[7] or 0  # Sum Basic column
+            total_base += row[6] or 0  # Sum Base column
+            total_stamp += row[7] or 0  # Sum Stamp column
+            total_basic += row[8] or 0  # Sum Basic column
 
         # Summarizing the department-level totals
-        total_row = ["Total", "Total", len(bonus_data), None,None, total_base, total_stamp, total_basic]
+        total_row = ["Total", "Total", len(bonus_data), None,None,None, total_base, total_stamp, total_basic]
         data.append(total_row)
 
     return data
@@ -65,6 +66,7 @@ def get_result(filters,department):
     ssa.employee_name,
     ssa.designation,
 	emp.date_of_joining,
+    CONCAT( FLOOR(TIMESTAMPDIFF(YEAR, emp.date_of_joining, '%s'))," Years ", MOD(TIMESTAMPDIFF(MONTH, emp.date_of_joining, '%s'),12)," Month") AS total_service_length,
     ssa.base,
 	(CASE WHEN emp.salary_mode='Cash' THEN SUM(CASE WHEN sd.abbr = 'ST' THEN sd.amount ELSE 0 END) ELSE 0 END) as stamp,				
     round(((ssa.base - SUM(CASE WHEN sd.abbr = 'DM' THEN sd.amount ELSE 0 END)) / 1.5)-(CASE WHEN emp.salary_mode='Cash' THEN SUM(CASE WHEN sd.abbr = 'ST' THEN sd.amount ELSE 0 END) ELSE 0 END),0) AS basic
@@ -88,7 +90,7 @@ GROUP BY
 ORDER BY 
     ssa.employee;
 
-"""% (conditions), as_list=True)
+"""% (filters.get("from_date", date.today()),filters.get("from_date", date.today()),conditions), as_list=True)
 
 	return result
 

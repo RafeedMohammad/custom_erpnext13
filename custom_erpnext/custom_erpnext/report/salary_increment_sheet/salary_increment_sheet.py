@@ -91,7 +91,7 @@ SELECT
     emp.department as dept,
     emp.designation,
     emp.date_of_joining as joining_date,
-    DATEDIFF('%s', emp.date_of_joining) AS total_service_length,
+    CONCAT( FLOOR(TIMESTAMPDIFF(YEAR, emp.date_of_joining, '%s'))," Years ", MOD(TIMESTAMPDIFF(MONTH, emp.date_of_joining, '%s'),12)," Month") AS total_service_length,
 
     prev_ssa.from_date AS previous_increment_date,
     prev_ssa.base AS gross_salary_prev,
@@ -123,7 +123,7 @@ LEFT JOIN PreviousDM prev_dm ON prev_dm.parent = prev_ssa.salary_structure
 WHERE emp.status = 'Active' AND %s
 ORDER BY emp.name;
 
-"""% (con,from_date or date.today(),conditions), as_dict=True)
+"""% (con,from_date or date.today(),from_date or date.today(),conditions), as_dict=True)
 
 	# for i in range(0,len(result)):
 	# 	if result[i][2] is None:
