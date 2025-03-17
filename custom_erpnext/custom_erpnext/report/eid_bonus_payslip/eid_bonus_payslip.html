@@ -1,0 +1,138 @@
+{%
+	var report_columns = report.get_columns_for_print();
+	report_columns = report_columns.filter(col => !col.hidden);
+
+	if (report_columns.length > 20) {
+		frappe.throw(__("Too many columns. Export the report and print it using a spreadsheet application."));
+	}
+%}
+
+
+
+<style>
+    table {
+        border: 1px solid black;
+        width: 100%;
+        text-align: center;
+    }
+
+    th {
+        font-size: 12px;
+        border: 1px solid black;
+    }
+
+    tr {
+        border: 1px solid black;
+        font-size: 10px;
+        margin-left: 0;
+        text-align: center;
+    }
+
+    td {
+        border: 1px solid black;
+        font-size: 11px;
+        margin-left: 0;
+		
+    }
+
+
+    .footer {
+        padding-top: 10mm;
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        color: black;
+        text-align: center;
+        font-size: 10px;
+    }
+
+    .pagebreak {
+        clear: both;
+        page-break-after: always;
+    }
+    table tr {
+    height: 50px; /* Adjust as needed */
+}
+
+/* Increase height of the 4th column */
+.vertical-column {
+    writing-mode: vertical-rl;
+    text-align: center;
+    white-space: nowrap;
+    padding-top: 20px;  /* Increase padding to extend vertical height */
+    padding-bottom: 20px; /* Optional: Adjust bottom padding if needed */
+}
+
+/* If you want to increase padding across all rows */
+table td {
+    padding-top: 20px;
+    padding-bottom: 20px; /* Adjust to increase row height */
+}
+</style>
+
+{% var report_columns = report.get_columns_for_print(); %}
+{% report_columns = report_columns.filter(col => !col.hidden); %}
+
+{% if (report_columns.length > 50) { %}
+    {% frappe.throw(__("Too many columns. Export the report and print it using a spreadsheet application.")); %}
+{% } %}
+
+{% for(let m=0, k=data.length; m<k; m++) { %}
+<div style="height: .5cm;"></div>
+
+<td> {%= m+1 %} </td>
+
+
+	<table>
+		
+		<thead>
+            <tr style="border-bottom: none;height: 10px;">
+                <th colspan="8" style="text-align: center;font-weight: bold">
+                    <font size="3%">{%= filters.company %}  </font>
+                </th>
+            </tr>
+			<tr style="height: 10px;">
+                {% if filters.occasion == "Advance Salary (Basic)" %}
+                    <th class="text-center" colspan="10">
+                        <font size="3%">Pay-slip of {{ filters.occasion }}, {{ filters.year.split("-")[0] }}</font>
+                    </th>
+                {% else %}
+                    <th class="text-center" colspan="10">
+                        <font size="3%">Pay-slip of {{ filters.mode_of_payment }} Bonus On {{ filters.occasion }}, {{ filters.year.split("-")[0] }}</font>
+                    </th>
+                {% endif %}
+            </tr>
+			
+			<tr >
+				<!-- <th>Sl No</th> -->
+				{% for (let i=0, l=report_columns.length-1; i<l; i++) { %}
+					<th class="text-center">{%= report_columns[i].label %}</th>
+				{% } %}
+				{% for (let i=report_columns.length-1, l=report_columns.length; i<l; i++) { %}
+					<th class="text-center">{%= report_columns[i].label %}</th>
+				{% } %}
+			</tr>
+		</thead>
+		<tbody>
+                    <tr style="text-align: center;">
+                        {% for(let i=0, l=report_columns.length; i<l; i++) { %}
+                        <td style="text-align: center;">
+                            {% const fieldname = report_columns[i].fieldname; %}
+                            {% if (!is_null(data[m][fieldname])) { %}
+                                {%= frappe.format(data[m][fieldname], report_columns[i], {}, data[m]) %}
+                            {% } %}
+                        </td>
+                        {% } %}
+                    </tr>
+                
+        </tbody>
+	</table>
+
+	<div class="pagebreak"></div>
+
+ 
+{% } %}
+
+
+

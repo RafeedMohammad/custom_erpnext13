@@ -356,7 +356,7 @@ def process_auto_attendance_for_all(from_date=None,to_date=None,working_holiday=
 	"working_holiday":working_holiday,
 	}
 	# check_late_entry_for_shift_type(from_date,to_date) #building this function to remove attendance late_entry>10 hours
-
+	bulk_update_attendance_sql(from_date,to_date)
 	# added in 10-7-23 for delete attendance
 	#frappe.db.sql("""delete from tabAttendance where status in ("Present", "Absent", "Half Day", "Weekly Off", "Holiday", "Late") and attendance_date between %s and %s""",(from_date,to_date))
 	#frappe.enqueue(method="test123",queue="long",**shift_args1)
@@ -442,3 +442,23 @@ def get_filtered_date_list(
 #             # Now delete the attendance record (even if canceled)
 #             # frappe.delete_doc("Attendance", attendance.name)
 #             # frappe.msgprint(_("Attendance record with late entry duration exceeding 12 hours has been deleted for date: ") + str(attendance.attendance_date))
+
+def bulk_update_attendance_sql(from_date, to_date):
+    query = """
+        UPDATE `tabAttendance`
+        SET 
+            overtime = "00:00:00",
+            rounded_ot = 0,
+            late_entry_duration = '00:00:00',
+            in_time = NULL,
+            out_time = NULL,
+            status = 'Absent'
+        WHERE 
+            docstatus = 1
+            AND attendance_date BETWEEN %s AND %s
+			AND status!="On Leave"
+            AND TIME_TO_SEC(late_entry_duration) / 3600 > 7
+    """
+    frappe.db.sql(query, (from_date, to_date))
+    frappe.db.commit()
+    # frappe.msgprint(_("Attendance records with late entry > 10 hours updated in bulk."))

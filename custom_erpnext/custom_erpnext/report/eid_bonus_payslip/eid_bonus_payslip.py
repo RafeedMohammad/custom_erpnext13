@@ -9,62 +9,63 @@ def execute(filters=None):
         filters = {}
 
     columns = get_columns()
-    data = get_data(filters)
+    data = get_result(filters)
 
     return columns, data
 
 def get_columns():
     return [
-        _("Department") + ":Data:90",
         _("Employee") + ":Data:200",
         _("Employee Name") + ":Data:200",
+		        
         _("Designation") + ":Data:90",
+		_("Department") + ":Data:90",
         _("Joining_Date") + ":Data:200",
         # _("Service Length") + ":Data:200",
         _("Base") + ":Int:100",
         _("Stamp") + ":Int:100",
-        _("Basic") + ":Int:100",
-        _("Signature_&_Stamp") + ":Text:10",
+        _("Bonus Payable (Basic)") + ":Data:100",
+        # _("Signature_&_Stamp") + ":Text:10",
 
     ]
 
-def get_data(filters):
-    data = []
-    departments = frappe.db.get_list("Department", pluck="name", order_by="name")
+# def get_data(filters):
+#     data = []
+#     departments = frappe.db.get_list("Department", pluck="name", order_by="name")
 
-    for department in departments:
-        bonus_data = get_result(filters, department)
+#     for department in departments:
+#         bonus_data = get_result(filters, department)
 
-        if not bonus_data:  # Skip if no data is found
-            continue
+#         if not bonus_data:  # Skip if no data is found
+#             continue
 
-        # Add department name as a separate row
-        data.append({"department": department})
+#         # Add department name as a separate row
+#         # data.append({"department": department})
 
-        total_base = 0
-        total_stamp = 0
-        total_basic = 0
+#         # total_base = 0
+#         # total_stamp = 0
+#         # total_basic = 0
 
-        for row in bonus_data:
-            data.append(row)
-            total_base += row[5] or 0  # Sum Base column
-            total_stamp += row[6] or 0  # Sum Stamp column
-            total_basic += row[7] or 0  # Sum Basic column
+#         # for row in bonus_data:
+#         #     data.append(row)
+#         #     total_base += row[5] or 0  # Sum Base column
+#         #     total_stamp += row[6] or 0  # Sum Stamp column
+#         #     total_basic += row[7] or 0  # Sum Basic column
 
-        # Summarizing the department-level totals
-        total_row = ["Total", "Total", len(bonus_data), None,None, total_base, total_stamp, total_basic]
-        data.append(total_row)
+#         # # Summarizing the department-level totals
+#         # total_row = ["Total", "Total", len(bonus_data), None,None, total_base, total_stamp, total_basic]
+#         # data.append(total_row)
 
-    return data
+#     return data
 
-def get_result(filters,department):
-	conditions, filters = get_conditions(filters,department)
+def get_result(filters):
+	conditions, filters = get_conditions(filters)
 	result = frappe.db.sql("""
    SELECT 
-	NULL,
     ssa.employee,
     ssa.employee_name,
     ssa.designation,
+	ssa.department,
 	emp.date_of_joining,
     ssa.base,
 	(CASE WHEN emp.salary_mode='Cash' THEN SUM(CASE WHEN sd.abbr = 'ST' THEN sd.amount ELSE 0 END) ELSE 0 END) as stamp,				
@@ -94,13 +95,12 @@ ORDER BY
 	return result
 
 
-def get_conditions(filters,department):
+def get_conditions(filters):
 	conditions="" 
 	if filters.get("company"): conditions += " emp.company= '%s'" % filters["company"]
 	if filters.get("employee"): conditions += " and emp.employee= '%s'" % filters["employee"]
 	if filters.get("from_date"): conditions += " and TIMESTAMPDIFF(MONTH, emp.date_of_joining, '%s')>=6 " % filters["from_date"]
 
-	if department: conditions += " and emp.department= '%s'" % department
 	if filters.get("department"): conditions += " and emp.department= '%s'" % filters["department"]
 	if filters.get("designation"): conditions += " and emp.designation='%s'" % filters["designation"]
 	# if filters.get("shift"): conditions += " and att.shift='%s'" % filters["shift"]
