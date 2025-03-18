@@ -65,7 +65,7 @@ WHERE
         WHERE employee = ssa.employee
 		 %s
     )
-    AND emp.status="Active" %s
+    AND emp.status="Active" and ssa.docstatus = 1 %s
 GROUP BY
     ssa.employee, ssa.employee_name, emp.status, ssa.base
 ORDER BY 

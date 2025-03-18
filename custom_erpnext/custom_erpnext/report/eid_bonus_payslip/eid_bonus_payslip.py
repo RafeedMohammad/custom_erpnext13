@@ -85,6 +85,7 @@ WHERE
 		 
     )
     AND  %s
+	and ssa.docstatus = 1				
 GROUP BY
     ssa.employee, ssa.employee_name, emp.status, ssa.base
 ORDER BY 

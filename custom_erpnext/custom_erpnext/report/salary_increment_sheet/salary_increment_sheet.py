@@ -50,7 +50,7 @@ def get_data(filters,from_date=None,to_date=None):
 		to_date = get_last_day(filters.get("month") + "-" + filters.get("year"))
 		# filters.update({"from_date": filters.get("from_date"), "to_date": filters.get("to_date")})
 		# conditions, filters = get_conditions(filters,from_date=None,to_date=None)
-		con+=" where from_date BETWEEN '"+str(from_date)+"' and '"+str(to_date)+"'"
+		con+="and from_date BETWEEN '"+str(from_date)+"' and '"+str(to_date)+"'"
 	
 	result = frappe.db.sql("""
   WITH LatestSalary AS (
@@ -58,7 +58,7 @@ def get_data(filters,from_date=None,to_date=None):
         employee,
         MAX(from_date) AS latest_from_date
     FROM `tabSalary Structure Assignment`
-    %s
+    where docstatus = 1 %s
     GROUP BY employee
 ),
 PreviousSalary AS (
@@ -70,7 +70,7 @@ PreviousSalary AS (
         SELECT latest_from_date 
         FROM LatestSalary ls 
         WHERE ls.employee = ssa.employee
-    )
+    ) and docstatus = 1
     GROUP BY ssa.employee
 ),
 LatestDM AS (
@@ -120,7 +120,7 @@ LEFT JOIN `tabSalary Structure Assignment` prev_ssa
     ON emp.name = prev_ssa.employee AND prev_ssa.from_date = ps.prev_from_date
 LEFT JOIN LatestDM latest_dm ON latest_dm.parent = latest_ssa.salary_structure
 LEFT JOIN PreviousDM prev_dm ON prev_dm.parent = prev_ssa.salary_structure
-WHERE emp.status = 'Active' AND %s
+WHERE emp.status = 'Active' and prev_ssa.docstatus = 1 and latest_ssa.docstatus=1 AND %s
 ORDER BY emp.name;
 
 """% (con,from_date or date.today(),from_date or date.today(),conditions), as_dict=True)

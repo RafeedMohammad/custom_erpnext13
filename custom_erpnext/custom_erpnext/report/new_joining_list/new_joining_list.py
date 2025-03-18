@@ -57,7 +57,7 @@ LEFT JOIN
     `tabSalary Detail` sd 
     ON sd.parent = ssa.salary_structure
 WHERE
-     %s
+     %s and ssa.docstatus = 1
 GROUP BY
     emp.name, emp.employee_name, emp.date_of_joining, ssa.base
 ORDER BY 
