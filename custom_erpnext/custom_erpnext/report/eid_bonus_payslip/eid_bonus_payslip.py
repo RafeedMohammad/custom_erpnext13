@@ -64,8 +64,8 @@ def get_result(filters):
    SELECT 
     ssa.employee,
     ssa.employee_name,
-    ssa.designation,
-	ssa.department,
+	emp.designation,
+    emp.department,
 	emp.date_of_joining,
     ssa.base,
 	(CASE WHEN emp.salary_mode='Cash' THEN SUM(CASE WHEN sd.abbr = 'ST' THEN sd.amount ELSE 0 END) ELSE 0 END) as stamp,				
