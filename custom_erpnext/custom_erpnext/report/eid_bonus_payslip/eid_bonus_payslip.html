@@ -19,6 +19,7 @@
     th {
         font-size: 12px;
         border: 1px solid black;
+        background-color: none;
     }
 
     tr {
@@ -95,11 +96,11 @@ table td {
 			<tr style="height: 10px;">
                 {% if filters.occasion == "Advance Salary (Basic)" %}
                     <th class="text-center" colspan="10">
-                        <font size="3%">Pay-slip of {{ filters.occasion }}, {{ filters.year.split("-")[0] }}</font>
+                        <font size="3%">Advance Basic Salary Month of {{ filters.month }}, {{ filters.year.split("-")[0] }}</font>
                     </th>
                 {% else %}
                     <th class="text-center" colspan="10">
-                        <font size="3%">Pay-slip of {{ filters.mode_of_payment }} Bonus On {{ filters.occasion }}, {{ filters.year.split("-")[0] }}</font>
+                        <font size="3%">Pay-slip of {{ filters.mode_of_payment }} Bonus On {{ filters.occasion }} {{ filters.month }}, {{ filters.year.split("-")[0] }}</font>
                     </th>
                 {% endif %}
             </tr>
