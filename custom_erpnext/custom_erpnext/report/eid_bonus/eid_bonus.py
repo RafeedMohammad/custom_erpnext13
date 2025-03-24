@@ -21,7 +21,7 @@ def get_columns():
         _("Designation") + ":Data:90",
         _("Joining_Date") + ":Data:200",
         # _("Service Length") + ":Data:200",
-        _("Base") + ":Int:100",
+        _("Gross Salary") + ":Int:100",# named base in my system
         _("Stamp") + ":Int:100",
         _("Basic") + ":Int:100",
         _("Signature_&_Stamp") + ":Text:10",
