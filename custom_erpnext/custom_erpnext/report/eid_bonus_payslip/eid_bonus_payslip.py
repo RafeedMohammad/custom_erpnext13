@@ -24,7 +24,7 @@ def get_columns():
         # _("Service Length") + ":Data:200",
         _("Base") + ":Int:100",
         _("Stamp") + ":Int:100",
-        _("Bonus Payable (Basic)") + ":Data:100",
+        _("Payable (Basic)") + ":Data:100",
         # _("Signature_&_Stamp") + ":Text:10",
 
     ]

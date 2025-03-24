@@ -110,9 +110,15 @@ table td {
 				{% for (let i=0, l=report_columns.length-1; i<l; i++) { %}
 					<th class="text-center">{%= report_columns[i].label %}</th>
 				{% } %}
-				{% for (let i=report_columns.length-1, l=report_columns.length; i<l; i++) { %}
-					<th class="text-center">{%= report_columns[i].label %}</th>
-				{% } %}
+                {% if filters.occasion == "Advance Salary (Basic)" %}
+                    {% for (let i=report_columns.length-1, l=report_columns.length; i<l; i++) { %}
+                        <th class="text-center">{%= report_columns[i].label %}</th>
+                    {% } %}
+                {% else %}
+                    {% for (let i=report_columns.length-1, l=report_columns.length; i<l; i++) { %}
+                    <th class="text-center">Bonus {%= report_columns[i].label %}</th>
+                    {% } %}
+                {% endif %}
 			</tr>
 		</thead>
 		<tbody>

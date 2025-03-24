@@ -13,44 +13,16 @@ frappe.ui.form.on('Arrear Tax Tool', {
         erpnext.arrear_tax_tool.load_employees(frm);
     },
 
-    month: function(frm) {
-        erpnext.arrear_tax_tool.load_employees(frm);
-    },
-    year: function(frm) {
-        erpnext.arrear_tax_tool.load_employees(frm);
-    },
-
-    department: function(frm) {
-        erpnext.arrear_tax_tool.load_employees(frm);
-    },
-
-    designation: function(frm) {
-        erpnext.arrear_tax_tool.load_employees(frm);
-    },
-
-    floor: function(frm) {
-        erpnext.arrear_tax_tool.load_employees(frm);
-    },
-
-    facility_or_line: function(frm) {
-        erpnext.arrear_tax_tool.load_employees(frm);
-    },
-
-    section: function(frm) {
-        erpnext.arrear_tax_tool.load_employees(frm);
-    },
-
-    group: function(frm) {
-        erpnext.arrear_tax_tool.load_employees(frm);
-    },
-
-    company: function(frm) {
-        erpnext.arrear_tax_tool.load_employees(frm);
-    },
-
-    employee_id: function(frm) {
-        erpnext.arrear_tax_tool.load_employees(frm);
-    },
+    month: function(frm) { erpnext.arrear_tax_tool.load_employees(frm); },
+    year: function(frm) { erpnext.arrear_tax_tool.load_employees(frm); },
+    department: function(frm) { erpnext.arrear_tax_tool.load_employees(frm); },
+    designation: function(frm) { erpnext.arrear_tax_tool.load_employees(frm); },
+    floor: function(frm) { erpnext.arrear_tax_tool.load_employees(frm); },
+    facility_or_line: function(frm) { erpnext.arrear_tax_tool.load_employees(frm); },
+    section: function(frm) { erpnext.arrear_tax_tool.load_employees(frm); },
+    group: function(frm) { erpnext.arrear_tax_tool.load_employees(frm); },
+    company: function(frm) { erpnext.arrear_tax_tool.load_employees(frm); },
+    employee_id: function(frm) { erpnext.arrear_tax_tool.load_employees(frm); },
 });
 
 erpnext.arrear_tax_tool = {
@@ -114,9 +86,11 @@ erpnext.EmployeeSelector = class EmployeeSelector {
         </div>').appendTo($(this.wrapper));
 
         var mark_employee_toolbar = $('<div class="col-sm-12 bottom-toolbar" style="margin-top: 25px;">\
+            <button class="btn btn-primary btn-fetch-basic btn-xs" style="margin-right: 10px;"></button>\
             <button class="btn btn-primary btn-assign btn-xs"></button>\
         </div>');
 
+        // Add Check All functionality
         employee_toolbar.find(".btn-add")
             .html(__('Check all'))
             .on("click", function() {
@@ -127,6 +101,7 @@ erpnext.EmployeeSelector = class EmployeeSelector {
                 });
             });
 
+        // Add Uncheck All functionality
         employee_toolbar.find(".btn-remove")
             .html(__('Uncheck all'))
             .on("click", function() {
@@ -137,6 +112,7 @@ erpnext.EmployeeSelector = class EmployeeSelector {
                 });
             });
 
+        // Add Update Salary Slip functionality
         mark_employee_toolbar.find(".btn-assign")
             .html(__('Update'))
             .on("click", function() {
@@ -158,12 +134,48 @@ erpnext.EmployeeSelector = class EmployeeSelector {
                         "employee_list": employees_to_shift,
                     },
                     callback: function(r) {
-                        alert("Salary Updated!");
+                        frappe.msgprint("Salary Updated!");
                         erpnext.arrear_tax_tool.load_employees(frm);
                     }
                 });
             });
 
+            mark_employee_toolbar.find(".btn-fetch-basic")
+            .html(__('Fetch Basic'))
+            .on("click", function() {
+                var selected_employees = [];
+                var checkbox_map = {};  // To map employee ID to row index
+        
+                $(me.wrapper).find('input[type="checkbox"]').each(function(i, check) {
+                    if ($(check).is(":checked")) {
+                        var emp_id = employee[i][0]; // employee[i][0] = Employee ID
+                        selected_employees.push(emp_id);
+                        checkbox_map[emp_id] = i + 1; // i+1 used in input names (e.g., other_deduction_1)
+                    }
+                });
+        
+                if (selected_employees.length > 0) {
+                    frappe.call({
+                        method: "custom_erpnext.custom_erpnext.doctype.arrear_tax_tool.arrear_tax_tool.get_basic_amounts",
+                        args: {
+                            employee_ids: selected_employees
+                        },
+                        callback: function(r) {
+                            if (r.message) {
+                                $.each(r.message, function(emp_id, basic) {
+                                    var idx = checkbox_map[emp_id];
+                                    var input_selector = `input[name="other_deduction_${idx}"]`;
+                                    $(me.wrapper).find(input_selector).val(basic);
+                                });
+                                frappe.msgprint("Basic amounts fetched and filled into Other Deduction.");
+                            }
+                        }
+                    });
+                } else {
+                    frappe.msgprint("Please select at least one employee.");
+                }
+            });
+        // Render Employee Table
         var row;
         $.each(employee, function(i, m) {
             if (i === 0 || (i % 1) === 0) {
@@ -191,8 +203,7 @@ erpnext.EmployeeSelector = class EmployeeSelector {
                             <label>No</label>\
                         </td>\
                     </tr>\
-                </table>', 
-                '')).appendTo(row);
+                </table>', '')).appendTo(row);
             }
 
             $(repl('<table border="1" style="width:100%">\

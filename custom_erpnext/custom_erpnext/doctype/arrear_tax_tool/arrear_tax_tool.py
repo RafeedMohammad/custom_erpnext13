@@ -88,3 +88,42 @@ def update_salary_slip(employee_list):
 			#Attendance document with updated values will be saved
 		salary_slip = frappe.get_doc('Salary Slip',employee['employee'][6]).save()
 
+
+@frappe.whitelist()
+def get_basic_amounts(employee_ids):
+    import json
+    if isinstance(employee_ids, str):
+        employee_ids = json.loads(employee_ids)
+
+    result = {}
+    for emp_id in employee_ids:
+        basic_data = frappe.db.sql("""
+            SELECT 
+                ROUND(((ssa.base - IFNULL(SUM(CASE WHEN sd.abbr = 'DM' THEN sd.amount ELSE 0 END), 0)) / 1.5) - 
+                      (CASE WHEN emp.salary_mode = 'Cash' 
+                            THEN IFNULL(SUM(CASE WHEN sd.abbr = 'ST' THEN sd.amount ELSE 0 END), 0) 
+                            ELSE 0 END), 0) AS basic
+            FROM
+                `tabSalary Structure Assignment` ssa
+            JOIN
+                `tabSalary Detail` sd ON sd.parent = ssa.salary_structure
+            JOIN 
+                `tabEmployee` emp ON emp.name = ssa.employee
+            WHERE
+                ssa.salary_structure IS NOT NULL 
+                AND ssa.from_date = (
+                    SELECT MAX(from_date) 
+                    FROM `tabSalary Structure Assignment` 
+                    WHERE employee = ssa.employee
+                )
+                AND ssa.employee = %s
+                AND ssa.docstatus = 1
+            GROUP BY
+                ssa.employee
+        """, values=[emp_id], as_list=True)
+
+        # Extract value safely
+        basic_value = basic_data[0][0] if basic_data else 0.0
+        result[emp_id] = basic_value
+
+    return result
