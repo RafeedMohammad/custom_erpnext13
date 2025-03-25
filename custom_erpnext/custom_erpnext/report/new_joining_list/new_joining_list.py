@@ -24,7 +24,7 @@ def get_columns():
 		_("Designation")+ ":Data:200",
 		_("Joining Date") + ":Data:100",
 		# _("Status") + ":Data:200",
-        _("Base") + ":Int:100",
+        _("Gross Pay") + ":Int:100",# named base in my system
         _("Basic") + ":Int:100",
         _("Hrent") + ":Int:100",
 		_("Medical") + ":Int:100"
@@ -39,7 +39,7 @@ def get_data(filters):
 	emp.department,
 	emp.designation,
     emp.date_of_joining AS joining_date,
-    COALESCE(ssa.base, 0) AS base, 
+    COALESCE(ssa.base, 0) AS gross_pay, 
     COALESCE((ssa.base - SUM(CASE WHEN sd.abbr = 'DM' THEN sd.amount ELSE 0 END)) / 1.5, 0) AS basic,
     COALESCE(((ssa.base - SUM(CASE WHEN sd.abbr = 'DM' THEN sd.amount ELSE 0 END)) / 1.5) / 2, 0) AS hrent,
     COALESCE(SUM(CASE WHEN sd.abbr = 'DM' THEN sd.amount ELSE 0 END), 0) AS medical

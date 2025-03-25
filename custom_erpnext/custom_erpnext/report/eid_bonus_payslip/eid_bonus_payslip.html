@@ -17,22 +17,20 @@
     }
 
     th {
-        font-size: 12px;
+        font-size: 30px;
         border: 1px solid black;
         background-color: none;
     }
 
     tr {
         border: 1px solid black;
-        font-size: 10px;
-        margin-left: 0;
+        font-size: 30px;
         text-align: center;
     }
 
     td {
         border: 1px solid black;
-        font-size: 11px;
-        margin-left: 0;
+        font-size: 30px;
 		
     }
 
@@ -52,24 +50,10 @@
         clear: both;
         page-break-after: always;
     }
-    table tr {
-    height: 50px; /* Adjust as needed */
-}
+    
 
 /* Increase height of the 4th column */
-.vertical-column {
-    writing-mode: vertical-rl;
-    text-align: center;
-    white-space: nowrap;
-    padding-top: 20px;  /* Increase padding to extend vertical height */
-    padding-bottom: 20px; /* Optional: Adjust bottom padding if needed */
-}
 
-/* If you want to increase padding across all rows */
-table td {
-    padding-top: 20px;
-    padding-bottom: 20px; /* Adjust to increase row height */
-}
 </style>
 
 {% var report_columns = report.get_columns_for_print(); %}
@@ -80,27 +64,26 @@ table td {
 {% } %}
 
 {% for(let m=0, k=data.length; m<k; m++) { %}
-<div style="height: .5cm;"></div>
-
-<td> {%= m+1 %} </td>
+<div style="height: 3cm; width: 100%;"></div>
+    <td style="font-size: 20px;width: 100%;"> {%= m+1 %} </td>
 
 
 	<table>
 		
 		<thead>
-            <tr style="border-bottom: none;height: 10px;">
+            <tr style="border-bottom: none;">
                 <th colspan="8" style="text-align: center;font-weight: bold">
-                    <font size="3%">{%= filters.company %}  </font>
+                    {%= filters.company %} 
                 </th>
             </tr>
-			<tr style="height: 10px;">
+			<tr >
                 {% if filters.occasion == "Advance Salary (Basic)" %}
                     <th class="text-center" colspan="10">
-                        <font size="3%">Advance Basic Salary Month of {{ filters.month }}, {{ filters.year.split("-")[0] }}</font>
+                        Advance Basic Salary Month of {{ filters.month }}, {{ filters.year.split("-")[0] }}
                     </th>
                 {% else %}
                     <th class="text-center" colspan="10">
-                        <font size="3%">Pay-slip of {{ filters.mode_of_payment }} Bonus On {{ filters.occasion }} {{ filters.month }}, {{ filters.year.split("-")[0] }}</font>
+                        Pay-slip of {{ filters.mode_of_payment }} Bonus On {{ filters.occasion }} {{ filters.month }}, {{ filters.year.split("-")[0] }}
                     </th>
                 {% endif %}
             </tr>

@@ -23,7 +23,7 @@ def get_columns():
 		_("Total Service Length") + ":Data:100",
 		_("Last Increment Date")+ ":Date:200",
 		# _("Status") + ":Data:200",
-        _("Base") + ":Currency:100",
+        _("Gross Pay") + ":Currency:100",# named base in my system
         _("Basic") + ":Currency:100",
         _("Hrent") + ":Currency:100",
 		_("Medical") + ":Currency:100"

@@ -21,17 +21,13 @@
 	<style>
 		tr{
 			border: 1px solid black;
-			font-size: 11.5px;
+			font-size: 25px;
 			margin-left: 0;
 		}
 		td{
 			border: 1px solid black;
-			font-size: 11.5px;
+			font-size: 26px;
 			margin-left: 0;
-		}
-		p{
-			font-size: 12.5px;
-			width: 100%;
 		}
 			.column {
 				float: left;
@@ -50,23 +46,22 @@
 			}
 	
 	</style>
-<div style="height: .25cm;"></div>
+<div style="height: 1cm;"></div>
 
-<table class="table table-bordered" 
-       style="max-height: 100%; width: 100%;">
+<table class="table table-bordered" style=" width: 100%;height: 100%;margin-right: -1cm;">
 	<tbody>
 		<tr style="border-bottom: none;">
-			<th colspan="8" style="text-align: center;font-weight: bold;font-size: 13px;">{%= filters.company %}</th>
+			<th colspan="8" style="text-align: center;font-weight: bold;font-size: 28px;">{%= filters.company %}</th>
 		</tr>
 		<tr style="border-bottom: none;">
-			<th colspan="8" style="text-align: center;font-weight: bold;font-size: 12px;">Pay-Slip for the month of - {%= filters.month %}, {%= filters.year %}</th>
+			<th colspan="8" style="text-align: center;font-weight: bold;font-size: 27px;">Pay-Slip for the month of - {%= filters.month %}, {%= filters.year %}</th>
 		</tr>
-		<tr style="border-bottom: none;margin: 0; padding: 0;font-size: 10px;">
+		<tr style="border-bottom: none;margin: 0; padding: 0;font-size: 24px;">
 			<th colspan="1" style="border: none;text-align: center;">Emp_No: {{data[j].employee}}</th>
 			<th colspan="5" style="border: none;text-align: center;">Name: {{data[j].employee_name}}</th>
 			<th colspan="2" style="border: none;text-align: center;">Join Date: {{data[j].date_of_joining}}</th>
 		</tr>
-		<tr style="border-bottom: none;margin: 0; padding: 0; font-size: 10px;">
+		<tr style="border-bottom: none;margin: 0; padding: 0; font-size: 24px;">
 			<th colspan="4" style="border: none;text-align: center;">Designation: {{data[j].designation}}</th>
 			<th colspan="4" style="border: none;text-align: center;">Department: {{data[j].department}}</th>
 		</tr>
