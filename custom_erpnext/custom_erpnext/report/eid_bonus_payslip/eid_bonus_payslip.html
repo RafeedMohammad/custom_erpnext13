@@ -50,7 +50,14 @@
         clear: both;
         page-break-after: always;
     }
-    
+    .box {
+            display: inline-block;
+            border: 1px solid black;
+            text-align: center;
+            font-size: 15px;
+            font-weight: bold;
+            width: 13px;
+        }
 
 /* Increase height of the 4th column */
 
@@ -65,7 +72,7 @@
 
 {% for(let m=0, k=data.length; m<k; m++) { %}
 <div style="height: 5cm; width: 95%;margin: 0;padding: 0;"></div>
-    <td style="font-size: 20px;width: 100%;"> {%= m+1 %} </td>
+    <p class="box"> {%= m+1 %} </p>
 
 
 	<table>
@@ -119,8 +126,9 @@
         </tbody>
 	</table>
 
-	<div class="pagebreak"></div>
-
+    {% if (m!=k-1) { %}
+    <div class="pagebreak"></div>
+    {% } %}
  
 {% } %}
 
