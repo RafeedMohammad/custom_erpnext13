@@ -11,6 +11,7 @@
   "designation",
   "select_shift",
   "employee_id",
+  "employment_type",
   "column_break_5",
   "year",
   "floor",
@@ -106,12 +107,18 @@
    "fieldname": "year",
    "fieldtype": "Data",
    "label": "Year"
+  },
+  {
+   "fieldname": "employment_type",
+   "fieldtype": "Link",
+   "label": "Employment Type",
+   "options": "Employment Type"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-10-01 12:10:28.804482",
+ "modified": "2025-04-07 01:19:13.429223",
  "modified_by": "Administrator",
  "module": "Custom Erpnext",
  "name": "Arrear Tax Tool",

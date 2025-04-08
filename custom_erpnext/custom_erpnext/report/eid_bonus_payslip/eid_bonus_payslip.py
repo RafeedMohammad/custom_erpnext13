@@ -22,9 +22,9 @@ def get_columns():
 		_("Department") + ":Data:90",
         _("Joining_Date") + ":Data:200",
         # _("Service Length") + ":Data:200",
-        _("Gross Salary") + ":Int:100",# named base in my system
-        _("Stamp") + ":Int:100",
-        _("Payable (Basic)") + ":Data:100",
+        _("Gross Salary") + ":Currency:100",# named base in my system
+        _("Stamp") + ":Currency:100",
+        _("Payable (Basic)") + ":Currency:100",
         # _("Signature_&_Stamp") + ":Text:10",
 
     ]

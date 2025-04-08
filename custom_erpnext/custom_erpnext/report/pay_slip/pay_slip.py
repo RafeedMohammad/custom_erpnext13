@@ -155,20 +155,20 @@ def get_columns(salary_slips):
 		_("LL LWP") + ":Integer:5",
 		_("A") + ":Integer:5",
 		_("Late Days") + ":Integer:5",
-		_("Total Salary") + ":Integer:10",
+		_("Total Salary") + ":Currency:10",
 		_("OT HR") + ":%.2Float:7",
 		_("OT Rate") + ":%.2Float:7",
-		_("OT Amt") + "::10",
-		_("Attn Bon") + ":Integer:5",
-		_("Lunch") + ":Integer:20",
-		_("Travel") + ":Integer:20",
+		_("OT Amt") + ":Currency:10",
+		_("Attn Bon") + ":Currency:5",
+		_("Lunch") + ":Currency:20",
+		_("Travel") + ":Currency:20",
 		_("Night Days") + ":Integer:5",
-		_("Night Amt") + ":Integer:20",
-		_("Arrear") + ":Integer:10",
-		_("Gross Payable") + ":Integer:20",
-		_("Income Tax") + ":Integer:20",
-		_("Absent Penalty") + ":Integer:20",
-		_("Other ded") + ":Integer:20",
+		_("Night Amt") + ":Currency:20",
+		_("Arrear") + ":Currency:10",
+		_("Gross Payable") + ":Currency:20",
+		_("Income Tax") + ":Currency:20",
+		_("Absent Penalty") + ":Currency:20",
+		_("Other ded") + ":Currency:20",
 
 
 
@@ -192,11 +192,11 @@ def get_columns(salary_slips):
 
 	columns = (
 		columns
-		+ [(d + ":Integer:10") for d in salary_components[_("Deduction")]]
+		+ [(d + ":Currency:10") for d in salary_components[_("Deduction")]]
 		+ [
-			_("Advance") + ":Integer:10",
-			_("Total Deduction") + ":Integer:20",
-			_("Net Pay") + ":Integer:20",
+			_("Advance") + ":Currency:10",
+			_("Total Deduction") + ":Currency:20",
+			_("Net Pay") + ":Currency:20",
 			_("Signature & Stamp") + ":Text:10",
 
 		]

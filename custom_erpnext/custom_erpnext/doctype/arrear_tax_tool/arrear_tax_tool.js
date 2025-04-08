@@ -23,6 +23,7 @@ frappe.ui.form.on('Arrear Tax Tool', {
     group: function(frm) { erpnext.arrear_tax_tool.load_employees(frm); },
     company: function(frm) { erpnext.arrear_tax_tool.load_employees(frm); },
     employee_id: function(frm) { erpnext.arrear_tax_tool.load_employees(frm); },
+    employment_type: function(frm) { erpnext.arrear_tax_tool.load_employees(frm); },
 });
 
 erpnext.arrear_tax_tool = {
@@ -40,7 +41,8 @@ erpnext.arrear_tax_tool = {
                     section: frm.doc.section,
                     group: frm.doc.group,
                     company: frm.doc.company,
-                    employee_id: frm.doc.employee_id
+                    employee_id: frm.doc.employee_id,
+                    employment_type:frm.doc.employment_type
                 },
                 callback: function(r) {
                     if (r.message['unmarked'].length > 0) {

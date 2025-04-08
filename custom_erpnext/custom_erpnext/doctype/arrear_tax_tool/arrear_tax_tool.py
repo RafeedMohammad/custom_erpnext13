@@ -16,7 +16,7 @@ class ArrearTaxTool(Document):
 	pass
 
 @frappe.whitelist()
-def get_employees(month=None,year=None, department=None, designation=None, floor=None, facility_or_line=None, section=None, group=None, company=None, employee_id=None):
+def get_employees(month=None,year=None, department=None, designation=None, floor=None, facility_or_line=None, section=None, group=None, company=None, employee_id=None,employment_type=None):
 	attendance_not_marked = []
 	attendance_marked = []
 	# filters = {"status": "Active", "emp.date_of_joining": ["<=", date,],"sa.start_date": ["<=", date,],"sa.end_date": [">=", date,]}
@@ -47,6 +47,7 @@ def get_employees(month=None,year=None, department=None, designation=None, floor
 	if floor: conditions += " and ss.floor='%s'" %floor
 	if facility_or_line: conditions += " and ss.facility_or_line='%s'" %facility_or_line
 	if group: conditions += " and ss.group='%s'" %group
+	if employment_type: conditions += " and emp.employment_type='%s'" %employment_type
 
 	if len(employees)>0:
 		conditions=conditions.replace("]", ")")
@@ -56,7 +57,9 @@ def get_employees(month=None,year=None, department=None, designation=None, floor
 	"""
 	select ss.employee, ss.employee_name, ss.income_tax ,ss.arear,ss.other_deduction,ss.posting_date,ss.name
 
-	FROM `tabSalary Slip` ss  %s
+	FROM `tabSalary Slip` ss  
+	JOIN `tabEmployee` emp ON ss.employee = emp.name
+	%s
 
 		
 	""" 

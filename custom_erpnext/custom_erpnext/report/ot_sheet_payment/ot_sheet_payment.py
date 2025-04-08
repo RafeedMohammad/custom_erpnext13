@@ -76,7 +76,7 @@ def execute(filters= None):
 			for i in range(len(row)): 
 				if i>4 and i<len(row): # Use the length of 'row' to avoid accessing out of bounds
 					result.append(0)  # Initialize result with 0s or use an already initialized result list
-					result[i] = result[i] + row[i]
+					result[i] = round(result[i] + row[i],1)
 				else:
 					result.append(None)
 			
