@@ -147,10 +147,10 @@ table td {
                     {% u++ %}
                 {% } %}
                 {% if (data[j][report_columns[0].fieldname] == "Total") { %}
-                    <tr style="height: 10px;">
+                    <tr style="height: 10px; font-size: 5px;">
                         <td> </td>
                         {% for(let i=1, l=report_columns.length; i<l; i++) { %}
-                            <td class="total-row">
+                            <td class="total-row" style="font-size: 5px;">
                                 {% const fieldname = report_columns[i].fieldname; %}
                                 {% if (!is_null(data[j][fieldname])) { %}
                                     {%= frappe.format(data[j][fieldname], report_columns[i], {}, data[j]) %}
