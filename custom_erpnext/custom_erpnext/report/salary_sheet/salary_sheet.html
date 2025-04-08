@@ -1,7 +1,7 @@
 <style>
     @page {
         size: landscape;
-        margin: 5mm;  /* Set margins to fit the content */
+        /* margin: 5mm;  Set margins to fit the content */
     }
 
     /* Reset body margin and padding */
@@ -14,7 +14,7 @@
 
     /* Ensure table uses full width of the page */
     table {
-        width: 340mm;
+        width: 90%;
         margin-left: 0;
         padding-left: 0;
         border-collapse: collapse;
@@ -30,7 +30,7 @@
     th {
         margin-left: 0;
         padding-left: 0;
-        font-size: 7px;
+        font-size: 6px;
         font-weight: bold;
         text-align: center;
     }
@@ -164,7 +164,9 @@ table td {
         </tbody>
     </table>
 
-    <div class="pagebreak"></div>
+    {% if (m < k - 1){ %}
+        <div class="pagebreak"></div>
+    {% } %}
 
     {% } %}
     {% } %}
