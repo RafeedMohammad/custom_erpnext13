@@ -1,0 +1,325 @@
+{%
+	var report_columns = report.get_columns_for_print();
+	report_columns = report_columns.filter(col => !col.hidden);
+
+	if (report_columns.length > 90) {
+		frappe.throw(__("Too many columns. Export the report and print it using a spreadsheet application."));
+	}
+%}
+{% for(let j=0, k=data.length; j<k; j++) { %}
+	<!-- var row = data[j]; -->
+	{% var cou=1 %}
+	{% for(let i=0, l=report_columns.length; i<l; i++) { %}
+
+			{% att= cou%}
+			{%cou ++%}
+			
+
+					
+	{% } %}
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            font-size: 10px;
+            text-align: left;
+        }
+        .company-name {
+            font-weight: bold;
+            font-size: 13px;
+            text-align:center;
+        }
+        .section-title {
+            font-weight: bold;
+            margin-top: 15px;
+        }
+        .signature-row {
+            margin-top: 50px;
+        }
+        .signature {
+            display: inline-block;
+            width: 18%;
+            text-align: center;
+            margin-right: 2%;
+        }
+    </style>
+
+
+<table>
+    <tr>
+        <td colspan="11" class="company-name">Queen South Textile Mills Ltd.</td>
+    </tr>
+    <tr>
+        <td colspan="11" style="text-align: center;">Plot No. 85-88, DEPZ, Ashulia, Dhaka</td>
+    </tr>
+    <tr>
+        <td colspan="6"style="text-align: center;">Final Settlement of Salary/Wages</td>
+        <td colspan="3"></td>
+        <td colspan="2">Date: {{data[j].posting_date}}</td>
+    </tr>
+    <tr>
+        <td>Name:</td>
+        <td colspan="3">{{data[j].employee_name}}</td>
+        <td>&nbsp;</td>
+        <td>Join Date:</td>
+        <td colspan="2">{{data[j].date_of_joining}}</td>
+        <td colspan="3">&nbsp;</td>
+    </tr>
+    <tr>
+        <td>ID No:</td>
+        <td colspan="3">{{data[j].employee}}</td>
+        <td>&nbsp;</td>
+        <td>Last Day:</td>
+        <td colspan="2">{{data[j].last_date}}</td>
+        <td colspan="3">&nbsp;</td>
+    </tr>
+    <tr>
+        <td>Department/Section:</td>
+        <td colspan="3">{{data[j].department}}</td>
+        <td>&nbsp;</td>
+
+        <td>Length of Service:</td>
+        <td colspan="2">{{data[j].length_of_service}}</td>
+        <td colspan="3">&nbsp;</td>
+    </tr>
+    <tr>
+        <td>Position:</td>
+        <td colspan="3">{{data[j].designation}}</td>
+        <td>&nbsp;</td>
+
+        <td>Reason:</td>
+        <td colspan="2">{{data[j].reason}}</td>
+        <td colspan="3">&nbsp;</td>
+    </tr>
+    <tr>
+        <td colspan="4">Salary/Wages :-</td>
+        <td colspan="7">&nbsp;</td>
+    </tr>
+    <tr>
+        <td>Basic:</td>
+        <td colspan="2">&nbsp;</td>
+        <td>Tk.</td>
+        <td>{{data[j].basic}}</td>
+        <td colspan="6">&nbsp;</td>
+    </tr>
+    <tr>
+        <td>House Rent :</td>
+        <td colspan="2">&nbsp;</td>
+        <td>Tk.</td>
+        <td>{{data[j].house_rent}}</td>
+        <td colspan="6">&nbsp;</td>
+    </tr>
+    <tr>
+        <td>Medical Allowance:</td>
+        <td colspan="2">&nbsp;</td>
+        <td>Tk.</td>
+        <td>{{data[j].medical_allowance}}</td>
+        <td colspan="6">&nbsp;</td>
+    </tr>
+    <tr>
+        <td>Total Tk.</td>
+        <td colspan="2">&nbsp;</td>
+        <td>Tk.</td>
+        <td>{{data[j].gross_salary}}</td>
+        <td colspan="6">&nbsp;</td>
+    </tr>
+
+    <tr>
+        <td colspan="11">&nbsp;</td>
+    </tr>
+    <tr>
+        <td colspan="4">Payment Entitled:</td>
+        <td colspan="7">&nbsp;</td>
+    </tr>
+    <tr>
+        <td colspan="7">1) Wages/Salary (TILL {{data[j].last_date}})</td>
+        <td>Total Days =</td>
+        <td>{{data[j].wagessalary_pay_period_total_days}}</td>
+        <td>Tk.</td>
+        <td>{{data[j].wagessalary_pay_period_total_days_payment}}</td>
+        </tr>
+    <tr>
+        <td>2) Overtime</td>
+        <td>&nbsp;</td>
+        <td>{{data[j].overtime}}</td>
+        <td>Hrs @</td>
+        <td>{{data[j].overtime_rate}}</td>
+        <td colspan="4">&nbsp;</td>
+        <td>Tk.</td>
+        <td>{{data[j].overtime_payment}}</td>
+        </tr>
+    <tr>
+        <td colspan="7">3) Leave(EL): As per BEPZA Law 2019, Section: 10</td>
+        <td>Total Days=</td>
+        <td>{{data[j].leave_el_total_days}}</td>
+        <td>Tk.</td>
+        <td>{{data[j].leave_el_total_payment}}</td>
+        </tr>
+    <tr>
+        <td colspan="7">4) P.F. Fund:</td>
+        <td colspan="2">&nbsp;</td>
+        <td>Tk.</td>
+        <td>{{data[j].p_f_fund}}</td>
+        </tr>
+    <tr>
+        <td colspan="7">5) Per Year Compensation :</td>
+        <td>Total Years=</td>
+        <td>{{data[j].total_years_for_per_year_compensation}}</td>
+        <td>Tk.</td>
+        <td>{{data[j].total_per_year_compensation_amount}}</td>
+        </tr>
+    <tr>
+        <td colspan="7">6) Arearr:</td>
+        <td colspan="2">&nbsp;</td>
+        <td>Tk.</td>
+        <td>{{data[j].arrear}}</td>
+        </tr>
+    <tr>
+        <td >6) Others: </td>
+        <td colspan="4">(Lunch Tk {{data[j].lunch_rate}}X </td>
+        <td>{{data[j].present_days}}</td>
+        <td colspan="3">&nbsp;</td>
+        <td>Tk. </td>
+        <td>{{data[j].lunch_amount}}</td>
+    </tr>
+    <tr>
+        <td >&nbsp;</td>
+        <td colspan="4">(Trans Tk.{{data[j].travel_rate}}X </td>
+        <td>{{data[j].present_days}}</td>
+        <td colspan="3">&nbsp;</td>
+        <td>Tk. </td>
+        <td>{{data[j].travel_amount}}</td>
+    </tr>
+    <tr>
+        <td >&nbsp;</td>
+        <td colspan="4">(Night Tk.{{data[j].night_rate}}X </td>
+        <td>{{data[j].night_days}}</td>
+        <td colspan="3">&nbsp;</td>
+        <td>Tk. </td>
+        <td>{{data[j].night_amount}}</td>
+    </tr>
+
+    <tr>
+        <td colspan="7">Sub Total Payment Entitled:</td>
+        <td colspan="2">&nbsp;</td>
+        <td>Tk.</td>
+        <td>{{data[j].sub_total_payment_entitled}}</td>
+        </tr>
+    <tr>
+        <td colspan="11">&nbsp;</td>
+    </tr>
+    <tr>
+        <td colspan="7">Notice pay (120 Day pay)</td>
+        <td>Total Basic:</td>
+        <td>{{data[j].number_of_basic_for_notice_pay_120_day_pay}}</td>
+        <td>Tk.</td>
+        <td>{{data[j].total_notice_pay}}</td>
+        </tr>
+    <tr>
+        <td colspan="7">Service Benefit (basic)<br>(As per EPZ Labor Act 2019)</td>
+        <td>Total Basic:</td>
+        <td>{{data[j].number_of_basic_for_service_benefit}}</td>
+        <td>Tk.</td>
+        <td>{{data[j].total_service_benefit_pay}}</td>
+        </tr>
+    <tr>
+        <td colspan="7">Gross Total Payment Entitiled</td>
+        <td colspan="2">&nbsp;</td>
+        <td>Tk.</td>
+        <td>{{data[j].gross_total_payment_entitiled}}</td>
+        </tr>
+    <tr>
+        <td colspan="11">&nbsp;</td>
+    </tr>
+    <tr>
+        <td colspan="7">Adjustment (Lay Off Calculation)</td>
+        <td colspan="6">&nbsp;</td>
+    </tr>
+    <tr>
+        <td colspan="7">1) Lay Off: 50% of basic.</td>
+        <td>Total Days=</td>
+        <td>{{data[j].total_days_for_lay_off}}</td>
+        <td>Tk.</td>
+        <td>{{data[j].lay_off_amount}}</td>
+        </tr>
+    <tr>
+        <td colspan="7">2) Friday : 100% basic & Medical allowance</td>
+        <td>Total Days=</td>
+        <td>{{data[j].total_days_for_friday}}</td>
+        <td>Tk.</td>
+        <td>{{data[j].amount_for_friday_100_basic_and_medical_allowance}}</td>
+        </tr>
+    <tr>
+        <td colspan="7">3) Medical allow:</td>
+        <td>Total Days=</td>
+        <td>{{data[j].total_days_for_medical_allow}}</td>
+        <td>Tk.</td>
+        <td>{{data[j].amount_for_friday_100_basic_and_medical_allowance}}</td>
+        </tr>
+    <tr>
+        <td colspan="7">4) Absent/Without Pay Leave:</td>
+        <td>Total Days=</td>
+        <td>{{data[j].absentwithout_pay_leave_days}}</td>
+        <td>Tk.</td>
+        <td>{{data[j].absentwithout_pay_leave_amount}}</td>
+        </tr>
+    <tr>
+        <td colspan="7">5) Others: 30 Days basic Deduction (For Instant resign)</td>
+        <td>Total Basic=</td>
+        <td>{{data[j].total_basic_for_instant_resign}}</td>
+        <td>Tk.</td>
+        <td>{{data[j].amount_for_instant_resign}}</td>
+        </tr>
+
+    <tr>
+        <td colspan="7">Total Adjustment:</td>
+        <td colspan="2">&nbsp;</td>
+        <td>Tk.</td>
+        <td>{{data[j].total_adjustment}}</td>
+        </tr>
+    <tr>
+        <td colspan="11">&nbsp;</td>
+    </tr>
+    <tr>
+        <td colspan="7">Net Payment Entitled</td>
+        <td colspan="2">&nbsp;</td>
+        <td>Tk.</td>
+        <td>{{data[j].net_payment_entitled}}</td>
+        </tr>
+    <tr>
+        <td colspan="7">Less Provident Found By Cheque</td>
+        <td colspan="2">&nbsp;</td>
+        <td>Tk.</td>
+        <td>{{data[j].less_provident_found_by_cheque}}</td>
+        </tr>
+    <tr>
+        <td colspan="7">Balance Money Paid By Cash</td>
+        <td colspan="2">&nbsp;</td>
+        <td>Tk.</td>
+        <td>{{data[j].balance_money_paid_by_cash}}</td>
+        </tr>
+    <tr>
+        <td colspan="11">&nbsp;</td>
+    </tr>
+
+    <tr>
+        <td colspan="2"style="text-align: center;">Prepared By <br>HR</td>
+        <td colspan="2"style="text-align: center;">Checked by <br>AGM (HR & COMP.) </td>
+        <td colspan="2"style="text-align: center;">Checked by <br>DGM (Admin)</td>
+        <!-- <td colspan="2">Checked by <br>CFO</td> -->
+        <td colspan="3"style="text-align: center;">Approved by <br>CFO</td>
+        <td colspan="2"style="text-align: center;">Received By <br>CEO</td>
+    </tr>
+    
+</table>
+{% if (j!=k-1) { %}
+<div class="pagebreak"></div>
+{% } %}
+{% } %}

@@ -1,0 +1,441 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-04-20 22:34:15.920543",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "employee",
+  "employee_name",
+  "department",
+  "designation",
+  "reason",
+  "column_break_4",
+  "posting_date",
+  "date_of_joining",
+  "last_date",
+  "length_of_service",
+  "salarywages_section",
+  "basic",
+  "medical_allowance",
+  "column_break_13",
+  "house_rent",
+  "gross_salary",
+  "attendance_details_section",
+  "present_days",
+  "overtime",
+  "night_days",
+  "column_break_23",
+  "absent_days",
+  "leave_days",
+  "leave_without_pay_days",
+  "payment_entitled_section",
+  "wagessalary_pay_period_total_days",
+  "overtime_rate",
+  "leave_el_total_days",
+  "arrear",
+  "total_years_for_per_year_compensation",
+  "lunch_rate",
+  "travel_rate",
+  "night_rate",
+  "sub_total_payment_entitled",
+  "column_break_18",
+  "wagessalary_pay_period_total_days_payment",
+  "overtime_payment",
+  "leave_el_total_payment",
+  "p_f_fund",
+  "total_per_year_compensation_amount",
+  "lunch_amount",
+  "travel_amount",
+  "night_amount",
+  "section_break_39",
+  "number_of_basic_for_notice_pay_120_day_pay",
+  "number_of_basic_for_service_benefit",
+  "gross_total_payment_entitiled",
+  "column_break_36",
+  "total_notice_pay",
+  "total_service_benefit_pay",
+  "adjustment_lay_off_calculation_section",
+  "total_days_for_lay_off",
+  "total_days_for_friday",
+  "total_days_for_medical_allow",
+  "absentwithout_pay_leave_days",
+  "total_basic_for_instant_resign",
+  "total_adjustment",
+  "column_break_51",
+  "lay_off_amount",
+  "amount_for_friday_100_basic_and_medical_allowance",
+  "medical_allow_amount",
+  "absentwithout_pay_leave_amount",
+  "amount_for_instant_resign",
+  "section_break_63",
+  "net_payment_entitled",
+  "less_provident_found_by_cheque",
+  "balance_money_paid_by_cash"
+ ],
+ "fields": [
+  {
+   "default": "Today",
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Posting Date"
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "employee.employee_name",
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "Employee Name"
+  },
+  {
+   "fetch_from": "employee.date_of_joining",
+   "fieldname": "date_of_joining",
+   "fieldtype": "Data",
+   "label": "Date Of Joining"
+  },
+  {
+   "fetch_from": "employee.department",
+   "fieldname": "department",
+   "fieldtype": "Data",
+   "label": "Department"
+  },
+  {
+   "fetch_from": "employee.designation",
+   "fieldname": "designation",
+   "fieldtype": "Data",
+   "label": "Designation"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "employee.relieving_date",
+   "fieldname": "last_date",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Last Date",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "employee.status_condition",
+   "fieldname": "reason",
+   "fieldtype": "Data",
+   "label": "Reason"
+  },
+  {
+   "fieldname": "salarywages_section",
+   "fieldtype": "Section Break",
+   "label": "Salary/Wages"
+  },
+  {
+   "fieldname": "basic",
+   "fieldtype": "Currency",
+   "label": "Basic"
+  },
+  {
+   "fieldname": "house_rent",
+   "fieldtype": "Currency",
+   "label": "House Rent"
+  },
+  {
+   "fieldname": "medical_allowance",
+   "fieldtype": "Currency",
+   "label": "Medical Allowance"
+  },
+  {
+   "fieldname": "payment_entitled_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "wagessalary_pay_period_total_days",
+   "fieldtype": "Data",
+   "label": "Wages/Salary (Pay Period) Total Days"
+  },
+  {
+   "fieldname": "wagessalary_pay_period_total_days_payment",
+   "fieldtype": "Currency",
+   "label": "Wages/Salary (Pay Period) Total Days Payment"
+  },
+  {
+   "fieldname": "overtime",
+   "fieldtype": "Float",
+   "label": "Overtime"
+  },
+  {
+   "fieldname": "overtime_rate",
+   "fieldtype": "Float",
+   "label": "Overtime Rate"
+  },
+  {
+   "fieldname": "overtime_payment",
+   "fieldtype": "Currency",
+   "label": "Overtime Payment"
+  },
+  {
+   "fieldname": "leave_el_total_days",
+   "fieldtype": "Float",
+   "label": "Leave (EL) Total Days"
+  },
+  {
+   "fieldname": "leave_el_total_payment",
+   "fieldtype": "Currency",
+   "label": "Leave (EL) Total Payment"
+  },
+  {
+   "fieldname": "p_f_fund",
+   "fieldtype": "Currency",
+   "label": "P. F. Fund"
+  },
+  {
+   "fieldname": "arrear",
+   "fieldtype": "Currency",
+   "label": "Arrear"
+  },
+  {
+   "fetch_from": "employee.lunch_rate",
+   "fieldname": "lunch_rate",
+   "fieldtype": "Data",
+   "label": "Lunch Rate"
+  },
+  {
+   "fetch_from": "employee.travel_rate",
+   "fieldname": "travel_rate",
+   "fieldtype": "Data",
+   "label": "Travel Rate"
+  },
+  {
+   "fetch_from": "employee.night_rate",
+   "fieldname": "night_rate",
+   "fieldtype": "Data",
+   "label": "Night Rate"
+  },
+  {
+   "fieldname": "present_days",
+   "fieldtype": "Float",
+   "label": "Present Days"
+  },
+  {
+   "fieldname": "absent_days",
+   "fieldtype": "Float",
+   "label": "Absent Days"
+  },
+  {
+   "fieldname": "number_of_basic_for_notice_pay_120_day_pay",
+   "fieldtype": "Float",
+   "label": "Number of Basic for Notice pay (120 Day pay)"
+  },
+  {
+   "fieldname": "number_of_basic_for_service_benefit",
+   "fieldtype": "Float",
+   "label": "Number of Basic for Service Benefit"
+  },
+  {
+   "fieldname": "total_notice_pay",
+   "fieldtype": "Currency",
+   "label": "Total Notice Pay"
+  },
+  {
+   "fieldname": "total_service_benefit_pay",
+   "fieldtype": "Currency",
+   "label": "Total Service Benefit Pay"
+  },
+  {
+   "fieldname": "column_break_13",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_18",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_36",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "attendance_details_section",
+   "fieldtype": "Section Break",
+   "label": "Attendance Details"
+  },
+  {
+   "fieldname": "night_days",
+   "fieldtype": "Float",
+   "label": "Night_days"
+  },
+  {
+   "fieldname": "lunch_amount",
+   "fieldtype": "Currency",
+   "label": "Lunch Amount"
+  },
+  {
+   "fieldname": "travel_amount",
+   "fieldtype": "Currency",
+   "label": "Travel Amount"
+  },
+  {
+   "fieldname": "night_amount",
+   "fieldtype": "Currency",
+   "label": "Night Amount"
+  },
+  {
+   "fieldname": "total_years_for_per_year_compensation",
+   "fieldtype": "Float",
+   "label": "Total Years for Per Year Compensation"
+  },
+  {
+   "fieldname": "total_per_year_compensation_amount",
+   "fieldtype": "Currency",
+   "label": "Total Per Year Compensation Amount"
+  },
+  {
+   "fieldname": "adjustment_lay_off_calculation_section",
+   "fieldtype": "Section Break",
+   "label": "Adjustment (Lay Off Calculation)"
+  },
+  {
+   "fieldname": "section_break_39",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "total_days_for_lay_off",
+   "fieldtype": "Float",
+   "label": "Total Days for Lay Off"
+  },
+  {
+   "fieldname": "total_days_for_friday",
+   "fieldtype": "Float",
+   "label": "Total Days For Friday"
+  },
+  {
+   "fieldname": "total_days_for_medical_allow",
+   "fieldtype": "Float",
+   "label": "Total Days For Medical allow"
+  },
+  {
+   "fieldname": "absentwithout_pay_leave_days",
+   "fieldtype": "Float",
+   "label": "Absent/Without Pay Leave Days"
+  },
+  {
+   "fieldname": "total_basic_for_instant_resign",
+   "fieldtype": "Float",
+   "label": "Total Basic For Instant resign"
+  },
+  {
+   "fieldname": "column_break_51",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "lay_off_amount",
+   "fieldtype": "Currency",
+   "label": "Lay Off Amount"
+  },
+  {
+   "fieldname": "amount_for_friday_100_basic_and_medical_allowance",
+   "fieldtype": "Currency",
+   "label": "Amount for Friday (100 basic and Medical allowance)"
+  },
+  {
+   "fieldname": "medical_allow_amount",
+   "fieldtype": "Currency",
+   "label": "Medical Allow Amount"
+  },
+  {
+   "fieldname": "absentwithout_pay_leave_amount",
+   "fieldtype": "Currency",
+   "label": "Absent/Without Pay Leave Amount"
+  },
+  {
+   "fieldname": "amount_for_instant_resign",
+   "fieldtype": "Currency",
+   "label": "Amount For Instant resign"
+  },
+  {
+   "fieldname": "total_adjustment",
+   "fieldtype": "Currency",
+   "label": "Total Adjustment"
+  },
+  {
+   "fieldname": "leave_days",
+   "fieldtype": "Float",
+   "label": "Leave Days"
+  },
+  {
+   "fieldname": "leave_without_pay_days",
+   "fieldtype": "Float",
+   "label": "Leave Without Pay Days"
+  },
+  {
+   "fieldname": "column_break_23",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "gross_salary",
+   "fieldtype": "Currency",
+   "label": "Gross Salary"
+  },
+  {
+   "fieldname": "sub_total_payment_entitled",
+   "fieldtype": "Currency",
+   "label": "Sub Total Payment Entitled"
+  },
+  {
+   "fieldname": "gross_total_payment_entitiled",
+   "fieldtype": "Currency",
+   "label": "Gross Total Payment Entitiled"
+  },
+  {
+   "fieldname": "section_break_63",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "net_payment_entitled",
+   "fieldtype": "Currency",
+   "label": "Net Payment Entitled"
+  },
+  {
+   "fieldname": "less_provident_found_by_cheque",
+   "fieldtype": "Currency",
+   "label": "Less Provident Found By Cheque"
+  },
+  {
+   "fieldname": "balance_money_paid_by_cash",
+   "fieldtype": "Currency",
+   "label": "Balance Money Paid By Cash"
+  },
+  {
+   "fieldname": "length_of_service",
+   "fieldtype": "Data",
+   "label": "Length of Service"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-04-28 13:11:24.658483",
+ "modified_by": "Administrator",
+ "module": "Custom Erpnext",
+ "name": "Employee Sattlement",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

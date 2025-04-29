@@ -103,7 +103,7 @@ frappe.ui.form.on('Payroll Entry', {
 			}).addClass("btn-secondary");
 		}
 
-		if (frm.doc.salary_slips_created) { //created the button to reprocess salary multiple times
+		if (frm.doc.salary_slips_created && !frm.doc.salary_slips_submitted) { //created the button to reprocess salary multiple times
 			frm.add_custom_button(__("Reprocess"), function () {
 				salary_slip_reprocess(frm);
 			}).addClass("btn-primary");

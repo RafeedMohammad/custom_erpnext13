@@ -30,7 +30,7 @@
     th {
         margin-left: 0;
         padding-left: 0;
-        font-size: 6px;
+        font-size: 5.8px;
         font-weight: bold;
         text-align: center;
     }
@@ -38,7 +38,7 @@
     td {
         margin-left: 0;
         padding-left: 0;
-        font-size: 6.5px;
+        font-size: 6.2px;
         text-align: center;
         word-wrap: break-word; /* Wrap long text to avoid overflow */
     }
@@ -98,7 +98,7 @@ table td {
     <table class="table table-bordered">
         
         <thead>
-            <tr style="height: 10px;"><th colspan="36" style="text-align: center; font-size: 8px;">Salary for the month of - {%= filters.month %}, {%= filters.year %}</th></tr>
+            <tr style="height: 10px;"><th colspan="37" style="text-align: center; font-size: 8px;">Salary for the month of - {%= filters.month %}, {%= filters.year %}</th></tr>
             <tr style="height: 10px;">
                 {% if (!is_null(data[m][report_columns[0].fieldname])) { %}
                     <th colspan="6" style="text-align: left; font-size: 6px;">{%= data[m][report_columns[0].fieldname] %}</th>

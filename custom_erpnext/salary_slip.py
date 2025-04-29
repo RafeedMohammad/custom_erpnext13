@@ -1604,7 +1604,8 @@ class override_SalarySlip(TransactionBase):
 
 		for loan in self.get_loan_details():
 			if loan.name not in loans:
-				amounts = calculate_amounts(loan.name, self.posting_date, "Regular Payment")
+			#	amounts = calculate_amounts(loan.name, self.posting_date, "Regular Payment") replaced posting date with end date to cut loan till salary end date.
+				amounts = calculate_amounts(loan.name, self.end_date, "Regular Payment")
 				if (
 					amounts["interest_amount"] + amounts["payable_principal_amount"]
 					> amounts["written_off_amount"]+amounts["loan_opening_amount"] 
@@ -1654,7 +1655,8 @@ class override_SalarySlip(TransactionBase):
 					)
 
 		for payment in self.get("loans"):
-			amounts = calculate_amounts(payment.loan, self.posting_date, "Regular Payment")
+			#amounts = calculate_amounts(payment.loan, self.posting_date, "Regular Payment") replace posting_date with end_date to cut loan till salary end date
+			amounts = calculate_amounts(payment.loan, self.end_date, "Regular Payment")
 			total_amount = amounts["interest_amount"] + amounts["payable_principal_amount"]
 			if flt(payment.total_payment) > total_amount:
 				frappe.throw(
@@ -1696,7 +1698,8 @@ class override_SalarySlip(TransactionBase):
 			for loan in loan_details:
 				if loan.is_term_loan:
 					process_loan_interest_accrual_for_term_loans(
-						posting_date=self.posting_date, loan_type=loan.loan_type, loan=loan.name
+						#posting_date=self.posting_date, loan_type=loan.loan_type, loan=loan.name
+						posting_date=self.end_date, loan_type=loan.loan_type, loan=loan.name
 					)
 
 		return loan_details
@@ -1710,6 +1713,7 @@ class override_SalarySlip(TransactionBase):
 					self.employee,
 					self.company,
 					self.posting_date,
+					#self.end_date,
 					loan.loan_type,
 					"Regular Payment",
 					loan.interest_amount,
