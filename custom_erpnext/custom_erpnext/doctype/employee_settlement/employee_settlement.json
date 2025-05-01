@@ -154,48 +154,47 @@
    "fieldtype": "Section Break"
   },
   {
-   "fieldname": "wagessalary_pay_period_total_days",
-   "fieldtype": "Data",
-   "label": "Wages/Salary (Pay Period) Total Days"
-  },
-  {
    "fieldname": "wagessalary_pay_period_total_days_payment",
-   "fieldtype": "Currency",
+   "fieldtype": "Int",
    "label": "Wages/Salary (Pay Period) Total Days Payment"
   },
   {
+   "default": "0",
    "fieldname": "overtime",
    "fieldtype": "Float",
    "label": "Overtime"
   },
   {
+   "default": "0",
    "fieldname": "overtime_rate",
    "fieldtype": "Float",
    "label": "Overtime Rate"
   },
   {
    "fieldname": "overtime_payment",
-   "fieldtype": "Currency",
+   "fieldtype": "Int",
    "label": "Overtime Payment"
   },
   {
+   "default": "0",
    "fieldname": "leave_el_total_days",
    "fieldtype": "Float",
    "label": "Leave (EL) Total Days"
   },
   {
    "fieldname": "leave_el_total_payment",
-   "fieldtype": "Currency",
+   "fieldtype": "Int",
    "label": "Leave (EL) Total Payment"
   },
   {
    "fieldname": "p_f_fund",
-   "fieldtype": "Currency",
+   "fieldtype": "Int",
    "label": "P. F. Fund"
   },
   {
+   "default": "0",
    "fieldname": "arrear",
-   "fieldtype": "Currency",
+   "fieldtype": "Int",
    "label": "Arrear"
   },
   {
@@ -217,33 +216,37 @@
    "label": "Night Rate"
   },
   {
+   "default": "0",
    "fieldname": "present_days",
    "fieldtype": "Float",
    "label": "Present Days"
   },
   {
+   "default": "0",
    "fieldname": "absent_days",
    "fieldtype": "Float",
    "label": "Absent Days"
   },
   {
+   "default": "0",
    "fieldname": "number_of_basic_for_notice_pay_120_day_pay",
    "fieldtype": "Float",
    "label": "Number of Basic for Notice pay (120 Day pay)"
   },
   {
+   "default": "0",
    "fieldname": "number_of_basic_for_service_benefit",
    "fieldtype": "Float",
    "label": "Number of Basic for Service Benefit"
   },
   {
    "fieldname": "total_notice_pay",
-   "fieldtype": "Currency",
+   "fieldtype": "Int",
    "label": "Total Notice Pay"
   },
   {
    "fieldname": "total_service_benefit_pay",
-   "fieldtype": "Currency",
+   "fieldtype": "Int",
    "label": "Total Service Benefit Pay"
   },
   {
@@ -264,33 +267,35 @@
    "label": "Attendance Details"
   },
   {
+   "default": "0",
    "fieldname": "night_days",
    "fieldtype": "Float",
    "label": "Night_days"
   },
   {
    "fieldname": "lunch_amount",
-   "fieldtype": "Currency",
+   "fieldtype": "Int",
    "label": "Lunch Amount"
   },
   {
    "fieldname": "travel_amount",
-   "fieldtype": "Currency",
+   "fieldtype": "Int",
    "label": "Travel Amount"
   },
   {
    "fieldname": "night_amount",
-   "fieldtype": "Currency",
+   "fieldtype": "Int",
    "label": "Night Amount"
   },
   {
+   "default": "0",
    "fieldname": "total_years_for_per_year_compensation",
    "fieldtype": "Float",
    "label": "Total Years for Per Year Compensation"
   },
   {
    "fieldname": "total_per_year_compensation_amount",
-   "fieldtype": "Currency",
+   "fieldtype": "Int",
    "label": "Total Per Year Compensation Amount"
   },
   {
@@ -303,26 +308,31 @@
    "fieldtype": "Section Break"
   },
   {
+   "default": "0",
    "fieldname": "total_days_for_lay_off",
    "fieldtype": "Float",
    "label": "Total Days for Lay Off"
   },
   {
+   "default": "0",
    "fieldname": "total_days_for_friday",
    "fieldtype": "Float",
    "label": "Total Days For Friday"
   },
   {
+   "default": "0",
    "fieldname": "total_days_for_medical_allow",
    "fieldtype": "Float",
    "label": "Total Days For Medical allow"
   },
   {
+   "default": "0",
    "fieldname": "absentwithout_pay_leave_days",
    "fieldtype": "Float",
    "label": "Absent/Without Pay Leave Days"
   },
   {
+   "default": "0",
    "fieldname": "total_basic_for_instant_resign",
    "fieldtype": "Float",
    "label": "Total Basic For Instant resign"
@@ -333,40 +343,42 @@
   },
   {
    "fieldname": "lay_off_amount",
-   "fieldtype": "Currency",
+   "fieldtype": "Int",
    "label": "Lay Off Amount"
   },
   {
    "fieldname": "amount_for_friday_100_basic_and_medical_allowance",
-   "fieldtype": "Currency",
+   "fieldtype": "Int",
    "label": "Amount for Friday (100 basic and Medical allowance)"
   },
   {
    "fieldname": "medical_allow_amount",
-   "fieldtype": "Currency",
+   "fieldtype": "Int",
    "label": "Medical Allow Amount"
   },
   {
    "fieldname": "absentwithout_pay_leave_amount",
-   "fieldtype": "Currency",
+   "fieldtype": "Int",
    "label": "Absent/Without Pay Leave Amount"
   },
   {
    "fieldname": "amount_for_instant_resign",
-   "fieldtype": "Currency",
+   "fieldtype": "Int",
    "label": "Amount For Instant resign"
   },
   {
    "fieldname": "total_adjustment",
-   "fieldtype": "Currency",
+   "fieldtype": "Int",
    "label": "Total Adjustment"
   },
   {
+   "default": "0",
    "fieldname": "leave_days",
    "fieldtype": "Float",
    "label": "Leave Days"
   },
   {
+   "default": "0",
    "fieldname": "leave_without_pay_days",
    "fieldtype": "Float",
    "label": "Leave Without Pay Days"
@@ -382,12 +394,12 @@
   },
   {
    "fieldname": "sub_total_payment_entitled",
-   "fieldtype": "Currency",
+   "fieldtype": "Int",
    "label": "Sub Total Payment Entitled"
   },
   {
    "fieldname": "gross_total_payment_entitiled",
-   "fieldtype": "Currency",
+   "fieldtype": "Int",
    "label": "Gross Total Payment Entitiled"
   },
   {
@@ -396,31 +408,38 @@
   },
   {
    "fieldname": "net_payment_entitled",
-   "fieldtype": "Currency",
+   "fieldtype": "Int",
    "label": "Net Payment Entitled"
   },
   {
+   "default": "0",
    "fieldname": "less_provident_found_by_cheque",
-   "fieldtype": "Currency",
+   "fieldtype": "Int",
    "label": "Less Provident Found By Cheque"
   },
   {
    "fieldname": "balance_money_paid_by_cash",
-   "fieldtype": "Currency",
+   "fieldtype": "Int",
    "label": "Balance Money Paid By Cash"
   },
   {
    "fieldname": "length_of_service",
    "fieldtype": "Data",
    "label": "Length of Service"
+  },
+  {
+   "default": "0",
+   "fieldname": "wagessalary_pay_period_total_days",
+   "fieldtype": "Float",
+   "label": "Wages/Salary (Pay Period) Total Days"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-04-28 13:11:24.658483",
+ "modified": "2025-04-30 23:11:51.338931",
  "modified_by": "Administrator",
  "module": "Custom Erpnext",
- "name": "Employee Sattlement",
+ "name": "Employee Settlement",
  "owner": "Administrator",
  "permissions": [
   {

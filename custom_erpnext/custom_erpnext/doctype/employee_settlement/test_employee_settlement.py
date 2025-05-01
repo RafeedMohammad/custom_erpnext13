@@ -4,5 +4,5 @@
 # import frappe
 import unittest
 
-class TestEmployeeSattlement(unittest.TestCase):
+class TestEmployeeSettlement(unittest.TestCase):
 	pass

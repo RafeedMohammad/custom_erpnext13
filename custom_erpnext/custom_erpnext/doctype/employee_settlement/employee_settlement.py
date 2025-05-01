@@ -6,7 +6,7 @@ import frappe
 from frappe.model.document import Document
 from dateutil.relativedelta import relativedelta
 
-class EmployeeSattlement(Document):
+class EmployeeSettlement(Document):
     def validate(self):
         self.calculate_length_of_service()
         self.get_attendance_details()

@@ -90,7 +90,7 @@ def get_data(filters):
 	total_days_for_lay_off,total_days_for_friday,total_days_for_medical_allow,absentwithout_pay_leave_days,total_basic_for_instant_resign,total_adjustment,lay_off_amount,amount_for_friday_100_basic_and_medical_allowance,
 	medical_allow_amount,absentwithout_pay_leave_amount,amount_for_instant_resign,net_payment_entitled,less_provident_found_by_cheque,balance_money_paid_by_cash
 						
-	FROM `tabEmployee Sattlement` where 1=1 %s
+	FROM `tabEmployee Settlement` where 1=1 %s
 	"""% (conditions), as_list=True)
 
 	return result
