@@ -60,6 +60,7 @@ def get_employees(month=None,year=None, department=None, designation=None, floor
 	FROM `tabSalary Slip` ss  
 	JOIN `tabEmployee` emp ON ss.employee = emp.name
 	%s
+	order by ss.employee
 
 		
 	""" 
