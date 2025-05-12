@@ -40,14 +40,8 @@
 
 <table>
     <tr>
-        <td colspan="6"style="text-align: center;">Final Settlement of Salary/Wages</td>
-        <td colspan="3"></td>
+        <td colspan="9"style="text-align: center;text-decoration: underline;">Final Settlement of Salary/Wages</td>
         <td colspan="2">Date: {{data[j].posting_date}}</td>
-    </tr>
-    <tr>
-        <td colspan="11" style="padding: 0;">
-            <hr style="margin: 2px 0; border: none; border-top: 1px solid #000;">
-        </td>
     </tr>
     <tr>
         <td>Name</td>
@@ -121,6 +115,11 @@
         <td colspan="5">&nbsp;</td>
     </tr>
     <tr>
+        <td colspan="11" style="padding: 0;">
+            <hr style="margin: 2px 0; border: none; border-top: 1px solid #000;">
+        </td>
+    </tr>
+    <tr>
         <td>Total Tk.</td>
         <td colspan="3">&nbsp;</td>
         <td>Tk.</td>
@@ -128,11 +127,6 @@
         <td colspan="5">&nbsp;</td>
     </tr>
 
-    <tr>
-        <td colspan="11" style="padding: 0;">
-            <hr style="margin: 2px 0; border: none; border-top: 1px solid #000;">
-        </td>
-    </tr>
     <tr>
         <td colspan="4">Payment Entitled:</td>
         <td colspan="7">&nbsp;</td>
@@ -204,17 +198,16 @@
         <td>Tk. </td>
         <td style="text-align: center;">{{data[j].night_amount}}</td>
     </tr>
-
+    <tr>
+        <td colspan="11" style="padding: 0;">
+            <hr style="margin: 2px 0; border: none; border-top: 1px solid #000;">
+        </td>
+    </tr>
     <tr>
         <td colspan="7">Sub Total Payment Entitled:</td>
         <td colspan="2">&nbsp;</td>
         <td>Tk.</td>
         <td style="text-align: center;">{{data[j].sub_total_payment_entitled}}</td>
-        </tr>
-    <tr>
-        <td colspan="11" style="padding: 0;">
-            <hr style="margin: 2px 0; border: none; border-top: 1px solid #000;">
-        </td>
     </tr>
     <tr>
         <td colspan="7">Notice pay (120 Day pay)</td>
@@ -231,16 +224,17 @@
         <td style="text-align: center;">{{data[j].total_service_benefit_pay}}</td>
         </tr>
     <tr>
+        <td colspan="11" style="padding: 0;">
+            <hr style="margin: 2px 0; border: none; border-top: 1px solid #000;">
+        </td>
+    </tr>
+    <tr>
         <td colspan="7">Gross Total Payment Entitiled</td>
         <td colspan="2">&nbsp;</td>
         <td>Tk.</td>
         <td style="text-align: center;">{{data[j].gross_total_payment_entitiled}}</td>
         </tr>
-    <tr>
-        <td colspan="11" style="padding: 0;">
-            <hr style="margin: 2px 0; border: none; border-top: 1px solid #000;">
-        </td>
-    </tr>
+
     <tr>
         <td colspan="7">Adjustment (Lay Off Calculation)</td>
         <td colspan="6">&nbsp;</td>
@@ -280,18 +274,18 @@
         <td>Tk.</td>
         <td style="text-align: center;">{{data[j].amount_for_instant_resign}}</td>
         </tr>
-
+    <tr>
+        <td colspan="11" style="padding: 0;">
+            <hr style="margin: 2px 0; border: none; border-top: 1px solid #000;">
+        </td>
+    </tr>
     <tr>
         <td colspan="7">Total Adjustment:</td>
         <td colspan="2">&nbsp;</td>
         <td>Tk.</td>
         <td style="text-align: center;">{{data[j].total_adjustment}}</td>
         </tr>
-    <tr>
-        <td colspan="11" style="padding: 0;">
-            <hr style="margin: 2px 0; border: none; border-top: 1px solid #000;">
-        </td>
-    </tr>
+
     <tr>
         <td colspan="7">Net Payment Entitled</td>
         <td colspan="2">&nbsp;</td>
@@ -324,9 +318,9 @@
         <td colspan="2"style="text-align: center;">Prepared By <br>HR</td>
         <td colspan="2"style="text-align: center;">Checked by <br>AGM (HR & COMP.) </td>
         <td colspan="3"style="text-align: center;">Checked by <br>DGM (Admin)</td>
-        <!-- <td colspan="2">Checked by <br>CFO</td> -->
-        <td colspan="2"style="text-align: center;">Approved by <br>CFO</td>
-        <td colspan="2"style="text-align: center;">Received By <br>CEO</td>
+        <td colspan="2"style="text-align: center;">Checked by <br>CFO</td>
+        <td colspan="2"style="text-align: center;">Approved by <br>CEO</td>
+        <td colspan="2"style="text-align: center;">Received By <br></td>
     </tr>
     
 </table>

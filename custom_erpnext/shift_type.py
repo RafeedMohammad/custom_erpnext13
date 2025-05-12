@@ -296,11 +296,12 @@ class override_ShiftType(Document):
 			if check_if_holiday:
 				# skip marking absent on a holiday
 				#Dev: Can be changed because if it's a weekly holiday, the status is shown as 'W'
-				if(check_if_weekly_off==1):
-					attendance = mark_attendance(employee, date, "Weekly Off", self.name)
-					return
-				attendance = mark_attendance(employee, date, "Holiday", self.name)
-				return
+				if check_if_holiday:
+					if check_if_weekly_off == 1:
+						mark_attendance(employee, date, "Weekly Off", self.name)
+					else:
+						mark_attendance(employee, date, "Holiday", self.name)
+					continue 
 				
 		
 		# dates = get_filtered_date_list(employee, start_date, end_date, holiday_list=holiday_list_name)
