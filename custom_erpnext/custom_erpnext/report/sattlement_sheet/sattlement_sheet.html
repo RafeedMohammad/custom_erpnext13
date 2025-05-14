@@ -18,6 +18,9 @@
 					
 	{% } %}
 
+    {% var d = data[j].posting_date.split('-') %}
+    {% var e = data[j].date_of_joining.split('-') %}
+    {% var f = data[j].last_date.split('-') %}
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -39,9 +42,9 @@
 
 
 <table>
-    <tr>
+    <tr style="font-weight: bold;">
         <td colspan="9"style="text-align: center;text-decoration: underline;">Final Settlement of Salary/Wages</td>
-        <td colspan="2">Date: {{data[j].posting_date}}</td>
+        <td colspan="2">Date: {{ d[2] }}/{{ d[1] }}/{{ d[0] }}</td>   
     </tr>
     <tr>
         <td>Name</td>
@@ -50,7 +53,7 @@
         <td>&nbsp;</td>
         <td>Join Date</td>
         <td>:</td>
-        <td colspan="2">{{data[j].date_of_joining}}</td>
+        <td colspan="2">{{ e[2] }}/{{ e[1] }}/{{ e[0] }}</td>
         <td>&nbsp;</td>
     </tr>
     <tr>
@@ -60,7 +63,7 @@
         <td>&nbsp;</td>
         <td>Last Day</td>
         <td>:</td>
-        <td colspan="2">{{data[j].last_date}}</td>
+        <td colspan="2">{{ f[2] }}/{{ f[1] }}/{{ f[0] }}</td>
         <td>&nbsp;</td>
     </tr>
     <tr>
@@ -87,7 +90,7 @@
     </tr>
     <tr>
         <td colspan="4">Salary/Wages </td>
-        <td>:</td>
+        <td></td>
         <td colspan="6">&nbsp;</td>
     </tr>
     <tr>
@@ -114,12 +117,7 @@
         <td>{{data[j].medical_allowance}}</td>
         <td colspan="5">&nbsp;</td>
     </tr>
-    <tr>
-        <td colspan="11" style="padding: 0;">
-            <hr style="margin: 2px 0; border: none; border-top: 1px solid #000;">
-        </td>
-    </tr>
-    <tr>
+    <tr style="font-weight: bold;">
         <td>Total Tk.</td>
         <td colspan="3">&nbsp;</td>
         <td>Tk.</td>
@@ -132,8 +130,8 @@
         <td colspan="7">&nbsp;</td>
     </tr>
     <tr>
-        <td colspan="7">1) Wages/Salary (TILL {{data[j].last_date}})</td>
-        <td>Total Days =</td>
+        <td colspan="6">1) Wages/Salary (TILL {{data[j].last_date}})</td>
+        <td colspan="2" style="text-align: right;">Total Days =</td>
         <td>{{data[j].wagessalary_pay_period_total_days}}</td>
         <td>Tk.</td>
         <td style="text-align: center;">{{data[j].wagessalary_pay_period_total_days_payment}}</td>
@@ -149,8 +147,8 @@
         <td style="text-align: center;">{{data[j].overtime_payment}}</td>
         </tr>
     <tr>
-        <td colspan="7">3) Leave(EL): As per BEPZA Law 2019, Section: 10</td>
-        <td>Total Days=</td>
+        <td colspan="6">3) Leave(EL): As per BEPZA Law 2019, Section: 10</td>
+        <td colspan="2" style="text-align: right;">Total Days=</td>
         <td>{{data[j].leave_el_total_days}}</td>
         <td>Tk.</td>
         <td style="text-align: center;">{{data[j].leave_el_total_payment}}</td>
@@ -162,8 +160,8 @@
         <td style="text-align: center;">{{data[j].p_f_fund}}</td>
         </tr>
     <tr>
-        <td colspan="7">5) Per Year Compensation :</td>
-        <td>Total Years=</td>
+        <td colspan="6">5) Per Year Compensation :</td>
+        <td colspan="2" style="text-align: right;">Total Years=</td>
         <td>{{data[j].total_years_for_per_year_compensation}}</td>
         <td>Tk.</td>
         <td style="text-align: center;">{{data[j].total_per_year_compensation_amount}}</td>
@@ -198,37 +196,28 @@
         <td>Tk. </td>
         <td style="text-align: center;">{{data[j].night_amount}}</td>
     </tr>
-    <tr>
-        <td colspan="11" style="padding: 0;">
-            <hr style="margin: 2px 0; border: none; border-top: 1px solid #000;">
-        </td>
-    </tr>
-    <tr>
+    <tr style="font-weight: bold;">
         <td colspan="7">Sub Total Payment Entitled:</td>
         <td colspan="2">&nbsp;</td>
         <td>Tk.</td>
         <td style="text-align: center;">{{data[j].sub_total_payment_entitled}}</td>
     </tr>
     <tr>
-        <td colspan="7">Notice pay (120 Day pay)</td>
-        <td>Total Basic:</td>
+        <td colspan="6">Notice pay (120 Day pay)</td>
+        <td colspan="2" style="text-align: right;">Total Basic:</td>
         <td>{{data[j].number_of_basic_for_notice_pay_120_day_pay}}</td>
         <td>Tk.</td>
         <td style="text-align: center;">{{data[j].total_notice_pay}}</td>
         </tr>
     <tr>
-        <td colspan="7">Service Benefit (basic)<br>(As per EPZ Labor Act 2019)</td>
-        <td>Total Basic:</td>
+        <td colspan="6">Service Benefit (basic)<br>(As per EPZ Labor Act 2019)</td>
+        <td colspan="2" style="text-align: right;">Total Basic:</td>
         <td>{{data[j].number_of_basic_for_service_benefit}}</td>
         <td>Tk.</td>
         <td style="text-align: center;">{{data[j].total_service_benefit_pay}}</td>
         </tr>
-    <tr>
-        <td colspan="11" style="padding: 0;">
-            <hr style="margin: 2px 0; border: none; border-top: 1px solid #000;">
-        </td>
-    </tr>
-    <tr>
+
+    <tr style="font-weight: bold;">
         <td colspan="7">Gross Total Payment Entitiled</td>
         <td colspan="2">&nbsp;</td>
         <td>Tk.</td>
@@ -240,46 +229,41 @@
         <td colspan="6">&nbsp;</td>
     </tr>
     <tr>
-        <td colspan="7">1) Lay Off: 50% of basic.</td>
-        <td>Total Days=</td>
+        <td colspan="6">1) Lay Off: 50% of basic.</td>
+        <td colspan="2" style="text-align: right;">Total Days=</td>
         <td>{{data[j].total_days_for_lay_off}}</td>
         <td>Tk.</td>
         <td style="text-align: center;">{{data[j].lay_off_amount}}</td>
         </tr>
     <tr>
-        <td colspan="7">2) Friday : 100% basic & Medical allowance</td>
-        <td>Total Days=</td>
+        <td colspan="6">2) Friday : 100% basic & Medical allowance</td>
+        <td colspan="2" style="text-align: right;">Total Days=</td>
         <td>{{data[j].total_days_for_friday}}</td>
         <td>Tk.</td>
         <td style="text-align: center;">{{data[j].amount_for_friday_100_basic_and_medical_allowance}}</td>
         </tr>
     <tr>
-        <td colspan="7">3) Medical allow:</td>
-        <td>Total Days=</td>
+        <td colspan="6">3) Medical allow:</td>
+        <td colspan="2" style="text-align: right;">Total Days=</td>
         <td>{{data[j].total_days_for_medical_allow}}</td>
         <td>Tk.</td>
         <td style="text-align: center;">{{data[j].amount_for_friday_100_basic_and_medical_allowance}}</td>
         </tr>
     <tr>
-        <td colspan="7">4) Absent/Without Pay Leave:</td>
-        <td>Total Days=</td>
+        <td colspan="6">4) Absent/Without Pay Leave:</td>
+        <td colspan="2" style="text-align: right;">Total Days=</td>
         <td>{{data[j].absentwithout_pay_leave_days}}</td>
         <td>Tk.</td>
         <td style="text-align: center;">{{data[j].absentwithout_pay_leave_amount}}</td>
         </tr>
     <tr>
-        <td colspan="7">5) Others: 30 Days basic Deduction (For Instant resign)</td>
-        <td>Total Basic=</td>
+        <td colspan="6">5) Others: 30 Days basic Deduction (For Instant resign)</td>
+        <td colspan="2" style="text-align: right;">Total Basic=</td>
         <td>{{data[j].total_basic_for_instant_resign}}</td>
         <td>Tk.</td>
         <td style="text-align: center;">{{data[j].amount_for_instant_resign}}</td>
         </tr>
-    <tr>
-        <td colspan="11" style="padding: 0;">
-            <hr style="margin: 2px 0; border: none; border-top: 1px solid #000;">
-        </td>
-    </tr>
-    <tr>
+    <tr style="font-weight: bold;">
         <td colspan="7">Total Adjustment:</td>
         <td colspan="2">&nbsp;</td>
         <td>Tk.</td>
@@ -298,7 +282,7 @@
         <td>Tk.</td>
         <td style="text-align: center;">{{data[j].less_provident_found_by_cheque}}</td>
         </tr>
-    <tr>
+    <tr style="font-weight: bold;">
         <td colspan="7">Balance Money Paid By Cash</td>
         <td colspan="2">&nbsp;</td>
         <td>Tk.</td>
@@ -315,8 +299,8 @@
     </tr>
 
     <tr>
-        <td colspan="2"style="text-align: center;">Prepared By <br>HR</td>
-        <td colspan="2"style="text-align: center;">Checked by <br>AGM (HR & COMP.) </td>
+        <td colspan="1"style="text-align: center;">Prepared By <br>HR</td>
+        <td colspan="1"style="text-align: center;">Checked by <br>AGM (HR & COMP.) </td>
         <td colspan="3"style="text-align: center;">Checked by <br>DGM (Admin)</td>
         <td colspan="2"style="text-align: center;">Checked by <br>CFO</td>
         <td colspan="2"style="text-align: center;">Approved by <br>CEO</td>
