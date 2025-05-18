@@ -33,16 +33,25 @@ class EmployeeSettlement(Document):
         fields=["status","rounded_ot", "is_night", "in_time","leave_type"]
         )
 
-        self.present_days = sum(1 for record in attendance_records if record.status in ("Present","Late"))
-        self.absent_days = sum(1 for record in attendance_records if record.status == "Absent")
-        self.leave_days = sum(1 for record in attendance_records if record.status == "On Leave")
-        self.leave_without_pay_days = sum(1 for record in attendance_records if record.status == "On Leave" and record.leave_type in("OL","Leave Without Pay"))
+        if not self.present_days or self.present_days == 0:
+            self.present_days = sum(1 for record in attendance_records if record.status in ("Present","Late"))
+        
+        if not self.absent_days or self.absent_days == 0:
+            self.absent_days = sum(1 for record in attendance_records if record.status == "Absent")
+        
+        if not self.leave_days or self.leave_days == 0:
+            self.leave_days = sum(1 for record in attendance_records if record.status == "On Leave")
+        
+        if not self.night_days or self.night_days == 0:        
+            self.leave_without_pay_days = sum(1 for record in attendance_records if record.status == "On Leave" and record.leave_type in("OL","Leave Without Pay"))
 
-        self.night_days = sum(
-        1 for record in attendance_records
-        if record.status in ("Present","Late") and record.is_night == "Yes" and record.in_time
-        )
-        self.overtime = sum(record.rounded_ot or 0 for record in attendance_records)+2
+        if not self.night_days or self.night_days == 0:
+            self.night_days = sum(
+            1 for record in attendance_records
+            if record.status in ("Present","Late") and record.is_night == "Yes" and record.in_time
+            )
+        if not self.overtime or self.overtime == 0:
+            self.overtime = sum(record.rounded_ot or 0 for record in attendance_records)+2
 
     def get_salary_dateils(self):
         salary_detail = frappe.get_all(
@@ -83,7 +92,9 @@ class EmployeeSettlement(Document):
         self.wagessalary_pay_period_total_days_payment=self.wagessalary_pay_period_total_days*(self.gross_salary/30)
         self.overtime_payment=self.overtime*self.overtime_rate
         self.leave_el_total_payment=self.leave_el_total_days*(self.gross_salary/30)
-        self.p_f_fund=get_total_pf(self.employee)
+        
+        if not self.p_f_fund or self.p_f_fund == 0: 
+            self.p_f_fund=get_total_pf(self.employee)
                 
         self.total_per_year_compensation_amount=self.total_years_for_per_year_compensation*self.basic
 
@@ -124,5 +135,5 @@ def get_total_pf(employee):
         GROUP BY emp.name
     """, (employee,), as_list=True)
 
-    total_pf = result[0][0] if result and result[0][0] is not None else 120
+    total_pf = result[0][0] if result and result[0][0] is not None else 0
     return total_pf
