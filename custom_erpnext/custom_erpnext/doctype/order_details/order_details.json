@@ -1,0 +1,45 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-07-14 17:10:05.276620",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "process_name",
+  "rate",
+  "employees"
+ ],
+ "fields": [
+  {
+   "fieldname": "process_name",
+   "fieldtype": "Link",
+   "label": "Process Name",
+   "options": "Process"
+  },
+  {
+   "fetch_from": "process_name.default_rate",
+   "fetch_if_empty": 1,
+   "fieldname": "rate",
+   "fieldtype": "Float",
+   "label": "Rate"
+  },
+  {
+   "fieldname": "employees",
+   "fieldtype": "Table MultiSelect",
+   "label": "Employees",
+   "options": "Employee Info"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-07-17 00:31:37.631964",
+ "modified_by": "Administrator",
+ "module": "Custom Erpnext",
+ "name": "Order Details",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

@@ -1,0 +1,56 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:process_name",
+ "creation": "2025-07-14 16:26:35.914007",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "process_name",
+  "parent_process",
+  "default_rate"
+ ],
+ "fields": [
+  {
+   "fieldname": "parent_process",
+   "fieldtype": "Link",
+   "label": "Parent Process",
+   "options": "Process Type"
+  },
+  {
+   "fieldname": "process_name",
+   "fieldtype": "Data",
+   "label": "Process Name",
+   "unique": 1
+  },
+  {
+   "fieldname": "default_rate",
+   "fieldtype": "Float",
+   "label": "Default Rate"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-07-14 17:22:02.655072",
+ "modified_by": "Administrator",
+ "module": "Custom Erpnext",
+ "name": "Process",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

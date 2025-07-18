@@ -1,0 +1,133 @@
+{%
+	var report_columns = report.get_columns_for_print();
+	report_columns = report_columns.filter(col => !col.hidden);
+
+	if (report_columns.length > 50) {
+		frappe.throw(__("Too many columns. Export the report and print it using a spreadsheet application."));
+	}
+%}
+
+
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      margin-top: auto;
+    }
+
+    .box-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 47px;
+      justify-content: center;
+      align-items: center;
+      margin-top: 20px; 
+    }
+
+    .box {
+      width: 198px;
+      height: 287px;
+      /* background-color: lightblue; */
+      border: 1px solid #333;
+      display: flex;
+      flex-direction:row;
+      max-width: fit-content;
+      justify-content: space-between;
+      margin-top: 40px;
+      /* align-items: center; */
+      /* padding-top: 30px; */
+    }
+
+    .id-card {
+      display: grid;
+      height: 100%;
+      grid-template-areas:
+        "header header header"
+        "sidebar content content";
+      background-color: #fff;
+      color: #333;
+      /* border-radius: 5px; */
+      /* padding: 1px; */
+      font-size: 1em;
+    }
+
+    .header {
+      grid-area: header;
+      text-align: center;
+      width: 188px;
+    }
+
+    .sidebar {
+      grid-area: sidebar;
+      writing-mode: vertical-rl;
+      /* width: 100%; */
+      /* height: 50px; */
+      text-align: center;
+      rotate: 180deg;
+    }
+
+    .content {
+      grid-area: content;
+      position: relative;
+      width: 173px;
+      margin-top: -5px;
+    }
+
+    .info {
+      margin-top: -1px;
+      font-size: 0.7em;
+    }
+    .Sign{
+      float: right;
+      padding-top: 1px; /* Adjust the value as needed */
+      border-top: 1px solid black; 
+    }
+  </style>
+
+
+{% for(let j=0, k=data.length; j<k; j++) { %}
+<!-- var row = data[j]; -->
+<!-- <div class="box-container"> -->
+  {% if (j==0) %}
+  <div class="box-container" style= "flex-direction: row; gap: -5px;">
+  {% endif %}
+
+
+ 
+    <!-- Box 1 -->
+    <div class="box">
+      <div class="id-card">
+        <div class="header">
+          <div style="text-align: left;">
+            <img src="{{data[j].company_logo}}" alt="logo" height="30px" width="40px">
+            <span>আইডি নং: {{data[j].name}}</span>
+          </div>
+          <p style="padding-top: 2px;"><b><font size="2%">{{data[j].company}}</font></b></p>
+      </div>
+        <div class="sidebar"><font size="3%"><b>পরিচয়পত্র</b></font></div>
+        <div class="content">
+          <div style="text-align: center;">
+            <img src="{{data[j].image}}" alt="Employee Picture" height="105px" width="90px">
+            <p><nobr>{{data[j].employee_name}}</nobr></p>
+          </div>
+          <div class="info">
+            <p ><nobr> পদবী  &nbsp;: {{data[j].designation}}</br>বিভাগ &nbsp;: {{data[j].department}}<br /> যোগদানের তারিখ : {{data[j].joining_date}}
+              <br /> রক্তের গ্রুপ : {{ data[j].blood_group}}<br /> EMC No.  &nbsp; &nbsp; : &nbsp;{{ data[j].phone_no}}</nobr></p> 
+              <img style="float: right;" src="{{data[j].boss_signature}}" alt="Signature" height="24px" width="80px"><br/><br/>
+              <p class="Sign">অনুমোদিত স্বাক্ষর</p>
+          </div>
+        </div>
+      </div>
+    <!-- </div> -->
+
+ 
+
+
+  </div>
+
+
+{% } %}
+
+

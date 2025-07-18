@@ -35,7 +35,7 @@ def get_columns():
 	return [
 		_("Employee No") + ":Data/:120",
 		_("Name") + ":Link/Employee:120",
-		_("Desingnation") + ":Data/:120",
+		_("Designation") + ":Data/:120",
 		_("Department") + ":Data/:120",
 		_("Shift") + ":Data/:120",
 		_("In Time") + ":Data/Attendance:120",

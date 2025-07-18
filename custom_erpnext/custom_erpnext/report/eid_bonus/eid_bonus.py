@@ -66,7 +66,7 @@ def get_result(filters,department):
     ssa.employee_name,
     emp.designation,
 	emp.date_of_joining,
-    ssa.base,
+    round(ssa.base,0),
 	(CASE WHEN emp.salary_mode='Cash' THEN SUM(CASE WHEN sd.abbr = 'ST' THEN sd.amount ELSE 0 END) ELSE 0 END) as stamp,				
     round(((ssa.base - SUM(CASE WHEN sd.abbr = 'DM' THEN sd.amount ELSE 0 END)) / 1.5)-(CASE WHEN emp.salary_mode='Cash' THEN SUM(CASE WHEN sd.abbr = 'ST' THEN sd.amount ELSE 0 END) ELSE 0 END),0) AS basic
 	FROM

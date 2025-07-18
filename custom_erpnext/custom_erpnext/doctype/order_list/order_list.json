@@ -1,0 +1,62 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "ORD-.buyer.-.YYYY.-.#####",
+ "creation": "2025-07-14 17:01:37.202757",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "buyer",
+  "styleorder",
+  "total_quantity",
+  "order_details"
+ ],
+ "fields": [
+  {
+   "fieldname": "buyer",
+   "fieldtype": "Link",
+   "label": "Buyer",
+   "options": "Customer"
+  },
+  {
+   "fieldname": "styleorder",
+   "fieldtype": "Data",
+   "label": "Style/Order"
+  },
+  {
+   "fieldname": "total_quantity",
+   "fieldtype": "Int",
+   "label": "Total Quantity"
+  },
+  {
+   "fieldname": "order_details",
+   "fieldtype": "Table",
+   "label": "Order Details",
+   "options": "Order Details"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-07-18 02:15:33.300491",
+ "modified_by": "Administrator",
+ "module": "Custom Erpnext",
+ "name": "Order List",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
