@@ -14,15 +14,6 @@ frappe.ui.form.on('Daily Production', {
         frm.clear_table('order_items');
         frm.refresh_field('order_items');
     },
-    onload: function(frm) {
-        frm.set_query('employee', function() {
-            return {
-                filters: {
-                    employment_type: ['in', ['Contract', 'Part-time']]
-                }
-            };
-        });
-    },
 
     order: function(frm) {
         if (frm.doc.order) {
@@ -43,6 +34,8 @@ frappe.ui.form.on('Daily Production', {
                             let row = frm.add_child('daily_production_details');
                             row.process_name = item.process_name;
                             row.rate = item.rate;
+                            row.employee= item.employee;
+                            row.department= item.department;
                         });
 
                         frm.refresh_field('daily_production_details');

@@ -10,7 +10,8 @@
   "buyer",
   "styleorder",
   "total_quantity",
-  "order_details"
+  "order_details",
+  "company"
  ],
  "fields": [
   {
@@ -34,11 +35,18 @@
    "fieldtype": "Table",
    "label": "Order Details",
    "options": "Order Details"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "remember_last_selected_value": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-18 02:15:33.300491",
+ "modified": "2025-07-26 16:44:01.891731",
  "modified_by": "Administrator",
  "module": "Custom Erpnext",
  "name": "Order List",

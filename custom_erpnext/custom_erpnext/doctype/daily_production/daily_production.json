@@ -11,7 +11,8 @@
   "employee",
   "buyer",
   "order",
-  "daily_production_details"
+  "daily_production_details",
+  "company"
  ],
  "fields": [
   {
@@ -43,11 +44,18 @@
    "fieldtype": "Link",
    "label": "Employee",
    "options": "Employee"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "remember_last_selected_value": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-18 16:56:49.476914",
+ "modified": "2025-07-26 16:44:44.317739",
  "modified_by": "Administrator",
  "module": "Custom Erpnext",
  "name": "Daily Production",

@@ -256,13 +256,13 @@ frappe.ui.form.on('Contract Worker Payroll Entry', {
 		frm.events.clear_employee_table(frm);
 	},
 
-	project: function (frm) {
-		frm.events.clear_employee_table(frm);
-	},
+	// project: function (frm) {
+	// 	frm.events.clear_employee_table(frm);
+	// },
 
-	salary_slip_based_on_timesheet: function (frm) {
-		frm.toggle_reqd(['payroll_frequency'], !frm.doc.salary_slip_based_on_timesheet);
-	},
+	// salary_slip_based_on_timesheet: function (frm) {
+	// 	frm.toggle_reqd(['payroll_frequency'], !frm.doc.salary_slip_based_on_timesheet);
+	// },
 
 	set_start_end_dates: function (frm) {
 		if (!frm.doc.salary_slip_based_on_timesheet) {
@@ -298,22 +298,22 @@ frappe.ui.form.on('Contract Worker Payroll Entry', {
 		});
 	},
 
-	validate_attendance: function (frm) {
-		if (frm.doc.validate_attendance && frm.doc.employees) {
-			frappe.call({
-				method: 'validate_employee_attendance',
-				args: {},
-				callback: function (r) {
-					render_employee_attendance(frm, r.message);
-				},
-				doc: frm.doc,
-				freeze: true,
-				freeze_message: __('Validating Employee Attendance...')
-			});
-		} else {
-			frm.fields_dict.attendance_detail_html.html("");
-		}
-	},
+	// validate_attendance: function (frm) {
+	// 	if (frm.doc.validate_attendance && frm.doc.employees) {
+	// 		frappe.call({
+	// 			method: 'validate_employee_attendance',
+	// 			args: {},
+	// 			callback: function (r) {
+	// 				render_employee_attendance(frm, r.message);
+	// 			},
+	// 			doc: frm.doc,
+	// 			freeze: true,
+	// 			freeze_message: __('Validating Employee Attendance...')
+	// 		});
+	// 	} else {
+	// 		frm.fields_dict.attendance_detail_html.html("");
+	// 	}
+	// },
 
 	clear_employee_table: function (frm) {
 		frm.clear_table('employees');
@@ -346,32 +346,32 @@ const submit_salary_slip = function (frm) {
 	);
 };
 
-let make_bank_entry = function (frm) {
-	var doc = frm.doc;
-	if (doc.payment_account) {
-		return frappe.call({
-			doc: cur_frm.doc,
-			method: "make_payment_entry",
-			callback: function () {
-				frappe.set_route(
-					'List', 'Journal Entry', {
-						"Journal Entry Account.reference_name": frm.doc.name
-					}
-				);
-			},
-			freeze: true,
-			freeze_message: __("Creating Payment Entries......")
-		});
-	} else {
-		frappe.msgprint(__("Payment Account is mandatory"));
-		frm.scroll_to_field('payment_account');
-	}
-};
+// let make_bank_entry = function (frm) {
+// 	var doc = frm.doc;
+// 	if (doc.payment_account) {
+// 		return frappe.call({
+// 			doc: cur_frm.doc,
+// 			method: "make_payment_entry",
+// 			callback: function () {
+// 				frappe.set_route(
+// 					'List', 'Journal Entry', {
+// 						"Journal Entry Account.reference_name": frm.doc.name
+// 					}
+// 				);
+// 			},
+// 			freeze: true,
+// 			freeze_message: __("Creating Payment Entries......")
+// 		});
+// 	} else {
+// 		frappe.msgprint(__("Payment Account is mandatory"));
+// 		frm.scroll_to_field('payment_account');
+// 	}
+// };
 
-let render_employee_attendance = function (frm, data) {
-	frm.fields_dict.attendance_detail_html.html(
-		frappe.render_template('employees_to_mark_attendance', {
-			data: data
-		})
-	);
-};
+// let render_employee_attendance = function (frm, data) {
+// 	frm.fields_dict.attendance_detail_html.html(
+// 		frappe.render_template('employees_to_mark_attendance', {
+// 			data: data
+// 		})
+// 	);
+// };

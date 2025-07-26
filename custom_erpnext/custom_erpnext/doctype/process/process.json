@@ -9,7 +9,8 @@
  "field_order": [
   "process_name",
   "parent_process",
-  "default_rate"
+  "default_rate",
+  "company"
  ],
  "fields": [
   {
@@ -28,11 +29,17 @@
    "fieldname": "default_rate",
    "fieldtype": "Float",
    "label": "Default Rate"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-14 17:22:02.655072",
+ "modified": "2025-07-26 17:01:03.237096",
  "modified_by": "Administrator",
  "module": "Custom Erpnext",
  "name": "Process",
