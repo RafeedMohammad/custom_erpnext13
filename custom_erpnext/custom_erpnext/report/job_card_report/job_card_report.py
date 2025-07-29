@@ -53,6 +53,8 @@ def get_columns():
 
 def get_attendance(filters):
 	type = frappe.db.get_value('User', frappe.session.user, 'type')
+	total_late_minutes = 0
+	total_ot_hours = 0.0
 	if type is None:
 		max_allowed_hour=13
 		max_allowed_minute=00
@@ -65,34 +67,7 @@ def get_attendance(filters):
 	rounded_over_time2 = frappe.db.get_value('Company', filters.company, 'rounding_overtime_for_extra_30min')
 
 	conditions, filters = get_conditions(filters)
-	# result= frappe.db.sql("""select DISTINCT att.attendance_date, att.employee, att.shift,
-	# att.in_time, att.late_entry_duration, att.out_time, att.rounded_ot, att.status, checkin.shift_start, checkin.shift_end, att.leave_type
-	# FROM tabAttendance as att
-	# INNER JOIN tabEmployee ON tabEmployee.name = att.employee 
-	# LEFT JOIN `tabEmployee Checkin` as checkin ON checkin.attendance = att.name 	
-	# where %s
-	# ORDER BY att.attendance_date""" 
-	# % conditions, as_list=1)
-
-
-	# result= frappe.db.sql("""select DISTINCT att.attendance_date, att.employee, att.shift,
-	# att.in_time, att.late_entry_duration, att.out_time, att.rounded_ot, att.status, checkin.shift_start, checkin.shift_end, att.leave_type, emp.first_name
-	# FROM tabAttendance as att
-	# INNER JOIN tabEmployee as emp ON emp.name = att.employee 
-	# LEFT JOIN `tabEmployee Checkin` as checkin ON checkin.attendance = att.name 	
-	# where %s
-	# ORDER BY att.attendance_date""" 
-	# % conditions, as_list=1)
-
-	# result= frappe.db.sql("""select DISTINCT att.attendance_date, att.employee, att.shift,
-	# att.in_time, att.late_entry_duration, att.out_time, att.rounded_ot, att.status, att.shift_start, att.shift_end, att.leave_type, emp.first_name
-	# FROM tabAttendance as att
-	# INNER JOIN tabEmployee as emp ON emp.name = att.employee  	
-	# where %s
-	# ORDER BY att.attendance_date""" 
-	# % conditions, as_list=1) for testing
 	
-
 	result= frappe.db.sql("""select DISTINCT att.attendance_date, att.employee, att.shift,
 	att.in_time, att.late_entry_duration, att.out_time, att.rounded_ot, att.status,
 	emp.department,emp.designation,emp.date_of_joining,emp.employee_name,
@@ -172,7 +147,30 @@ def get_attendance(filters):
 			if ((result[i][7]=="Weekly Off" or result[i][7]=="Holiday" )and max_allowed_hour<10):
 					result[i][3]=result[i][5]=None
 					result[i][6]=0
-				
+		try:
+			total_ot_hours += float(result[i][6])
+		except:
+			pass
+
+			
+		
+	total_late_minutes,total_ot=frappe.db.sql("""select DISTINCT SUM(IFNULL(TIME_TO_SEC(att.late_entry_duration),0)),SUM(IFNULL(att.rounded_ot,0))
+	FROM tabAttendance as att
+	INNER JOIN tabEmployee as emp ON emp.name = att.employee  	
+	where %s and att.docstatus = 1 and att.status!="On Leave"
+	ORDER BY att.attendance_date""" 
+	% conditions)[0]
+		
+	total_row = [""] * 20
+	total_row[1] = "Total"
+	if(total_late_minutes):
+		total_row[4] = round(total_late_minutes/60,2)#"{:02d}:{:02d}".format(total_late_minutes // 60, total_late_minutes % 60)
+	else:
+		total_row[4]=0
+	
+	total_row[6] = round(total_ot_hours, 2)
+	
+	result.append(total_row)		
 	return result
 
 

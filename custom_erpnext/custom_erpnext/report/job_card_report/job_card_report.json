@@ -1,5 +1,5 @@
 {
- "add_total_row": 1,
+ "add_total_row": 0,
  "columns": [],
  "creation": "2022-10-23 14:19:56.025208",
  "disable_prepared_report": 1,
@@ -9,7 +9,7 @@
  "filters": [],
  "idx": 0,
  "is_standard": "Yes",
- "modified": "2023-02-25 17:00:23.608229",
+ "modified": "2025-07-29 13:06:09.251058",
  "modified_by": "Administrator",
  "module": "Custom Erpnext",
  "name": "Job Card Report",
