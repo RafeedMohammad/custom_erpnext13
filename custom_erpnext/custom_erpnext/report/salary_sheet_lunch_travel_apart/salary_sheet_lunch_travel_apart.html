@@ -135,7 +135,7 @@ table td {
         <tbody>
             {% for(let j=m+1, k=data.length; j<k; j++) { %}
                 {% if (data[j][report_columns[0].fieldname] != "Total") { %}
-                    <tr>
+                    <tr style="font-weight: 600;">
                         <td style="padding-left: 0; margin-left: 0;"> {%= u+1 %} </td>
                         {% for(let i=1, l=report_columns.length; i<l; i++) { %}
                         <td class="{% if i == 3 %}vertical-column{% endif %}">
@@ -150,7 +150,7 @@ table td {
                     {% u++ %}
                 {% } %}
                 {% if (data[j][report_columns[0].fieldname] == "Total") { %}
-                    <tr style="height: 10px; font-size: 4.8px;">
+                    <tr style="height: 10px; font-size: 4.8px;font-weight: 500;">
                         <td> </td>
                         {% for(let i=1, l=report_columns.length; i<l; i++) { %}
                             <td class="total-row" style="font-size: 5.5px;">
