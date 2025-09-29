@@ -195,7 +195,9 @@ class override_SalarySlip(TransactionBase):
 		self.total_month_minutes=(date_diff(self.end_date,self.start_date)+1)*8*60
 		#self.total_month_minutes = ((date(int(self.end_date.split('-')[0]), int(self.end_date.split('-')[1]), int(self.end_date.split('-')[2])) - date(int(self.start_date.split('-')[0]), int(self.start_date.split('-')[1]), int(self.start_date.split('-')[2]))).days) * 8 * 60 #fetch regular_working_hour from shift_type		
 		#if (self.overtime_rate == None):
-
+		if self.present_days==0:
+			self.arear=int(self.arrear_calculation() or 0)#for add extra pay (working holiday lunch and night) 
+			# frappe.publish_realtime('msgprint',"test")
 
 		self.validate_dates()
 		self.check_existing()
@@ -741,6 +743,16 @@ class override_SalarySlip(TransactionBase):
 		else:
 			return 0
 
+	def arrear_calculation(self):
+		employee_data = frappe.db.get_value("Employee", self.employee, ["lunch_rate","travel_rate", "night_rate"], as_dict=1) or {}
+		lunch_rate = employee_data.get("lunch_rate") or 0
+		night_rate = employee_data.get("night_rate") or 0
+		travel_rate= employee_data.get("travel_rate") or 0
+		# frappe.publish_realtime('msgprint', 'base '+str(self.working_holidays)+ ' medical '+str(lunch_rate)+' rate '+str(self.working_holiday_in_night)+' holiday= '+str(night_rate))
+
+
+		# STEP 4: Calculate arrear
+		return (self.working_holidays * (lunch_rate + travel_rate) + self.working_holiday_in_night * night_rate) or 0
 
 
 
