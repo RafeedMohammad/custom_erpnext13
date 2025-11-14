@@ -7,18 +7,19 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "line"
+  "floor"
  ],
  "fields": [
   {
-   "fieldname": "line",
-   "fieldtype": "Data",
-   "label": "line"
+   "fieldname": "floor",
+   "fieldtype": "Link",
+   "label": "Floor",
+   "options": "Floor"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-10-25 17:42:52.898264",
+ "modified": "2025-10-23 16:57:43.654225",
  "modified_by": "Administrator",
  "module": "Custom Erpnext",
  "name": "Facility or Line",
