@@ -1,0 +1,193 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:{employee}({income_year})",
+ "creation": "2026-05-11 13:23:40.335652",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "employee",
+  "employee_name",
+  "department",
+  "designation",
+  "column_break_5",
+  "posting_date",
+  "tin_no",
+  "joining_date",
+  "section_break_7",
+  "income_year",
+  "assessment_year",
+  "column_break_11",
+  "from_date",
+  "to_date",
+  "section_break_10",
+  "total_basic",
+  "total_hrent",
+  "total_medical",
+  "total_conveyance",
+  "festival_bonus",
+  "earn_leave_allowance",
+  "total_pf",
+  "gross_income"
+ ],
+ "fields": [
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Employee",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "employee.employee_name",
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "Employee Name"
+  },
+  {
+   "fetch_from": "employee.department",
+   "fieldname": "department",
+   "fieldtype": "Data",
+   "label": "Department"
+  },
+  {
+   "fetch_from": "employee.designation",
+   "fieldname": "designation",
+   "fieldtype": "Data",
+   "label": "Designation"
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "employee.date_of_joining",
+   "fieldname": "joining_date",
+   "fieldtype": "Date",
+   "label": "Joining Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_7",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fetch_from": "income_year.year_start_date",
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "label": "From Date"
+  },
+  {
+   "fetch_from": "income_year.year_end_date",
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "label": "To Date"
+  },
+  {
+   "fieldname": "section_break_10",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "total_basic",
+   "fieldtype": "Currency",
+   "label": "Total Basic"
+  },
+  {
+   "default": "0",
+   "fieldname": "total_hrent",
+   "fieldtype": "Currency",
+   "label": "Total Hrent"
+  },
+  {
+   "default": "0",
+   "fieldname": "total_medical",
+   "fieldtype": "Currency",
+   "label": "Total Medical"
+  },
+  {
+   "default": "0",
+   "fieldname": "total_conveyance",
+   "fieldtype": "Currency",
+   "label": "Total Conveyance"
+  },
+  {
+   "default": "0",
+   "fieldname": "earn_leave_allowance",
+   "fieldtype": "Currency",
+   "label": "Earn Leave Allowance"
+  },
+  {
+   "default": "0",
+   "fieldname": "total_pf",
+   "fieldtype": "Currency",
+   "label": "Total PF"
+  },
+  {
+   "default": "0",
+   "fieldname": "gross_income",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Gross Income"
+  },
+  {
+   "default": "0",
+   "fieldname": "festival_bonus",
+   "fieldtype": "Currency",
+   "label": "Festival Bonus"
+  },
+  {
+   "default": "Today",
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Posting Date"
+  },
+  {
+   "fieldname": "income_year",
+   "fieldtype": "Link",
+   "label": "Income Year",
+   "options": "Fiscal Year"
+  },
+  {
+   "fieldname": "assessment_year",
+   "fieldtype": "Link",
+   "label": "Assessment Year",
+   "options": "Fiscal Year"
+  },
+  {
+   "fieldname": "column_break_11",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "employee.tin_no",
+   "fieldname": "tin_no",
+   "fieldtype": "Data",
+   "label": "TIN No"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-06-15 16:32:30.316178",
+ "modified_by": "Administrator",
+ "module": "Custom Erpnext",
+ "name": "Employee Income Summary",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
