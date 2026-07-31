@@ -92,6 +92,18 @@ erpnext.EmployeeSelector = class EmployeeSelector {
             <button class="btn btn-primary btn-assign btn-xs"></button>\
         </div>');
 
+        var bulk_assign_tax_toolbar = $('<div class="col-sm-12 bulk-toolbar" style="margin-top: 25px; display: flex; align-items: center; gap: 10px;">\
+            <label style="margin: 0;">Bulk Set:</label>\
+            <select class="form-control bulk-field-type" style="width: 160px; height: 30px; display: inline-block; background-color: #dfdedea5;">\
+                <option value=""></option>\
+                <option value="tax">' + __('Tax') + '</option>\
+                <option value="arear">' + __('Arrear') + '</option>\
+                <option value="other_deduction">' + __('Other Deduction') + '</option>\
+            </select>\
+            <input type="number" class="form-control bulk-field-value" placeholder="Enter amount" style="width: 140px; height: 30px; display: inline-block;" />\
+            <button class="btn btn-primary btn-xs btn-bulk-assign" style="height: 30px;">' + __('Assign Value') + '</button>\
+        </div>').appendTo($(this.wrapper));
+
         // Add Check All functionality
         employee_toolbar.find(".btn-add")
             .html(__('Check all'))
@@ -177,6 +189,36 @@ erpnext.EmployeeSelector = class EmployeeSelector {
                     frappe.msgprint("Please select at least one employee.");
                 }
             });
+        
+        // NEW: Bulk Assign Handler
+        bulk_assign_tax_toolbar.find(".btn-bulk-assign").on("click", function() {
+            var selectedType = bulk_assign_tax_toolbar.find(".bulk-field-type").val();
+            var valueToAssign = bulk_assign_tax_toolbar.find(".bulk-field-value").val();
+
+            if (valueToAssign === "" || valueToAssign === null) {
+                frappe.msgprint(__("Please enter a value to assign."));
+                return;
+            }
+
+            var count = 0;
+            $(me.wrapper).find('input[type="checkbox"]').each(function(i, check) {
+                if ($(check).is(":checked")) {
+                    var inputSelector = `input[name="${selectedType}_${i + 1}"]`;
+                    $(me.wrapper).find(inputSelector).val(valueToAssign);
+                    count++;
+                }
+            });
+
+            if (count > 0) {
+                frappe.show_alert({
+                    message: __(`Updated ${count} selected employee(s).`),
+                    indicator: 'green'
+                });
+            } else {
+                frappe.msgprint(__("Please select at least one employee."));
+            }
+        });
+
         // Render Employee Table
         var row;
         $.each(employee, function(i, m) {
@@ -239,7 +281,8 @@ erpnext.EmployeeSelector = class EmployeeSelector {
                 employee4: m[4]
             })).appendTo(row);
         });
-
-        mark_employee_toolbar.appendTo($(this.wrapper));
+        
+        bulk_assign_tax_toolbar.appendTo($(this.wrapper)); 
+        mark_employee_toolbar.appendTo($(this.wrapper));        
     }
 };

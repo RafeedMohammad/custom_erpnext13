@@ -1,6 +1,5 @@
 {
  "actions": [],
- "allow_rename": 1,
  "creation": "2024-09-22 16:43:01.917809",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -118,7 +117,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-04-07 01:19:13.429223",
+ "modified": "2026-07-13 17:19:44.078129",
  "modified_by": "Administrator",
  "module": "Custom Erpnext",
  "name": "Arrear Tax Tool",
